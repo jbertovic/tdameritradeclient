@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::client::*;
+use tdameritradeclient::client::{TDAClient, Execute};
 
 //cargo run quote "symbols"
 //cargo run userprincipals
@@ -11,11 +11,11 @@ fn main() {
     match command.as_str() {
         "quote" => {    
             let symbols = env::args().skip(2).next().unwrap();
-            let resptxt = c.getquotes(&symbols).exec_to_jsontext();
+            let resptxt: String = c.getquotes(&symbols).execute();
             println!("{}", resptxt);
         },
         "userprincipals" => {
-            let resptxt = c.getuserprincipals().exec_to_jsontext();
+            let resptxt: String = c.getuserprincipals().execute();
             println!("{}", resptxt);
         },
         _=>{println!("Command Not Recognized");}

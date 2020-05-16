@@ -9,3 +9,8 @@ edition = "2018"
 [dependencies]
 attohttpc = "0.13.0"
 serde_json = "1.0"
+
+
+[[bin]]
+name = "tdquote"
+path = "src/bin/main.rs"

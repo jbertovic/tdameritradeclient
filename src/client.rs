@@ -2,7 +2,7 @@ static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 //use serde_json::Value;
 /*
-* two options for output -> text which in this case is JSON from TDA API, or -> convert to Hashmap
+* two options for output -> text which in this case is JSON from TDA API, or -> convert to serde_json::Value;
 * this way who ever is using the library can pick what they want
 * able to pick which keys you want returned in hash map or maybe a way of reducing it to a paticular native format within the library
 */
@@ -38,20 +38,25 @@ impl TDAClient {
     }
 }
 
-// TODO: Error Checking
-impl Executor for RequestBuilder {
-    fn exec_to_jsontext(self) -> String {
-        self.send().unwrap().text().unwrap()
-    }
+pub trait Execute<T> {
+    fn execute(self) -> T;
+}
 
-    fn exec_to_jsonobject(self) -> serde_json::Value {
-        serde_json::from_str(self.send().unwrap().text().unwrap().as_str()).unwrap()
+impl Execute<String> for RequestBuilder {
+    fn execute(self) -> String {
+        self
+            .send().expect("Trouble Retrieving Response: ERROR")
+            .text().expect("Response did not return JSON: ERROR")
     }
 }
-pub trait Executor {
-    fn exec_to_jsonobject(self) -> serde_json::Value;
-    fn exec_to_jsontext(self) -> String; 
-    // fn exec_to_jsonobject(self, map: Vec<&str>)
+
+impl Execute<serde_json::Value> for RequestBuilder {
+    fn execute(self) -> serde_json::Value {
+        serde_json::from_str(self
+            .send().expect("Trouble Retrieving Response: ERROR")
+            .text().expect("Response did not return JSON: ERROR")
+            .as_str()).expect("SERDE: Trouble parsing json text: ERROR")
+    }
 }
 
 #[cfg(test)]
@@ -69,21 +74,21 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_user_data() {
         let c = initialize_client();
-        let resptxt = c.getuserprincipals().exec_to_jsontext();
+        let resptxt: String = c.getuserprincipals().execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
     }
     #[test]
     fn able_to_retrieve_quotes() {
         let c = initialize_client();
-        let resptxt = c.getquotes("F,INTC,TRP").exec_to_jsontext();
+        let resptxt: String = c.getquotes("F,INTC,TRP").execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"assetType\""), true);
     }
     #[test]
     fn able_to_retrieve_tojson() {
         let c = initialize_client();
-        let resptxt = c.getuserprincipals().exec_to_jsonobject();
+        let resptxt: serde_json::Value = c.getuserprincipals().execute();
         println!("{:?}", resptxt);
         assert!(resptxt["userId"].is_string());
     }
