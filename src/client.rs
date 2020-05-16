@@ -40,7 +40,7 @@ impl TDAClient {
 
 // TODO: Error Checking
 impl Executor for RequestBuilder {
-    fn exec_to_text(self) -> String {
+    fn exec_to_jsontext(self) -> String {
         self.send().unwrap().text().unwrap()
     }
 
@@ -50,7 +50,8 @@ impl Executor for RequestBuilder {
 }
 pub trait Executor {
     fn exec_to_jsonobject(self) -> serde_json::Value;
-    fn exec_to_text(self) -> String; 
+    fn exec_to_jsontext(self) -> String; 
+    // fn exec_to_jsonobject(self, map: Vec<&str>)
 }
 
 #[cfg(test)]
@@ -68,14 +69,14 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_user_data() {
         let c = initialize_client();
-        let resptxt = c.getuserprincipals().exec_to_text();
+        let resptxt = c.getuserprincipals().exec_to_jsontext();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
     }
     #[test]
     fn able_to_retrieve_quotes() {
         let c = initialize_client();
-        let resptxt = c.getquotes("F,INTC,TRP").exec_to_text();
+        let resptxt = c.getquotes("F,INTC,TRP").exec_to_jsontext();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"assetType\""), true);
     }

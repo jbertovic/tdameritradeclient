@@ -1,3 +1,5 @@
 /target
 config.txt
 updateenv.sh
+/.vscode
+launch.json

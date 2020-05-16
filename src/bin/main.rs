@@ -11,11 +11,11 @@ fn main() {
     match command.as_str() {
         "quote" => {    
             let symbols = env::args().skip(2).next().unwrap();
-            let resptxt = c.getquotes(&symbols).exec_to_text();
+            let resptxt = c.getquotes(&symbols).exec_to_jsontext();
             println!("{}", resptxt);
         },
         "userprincipals" => {
-            let resptxt = c.getuserprincipals().exec_to_text();
+            let resptxt = c.getuserprincipals().exec_to_jsontext();
             println!("{}", resptxt);
         },
         _=>{println!("Command Not Recognized");}
