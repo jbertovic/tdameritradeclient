@@ -9,6 +9,7 @@ use attohttpc::{RequestBuilder, Session};
 * TODO: quote history
 * TODO: option chain
 * TODO: return text or json value modified by search strings
+* TODO: client can renew token through refresh token - not sure what to do with regular token as then state doesn't have to be managed - needs thinking
 */
 
 #[derive(Debug)]
@@ -41,17 +42,19 @@ impl TDAClient {
             .param("symbol", quotequery)
     }
 
+    // TODO: add param option to import a vector of <History> with default none
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
         .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
     }
 
+    // TODO: build out similar to gethistory
     pub fn getoptionchain(&self) -> RequestBuilder {
         unimplemented!();
     }
 }
 
-enum History<'a> {
+pub enum History<'a> {
     PeriodType(&'a str),
     Period(u8),
     FrequencyType(&'a str),
@@ -74,10 +77,57 @@ impl<'a> History<'a> {
         }
     }
 
-    fn pair(self) -> [(&'static str, String);1] {
+    pub fn pair(self) -> [(&'static str, String);1] {
         [self.into();1]
     }
 }
+
+pub enum OptionChain<'a> {
+    Symbol(&'a str),
+    ContractType(&'a str),
+    StrikeCount(u8),
+    Strategy(&'a str),
+    Interval(u8),
+    Strike(f64),
+    IncludeQuotes(bool),
+    Range(&'a str),
+    FromDate(&'a str),
+    ToDate(&'a str),
+    Volatility(f64),
+    UnderlyingPrice(f64),
+    InterestRate(f64),
+    DaysToExpiration(f64),
+    ExpireMonth(&'a str),
+    OptionType(&'a str),
+}
+
+impl<'a> OptionChain<'a> {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            OptionChain::Symbol(s) => ("symbol", s.into()),
+            OptionChain::ContractType(i) => ("contractType", i.to_string()),
+            OptionChain::Strategy(s) => ("strategy", s.into()),
+            OptionChain::StrikeCount(i) => ("strikeCount", i.to_string()),
+            OptionChain::Interval(i) => ("interval", i.to_string()),
+            OptionChain::Strike(i) => ("strike", i.to_string()),
+            OptionChain::IncludeQuotes(b) => ("includeQuotes", b.to_string()),
+            OptionChain::Range(s) => ("range", s.into()),
+            OptionChain::FromDate(s) => ("fromDate", s.into()),
+            OptionChain::ToDate(s) => ("toDate", s.into()),
+            OptionChain::Volatility(i) => ("volatility", i.to_string()),
+            OptionChain::UnderlyingPrice(i) => ("underlyingPrice", i.to_string()),
+            OptionChain::InterestRate(i) => ("interestRate", i.to_string()),
+            OptionChain::DaysToExpiration(i) => ("daysToExpiration", i.to_string()),
+            OptionChain::ExpireMonth(s) => ("expireMonth", s.into()),
+            OptionChain::OptionType(s) => ("optionType", s.into()),
+        }
+    }
+
+    pub fn pair(self) -> [(&'static str, String);1] {
+        [self.into();1]
+    }
+}
+
 
 // TODO: Check if Error is returned with bad token or expired or invalid
 pub trait Execute<T> {
