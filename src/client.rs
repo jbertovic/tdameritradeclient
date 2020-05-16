@@ -44,12 +44,12 @@ impl Executor for RequestBuilder {
         self.send().unwrap().text().unwrap()
     }
 
-    fn exec_to_json(self) -> serde_json::Value {
+    fn exec_to_jsonobject(self) -> serde_json::Value {
         serde_json::from_str(self.send().unwrap().text().unwrap().as_str()).unwrap()
     }
 }
 pub trait Executor {
-    fn exec_to_json(self) -> serde_json::Value;
+    fn exec_to_jsonobject(self) -> serde_json::Value;
     fn exec_to_text(self) -> String; 
 }
 
@@ -82,7 +82,7 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_tojson() {
         let c = initialize_client();
-        let resptxt = c.getuserprincipals().exec_to_json();
+        let resptxt = c.getuserprincipals().exec_to_jsonobject();
         println!("{:?}", resptxt);
         assert!(resptxt["userId"].is_string());
     }
