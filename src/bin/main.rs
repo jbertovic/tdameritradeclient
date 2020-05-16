@@ -18,6 +18,11 @@ fn main() {
             let resptxt: String = c.getuserprincipals().execute();
             println!("{}", resptxt);
         },
+        "history" => {
+            let symbol = env::args().skip(2).next().unwrap();
+            let resptxt: String = c.gethistory(&symbol).execute();
+            println!("{}", resptxt);
+        }
         _=>{println!("Command Not Recognized");}
     }
 }
