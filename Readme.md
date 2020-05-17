@@ -14,6 +14,7 @@ use std::env;
 use tdameritradeclient::{TDAClient, Execute}
 
 fn main() {
+
     //set key and token from environment variables
     let consumerkey = env::var("TDCONSUMERKEY").unwrap();
     let token = env::var("TDAUTHTOKEN").unwrap();
