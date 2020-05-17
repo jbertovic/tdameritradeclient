@@ -6,15 +6,6 @@ use attohttpc::{RequestBuilder, Session};
 * this way who ever is using the library can pick what they want
 * able to pick which keys you want returned in hash map or maybe a way of reducing it to a paticular native format within the library
 *
-* ENDPOINTS TO ADD
-* Account Portfolio update
-* Add saved order
-* See saved orders
-* See working orders
-* 
-* FRAMEWORK CHANGES
-* TODO: return text or json value modified by search strings
-* TODO: client can renew token through refresh token - not sure what to do with regular token as then state doesn't have to be managed - needs thinking
 */
 
 #[derive(Debug)]
