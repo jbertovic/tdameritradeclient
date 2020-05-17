@@ -6,6 +6,29 @@ I have matching projects in my repository;
 - tdacli - which acts as a command line interface to this library.  You can also look at it for examples.
 - tokenstatemanager - which uses node.js to maintain a small server and a local mysql db to always have a valid token on hand.
 
+## Example
+
+```
+use std::env;
+use tdameritradeclient::{TDAClient, Execute}
+
+fn main {
+    //set key and token from environment variables
+    let consumerkey = env::var("TDCONSUMERKEY").unwrap();
+    let token = env::var("TDAUTHTOKEN").unwrap();
+
+    // initiate client
+    let c = TDAClient::new(consumerkey, token);
+
+    // get quotes for 3 symbols and execute
+    let resptxt: String = c.getquotes("F,INTC,TRP").execute();
+
+    // output will be text string in json format
+    println!("{:?}", resptxt);
+}
+```
+
+
 ## Setup
 
 Environment Variables required
