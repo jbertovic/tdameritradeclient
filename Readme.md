@@ -44,8 +44,6 @@ Environment Variables required
 - [ ] grab account data (endpoint below /accounts)
 - [ ] able to view saved and current orders with filter (endpoint below /saveorders)
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
-- [ ] a method to filter out response into the data required (need to think about how to keep this simple)
-
 
 ## Future IDEAS
 - [ ] use `refresh` token instead of actual token if maintaining a client
