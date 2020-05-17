@@ -6,8 +6,6 @@ use attohttpc::{RequestBuilder, Session};
 * this way who ever is using the library can pick what they want
 * able to pick which keys you want returned in hash map or maybe a way of reducing it to a paticular native format within the library
 *
-* TODO: quote history
-* TODO: option chain
 * TODO: return text or json value modified by search strings
 * TODO: client can renew token through refresh token - not sure what to do with regular token as then state doesn't have to be managed - needs thinking
 */
@@ -49,8 +47,10 @@ impl TDAClient {
     }
 
     // TODO: build out similar to gethistory
-    pub fn getoptionchain(&self) -> RequestBuilder {
-        unimplemented!();
+    pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
+        self.client
+        .get(format!("{}marketdata/chains", APIWWW))
+        .param("symbol", symbol)
     }
 }
 
@@ -83,7 +83,6 @@ impl<'a> History<'a> {
 }
 
 pub enum OptionChain<'a> {
-    Symbol(&'a str),
     ContractType(&'a str),
     StrikeCount(u8),
     Strategy(&'a str),
@@ -104,7 +103,6 @@ pub enum OptionChain<'a> {
 impl<'a> OptionChain<'a> {
     fn into(self) -> (&'static str, String) {
         match self {
-            OptionChain::Symbol(s) => ("symbol", s.into()),
             OptionChain::ContractType(i) => ("contractType", i.to_string()),
             OptionChain::Strategy(s) => ("strategy", s.into()),
             OptionChain::StrikeCount(i) => ("strikeCount", i.to_string()),
@@ -170,6 +168,7 @@ mod tests_tdaclient {
         println!("{:?}", resptxt);
         assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
     }
+
     #[test]
     fn able_to_retrieve_quotes() {
         let c = initialize_client();
@@ -177,6 +176,7 @@ mod tests_tdaclient {
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"assetType\""), true);
     }
+
     #[test]
     fn able_to_retrieve_tojson() {
         let c = initialize_client();
@@ -197,5 +197,19 @@ mod tests_tdaclient {
             .execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"candles\""), true);
+
+    }
+
+    #[test]
+    fn able_to_retrieve_optionchain() {
+        let c = initialize_client();
+        let resptxt: String = c
+            .getoptionchain("TRP")
+            .params(&OptionChain::StrikeCount(3).pair())
+            .params(&OptionChain::ContractType("CALL").pair())
+            .execute();
+        println!("{:?}", resptxt);
+        assert_eq!(resptxt.contains("\"SUCCESS\""), true);
+
     }
 }
