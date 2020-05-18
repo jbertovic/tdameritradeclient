@@ -10,19 +10,19 @@ use attohttpc::{RequestBuilder, Session};
 
 #[derive(Debug)]
 pub struct TDAClient {
-    consumerkey: String,
+    // consumerkey: String,
     authtoken: String,
     pub client: Session,
 }
 
 #[allow(dead_code)]
 impl TDAClient {
-    pub fn new(consumerkey: String, token: String) -> TDAClient {
+    pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
 
         TDAClient {
-            consumerkey: consumerkey,
+            // consumerkey: consumerkey,
             authtoken: token,
             client: client,
         }
@@ -154,9 +154,9 @@ mod tests_tdaclient {
     use std::env;
 
     fn initialize_client() -> TDAClient {
-        let consumerkey = env::var("TDCONSUMERKEY").unwrap();
+        // let consumerkey = env::var("TDCONSUMERKEY").unwrap();
         let token = env::var("TDAUTHTOKEN").unwrap();
-        let c = TDAClient::new(consumerkey, token);
+        let c = TDAClient::new(token);
         return c;
     }
 
