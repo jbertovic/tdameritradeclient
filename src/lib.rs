@@ -10,21 +10,21 @@ use attohttpc::{RequestBuilder, Session};
 
 #[derive(Debug)]
 pub struct TDAClient {
-    consumerkey: String,
+    // consumerkey: String,
     authtoken: String,
     pub client: Session,
 }
 
 #[allow(dead_code)]
 impl TDAClient {
-    pub fn new(consumerkey: String, token: String) -> TDAClient {
+    pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
 
         TDAClient {
-            consumerkey: consumerkey,
+            // consumerkey: consumerkey,
             authtoken: token,
-            client: client,
+            client,
         }
     }
 
@@ -100,7 +100,6 @@ pub enum OptionChain<'a> {
 
 impl<'a> OptionChain<'a> {
     fn into(self) -> (&'static str, String) {
-        
         match self {
             OptionChain::ContractType(i) => ("contractType", i.to_string()),
             OptionChain::Strategy(s) => ("strategy", s.into()),
@@ -124,7 +123,6 @@ impl<'a> OptionChain<'a> {
         [self.into();1]
     }
 }
-
 
 // TODO: Check if Error is returned with bad token or expired or invalid
 pub trait Execute<T> {
@@ -154,9 +152,9 @@ mod tests_tdaclient {
     use std::env;
 
     fn initialize_client() -> TDAClient {
-        let consumerkey = env::var("TDCONSUMERKEY").unwrap();
+        // let consumerkey = env::var("TDCONSUMERKEY").unwrap();
         let token = env::var("TDAUTHTOKEN").unwrap();
-        let c = TDAClient::new(consumerkey, token);
+        let c = TDAClient::new(token);
         return c;
     }
 
