@@ -22,7 +22,6 @@ impl TDAClient {
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
 
         TDAClient {
-            // consumerkey: consumerkey,
             authtoken: token,
             client,
         }
@@ -38,18 +37,25 @@ impl TDAClient {
             .param("symbol", quotequery)
     }
 
-    // TODO: add param option to import a vector of <History> with default none
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
         .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
     }
 
-    // TODO: build out similar to gethistory
     pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
         self.client
         .get(format!("{}marketdata/chains", APIWWW))
         .param("symbol", symbol)
     }
+
+    pub fn getaccounts(&self) -> RequestBuilder {
+        self.client.get(format!("{}accounts", APIWWW))
+    }
+
+    pub fn getaccount(&self, account: &str) -> RequestBuilder {
+        self.client.get(format!("{}accounts/{}", APIWWW, account))
+    }
+
 }
 
 pub enum History<'a> {
@@ -124,7 +130,6 @@ impl<'a> OptionChain<'a> {
     }
 }
 
-// TODO: Check if Error is returned with bad token or expired or invalid
 pub trait Execute<T> {
     fn execute(self) -> T;
 }
@@ -152,7 +157,6 @@ mod tests_tdaclient {
     use std::env;
 
     fn initialize_client() -> TDAClient {
-        // let consumerkey = env::var("TDCONSUMERKEY").unwrap();
         let token = env::var("TDAUTHTOKEN").unwrap();
         let c = TDAClient::new(token);
         return c;
@@ -160,32 +164,28 @@ mod tests_tdaclient {
 
     #[test]
     fn able_to_retrieve_user_data() {
-        let c = initialize_client();
-        let resptxt: String = c.getuserprincipals().execute();
+        let resptxt: String = initialize_client().getuserprincipals().execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
     }
 
     #[test]
     fn able_to_retrieve_quotes() {
-        let c = initialize_client();
-        let resptxt: String = c.getquotes("F,INTC,TRP").execute();
+        let resptxt: String = initialize_client().getquotes("F,INTC,TRP").execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"assetType\""), true);
     }
 
     #[test]
     fn able_to_retrieve_tojson() {
-        let c = initialize_client();
-        let resptxt: serde_json::Value = c.getuserprincipals().execute();
+        let resptxt: serde_json::Value = initialize_client().getuserprincipals().execute();
         println!("{:?}", resptxt);
         assert!(resptxt["userId"].is_string());
     }
 
     #[test]
     fn able_to_retrieve_history() {
-        let c = initialize_client();
-        let resptxt: String = c
+        let resptxt: String = initialize_client()
             .gethistory("TRP")
             .params(&History::Period(1).pair())
             .params(&History::PeriodType("month").pair())
@@ -199,14 +199,29 @@ mod tests_tdaclient {
 
     #[test]
     fn able_to_retrieve_optionchain() {
-        let c = initialize_client();
-        let resptxt: String = c
+        let resptxt: String = initialize_client()
             .getoptionchain("TRP")
             .params(&OptionChain::StrikeCount(3).pair())
             .params(&OptionChain::ContractType("CALL").pair())
             .execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"SUCCESS\""), true);
+    }
 
+    #[test]
+    fn able_to_retrieve_all_accounts() {
+        let resptxt: String = initialize_client().getaccounts().execute();
+        println!("{:?}", resptxt);
+        assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
+    }
+
+    #[test]
+    fn able_to_retrieve_one_account() {
+        let c = initialize_client();
+        let user: serde_json::Value = c.getuserprincipals().execute();
+        let resptxt: String = initialize_client()
+            .getaccount(user["primaryAccountId"].as_str().unwrap()).execute();
+        println!("{:?}", resptxt);
+        assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
     }
 }
