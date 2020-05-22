@@ -16,7 +16,6 @@ use tdameritradeclient::{TDAClient, Execute}
 fn main() {
 
     //set key and token from environment variables
-    let consumerkey = env::var("TDCONSUMERKEY").unwrap();
     let token = env::var("TDAUTHTOKEN").unwrap();
 
     // initiate client
@@ -36,11 +35,11 @@ fn main() {
 Environment Variables required
 |Property|Location|Description
 |---|---|---
-|TDCONSUMERKEY|Used to create new `TDAClient`| as registered on [developer.tdameritrade.com]
 |TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com] 
 
 ## Current TODO
 - [X] grab account data (endpoint below /accounts)
+- [ ] How do I use the enum better to correspond to the proper endpoint?
 - [ ] able to view saved and current orders with filter (endpoint below /saveorders)
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
 
@@ -54,13 +53,16 @@ Environment Variables required
 ## Endpoints added
 see [https://developer.tdameritrade.com/user-principal/apis]
 
-- [X] GET /marketdata/quotes
 - [X] GET /userprincipals
+- [X] GET /accounts/{}
+- [X] GET /marketdata/quotes
 - [X] GET /marketdata/{}/pricehistory
 - [X] GET /marketdata/chains
 
 ## Endpoints working on
-- [X] GET /accounts/{}
+- [ ] GET /accounts/{}?parameters
+- [ ] GET /marketdata/{}/pricehistory?parameters  (DONE but is there a betterway?)
+- [ ] GET /marketdata/chains?parameters (DONE but is there a betterway?)
 - [ ] GET /accounts/{}/savedorders
 - [ ] POST /accounts/{}/savedorders
 - [ ] DELETE /accounts/{}/savedorders
