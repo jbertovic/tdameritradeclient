@@ -51,7 +51,7 @@ Environment Variables required
 
 
 ## Endpoints added
-see [https://developer.tdameritrade.com/user-principal/apis]
+see [https://developer.tdameritrade.com/apis]
 
 - [X] GET /userprincipals
 - [X] GET /accounts/{}
@@ -60,9 +60,10 @@ see [https://developer.tdameritrade.com/user-principal/apis]
 - [X] GET /marketdata/chains
 
 ## Endpoints working on
-- [ ] GET /accounts/{}?parameters
+- [ ] GET /accounts/{}?fields=positions
+- [ ] GET /accounts/{}?fields=balances
 - [ ] GET /marketdata/{}/pricehistory?parameters  (DONE but is there a betterway?)
 - [ ] GET /marketdata/chains?parameters (DONE but is there a betterway?)
-- [ ] GET /accounts/{}/savedorders
-- [ ] POST /accounts/{}/savedorders
-- [ ] DELETE /accounts/{}/savedorders
+- [ ] GET /accounts/{}/savedorders (Build off of Account)
+- [ ] POST /accounts/{}/savedorders 
+- [ ] DELETE /accounts/{}/savedorders 

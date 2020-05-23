@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 //use serde_json::Value;
@@ -12,7 +14,7 @@ use attohttpc::{RequestBuilder, Session};
 pub struct TDAClient {
     // consumerkey: String,
     authtoken: String,
-    pub client: Session,
+    client: Session,
 }
 
 #[allow(dead_code)]
@@ -39,13 +41,13 @@ impl TDAClient {
 
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
-        .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
+            .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
     }
 
     pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
         self.client
-        .get(format!("{}marketdata/chains", APIWWW))
-        .param("symbol", symbol)
+            .get(format!("{}marketdata/chains", APIWWW))
+            .param("symbol", symbol)
     }
 
     pub fn getaccounts(&self) -> RequestBuilder {
@@ -56,6 +58,17 @@ impl TDAClient {
         self.client.get(format!("{}accounts/{}", APIWWW, account))
     }
 
+    //TODO Build these on top of accounts so then its implied which account we are talking about
+    pub fn getorders(&self, account: &str) -> RequestBuilder {
+        self.client
+            .get(format!("{}accounts/{}/orders", APIWWW, account))
+    }
+
+    //TODO Build these on top of accounts so then its implied which account we are talking about
+    pub fn getsavedorders(&self, account: &str) -> RequestBuilder {
+        self.client
+            .get(format!("{}accounts/{}/savedorders", APIWWW, account))
+    }
 }
 
 pub enum History<'a> {
@@ -81,8 +94,8 @@ impl<'a> History<'a> {
         }
     }
 
-    pub fn pair(self) -> [(&'static str, String);1] {
-        [self.into();1]
+    pub fn pair(self) -> [(&'static str, String); 1] {
+        [self.into(); 1]
     }
 }
 
@@ -125,41 +138,70 @@ impl<'a> OptionChain<'a> {
         }
     }
 
-    pub fn pair(self) -> [(&'static str, String);1] {
-        [self.into();1]
+    pub fn pair(self) -> [(&'static str, String); 1] {
+        [self.into(); 1]
     }
 }
 
+// TODO: Should TDRequestparam be changed into TDRequestBuilder instead / eliminate access to RequestBuilder
+pub trait TDRequestparam<RequestBuilder> {
+    fn positions(self) -> RequestBuilder;
+    fn orders(self) -> RequestBuilder;
+}
+
+impl TDRequestparam<RequestBuilder> for RequestBuilder {
+    fn positions(self) -> RequestBuilder {
+        // do i check that this is chained to accounts only and panic if not?
+        self.param("fields", "positions")
+    }
+    //TODO inspect -> get url -> modify url to add orders to it -> give back requestbuilder
+    fn orders(self) -> RequestBuilder {
+        self.param("fields", "orders")
+    }
+
+    //TODO is there a way to use the optionchain and history parameters here?
+
+}
+
+// TODO: Execute should return a result to propogate error upward
 pub trait Execute<T> {
     fn execute(self) -> T;
 }
 
 impl Execute<String> for RequestBuilder {
     fn execute(self) -> String {
-        self
-            .send().expect("Trouble Retrieving Response: ERROR")
-            .text().expect("Response did not return JSON: ERROR")
+        self.send()
+            .expect("Trouble Retrieving Response: ERROR")
+            .text()
+            .expect("Response did not return JSON: ERROR")
     }
 }
 
 impl Execute<serde_json::Value> for RequestBuilder {
     fn execute(self) -> serde_json::Value {
-        serde_json::from_str(self
-            .send().expect("Trouble Retrieving Response: ERROR")
-            .text().expect("Response did not return JSON: ERROR")
-            .as_str()).expect("SERDE: Trouble parsing json text: ERROR")
+        serde_json::from_str(
+            self.send()
+                .expect("Trouble Retrieving Response: ERROR")
+                .text()
+                .expect("Response did not return JSON: ERROR")
+                .as_str(),
+        )
+        .expect("SERDE: Trouble parsing json text: ERROR")
     }
 }
 
 #[cfg(test)]
 mod tests_tdaclient {
+
+    // Tests should have some sort of mock to retrieve example json
+    // These are more like examples
+    // REQUIRES an active TD ameritrade account and valid token
+
     use super::*;
     use std::env;
 
     fn initialize_client() -> TDAClient {
-        let token = env::var("TDAUTHTOKEN").unwrap();
-        let c = TDAClient::new(token);
-        return c;
+        TDAClient::new(env::var("TDAUTHTOKEN").unwrap())
     }
 
     #[test]
@@ -194,7 +236,6 @@ mod tests_tdaclient {
             .execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"candles\""), true);
-
     }
 
     #[test]
@@ -219,9 +260,34 @@ mod tests_tdaclient {
     fn able_to_retrieve_one_account() {
         let c = initialize_client();
         let user: serde_json::Value = c.getuserprincipals().execute();
-        let resptxt: String = initialize_client()
-            .getaccount(user["primaryAccountId"].as_str().unwrap()).execute();
+        let resptxt: String = c
+            .getaccount(user["primaryAccountId"].as_str().unwrap())
+            .execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
+    }
+
+    #[test]
+    fn able_to_retrieve_savedorders() {
+        let c = initialize_client();
+        let user: serde_json::Value = c.getuserprincipals().execute();
+        let resptxt: String = c
+            .getsavedorders(user["primaryAccountId"].as_str().unwrap())
+            .execute();
+        println!("{:?}", resptxt);
+        assert_eq!(resptxt.contains("\"orders\""), true);
+    }
+
+    #[test]
+    fn able_to_retrieve_account_positions() {
+        let c = initialize_client();
+        let user: serde_json::Value = c.getuserprincipals().execute();
+        let resptxt: String = c
+            .getaccount(user["primaryAccountId"].as_str().unwrap())
+            // .param("fields", "positions")
+            .positions() // takes requestbuilder and outputs requestbuilder
+            .execute();
+        println!("{:?}", resptxt);
+        assert_eq!(resptxt.contains("\"positions\""), true);
     }
 }
