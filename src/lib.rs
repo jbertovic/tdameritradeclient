@@ -2,16 +2,14 @@
 #![allow(clippy::must_use_candidate)]
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
-// # TDA Client
-//
-// Uses 'attohttpc::RequestBuilder' to build requests and 'attohttpc::Session' to maintain the same client configuration
-//
-// Two options for output:
-// 1) text which in this case is JSON from TDA API
-// 2) convert to 'serde_json::Value'
-//
-//
-// TODO: Rethink structure and remove Requestbuilder from outside use to limit only parameters related to TDAmeritrade API
+/// # TDA Client
+///
+/// Uses 'attohttpc::RequestBuilder' to build requests and 'attohttpc::Session' to maintain the same client configuration
+///
+/// Two options for output:
+/// 1) text which in this case is JSON from TDA API
+/// 2) convert to 'serde_json::Value'
+///
 
 #[derive(Debug)]
 pub struct TDAClient {
@@ -22,6 +20,7 @@ pub struct TDAClient {
 
 #[allow(dead_code)]
 impl TDAClient {
+    /// Create new bsae client that maintains Authorization Header
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
@@ -31,41 +30,44 @@ impl TDAClient {
             client,
         }
     }
-
+    /// get /userprincipals
     pub fn getuserprincipals(&self) -> RequestBuilder {
         self.client.get(format!("{}userprincipals", APIWWW))
     }
-
+    /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
     pub fn getquotes(&self, quotequery: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/quotes", APIWWW))
             .param("symbol", quotequery)
     }
-
+    /// get /marketdata/{SYM}/pricehistory
+    /// additional query parameters need to be added from 'History' Enum
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
     }
-
+    /// get /marketdata/chains?symbol=SYM
+    /// additional query parameters need to be added from 'OptionChain' Enum
     pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/chains", APIWWW))
             .param("symbol", symbol)
     }
-
+    /// get /accounts
     pub fn getaccounts(&self) -> RequestBuilder {
         self.client.get(format!("{}accounts", APIWWW))
     }
-
+    /// get /accounts/{account}
+    /// additional query parameters need to be added from 'Account' Enum
     pub fn getaccount(&self, account: &str) -> RequestBuilder {
         self.client.get(format!("{}accounts/{}", APIWWW, account))
     }
-
+    /// get /accounts/{account}/orders
     pub fn getorders(&self, account: &str) -> RequestBuilder {
         self.client
             .get(format!("{}accounts/{}/orders", APIWWW, account))
     }
-
+    /// get /accounts/{account}/savedorders
     pub fn getsavedorders(&self, account: &str) -> RequestBuilder {
         self.client
             .get(format!("{}accounts/{}/savedorders", APIWWW, account))
