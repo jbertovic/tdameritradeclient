@@ -2,13 +2,16 @@
 #![allow(clippy::must_use_candidate)]
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
-//use serde_json::Value;
-/*
-* two options for output -> text which in this case is JSON from TDA API, or -> convert to serde_json::Value;
-* this way who ever is using the library can pick what they want
-* able to pick which keys you want returned in hash map or maybe a way of reducing it to a paticular native format within the library
-*
-*/
+// # TDA Client
+//
+// Uses 'attohttpc::RequestBuilder' to build requests and 'attohttpc::Session' to maintain the same client configuration
+//
+// Two options for output:
+// 1) text which in this case is JSON from TDA API
+// 2) convert to 'serde_json::Value'
+//
+//
+// TODO: Rethink structure and remove Requestbuilder from outside use to limit only parameters related to TDAmeritrade API
 
 #[derive(Debug)]
 pub struct TDAClient {
@@ -58,16 +61,33 @@ impl TDAClient {
         self.client.get(format!("{}accounts/{}", APIWWW, account))
     }
 
-    //TODO Build these on top of accounts so then its implied which account we are talking about
     pub fn getorders(&self, account: &str) -> RequestBuilder {
         self.client
             .get(format!("{}accounts/{}/orders", APIWWW, account))
     }
 
-    //TODO Build these on top of accounts so then its implied which account we are talking about
     pub fn getsavedorders(&self, account: &str) -> RequestBuilder {
         self.client
             .get(format!("{}accounts/{}/savedorders", APIWWW, account))
+    }
+}
+
+pub enum Account<> {
+    Positions,
+    Orders,
+    PositionsAndOrders,
+}
+impl Account {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            Account::Positions => ("fields", String::from("positions")),
+            Account::Orders => ("fields", String::from("orders")),
+            Account::PositionsAndOrders => ("fields", String::from("positions,orders")),
+        }
+    }
+
+    pub fn pair(self) -> [(&'static str, String); 1] {
+        [self.into(); 1]
     }
 }
 
@@ -141,26 +161,6 @@ impl<'a> OptionChain<'a> {
     pub fn pair(self) -> [(&'static str, String); 1] {
         [self.into(); 1]
     }
-}
-
-// TODO: Should TDRequestparam be changed into TDRequestBuilder instead / eliminate access to RequestBuilder
-pub trait TDRequestparam<RequestBuilder> {
-    fn positions(self) -> RequestBuilder;
-    fn orders(self) -> RequestBuilder;
-}
-
-impl TDRequestparam<RequestBuilder> for RequestBuilder {
-    fn positions(self) -> RequestBuilder {
-        // do i check that this is chained to accounts only and panic if not?
-        self.param("fields", "positions")
-    }
-    //TODO inspect -> get url -> modify url to add orders to it -> give back requestbuilder
-    fn orders(self) -> RequestBuilder {
-        self.param("fields", "orders")
-    }
-
-    //TODO is there a way to use the optionchain and history parameters here?
-
 }
 
 // TODO: Execute should return a result to propogate error upward
@@ -284,8 +284,7 @@ mod tests_tdaclient {
         let user: serde_json::Value = c.getuserprincipals().execute();
         let resptxt: String = c
             .getaccount(user["primaryAccountId"].as_str().unwrap())
-            // .param("fields", "positions")
-            .positions() // takes requestbuilder and outputs requestbuilder
+            .params(&Account::Positions.pair())
             .execute();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"positions\""), true);

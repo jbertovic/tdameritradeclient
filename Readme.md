@@ -2,6 +2,8 @@
 
 A client that uses the TD Ameritrade API as described on [developer.tdameritrade.com].  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
 
+This client uses a blocking web request client library [attohttps](https://github.com/sbstp/attohttpc).
+
 I have matching projects in my repository;
 - [tdacli](https://github.com/jbertovic/tdacli) - which acts as a command line interface to this library.  You can also look at it for examples.
 - [tokenstatemanager](https://github.com/jbertovic/tokenstatemanager) - which uses node.js to maintain a small server and a local mysql db to always have a valid token on hand.

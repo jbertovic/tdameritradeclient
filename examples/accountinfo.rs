@@ -1,6 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Execute, TDRequestparam};
-
+use tdameritradeclient::{TDAClient, Execute};
 
 fn main() {
 
@@ -10,13 +9,13 @@ fn main() {
     let resptxt: serde_json::Value = c.getuserprincipals().execute();
     prettyprint(&resptxt);
 
-    let accountid = resptxt["primaryAccountId"].as_str().unwrap();
+    // let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    titleprint("position info:");
-    prettyprint(&c.getaccount(accountid).positions().execute());
+    // titleprint("position info:");
+    // prettyprint(&c.getaccount(accountid).param().execute());
 
-    titleprint("orders:");
-    prettyprint(&c.getaccount(accountid).orders().execute());
+    // titleprint("orders:");
+    // prettyprint(&c.getaccount(accountid).orders().execute());
 }
 
 fn prettyprint(toprint: &serde_json::Value) {
