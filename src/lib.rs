@@ -4,11 +4,11 @@ static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 /// # TDA Client
 ///
-/// Uses 'attohttpc::RequestBuilder' to build requests and 'attohttpc::Session' to maintain the same client configuration
+/// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
 ///
 /// Two options for output:
 /// 1) text which in this case is JSON from TDA API
-/// 2) convert to 'serde_json::Value'
+/// 2) convert to `serde_json::Value`
 ///
 
 #[derive(Debug)]
@@ -41,13 +41,13 @@ impl TDAClient {
             .param("symbol", quotequery)
     }
     /// get /marketdata/{SYM}/pricehistory
-    /// additional query parameters need to be added from 'History' Enum
+    /// additional query parameters need to be added from `History` Enum
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
     }
     /// get /marketdata/chains?symbol=SYM
-    /// additional query parameters need to be added from 'OptionChain' Enum
+    /// additional query parameters need to be added from `OptionChain` Enum
     pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/chains", APIWWW))
@@ -58,7 +58,7 @@ impl TDAClient {
         self.client.get(format!("{}accounts", APIWWW))
     }
     /// get /accounts/{account}
-    /// additional query parameters need to be added from 'Account' Enum
+    /// additional query parameters need to be added from `Account` Enum
     pub fn getaccount(&self, account: &str) -> RequestBuilder {
         self.client.get(format!("{}accounts/{}", APIWWW, account))
     }
@@ -73,7 +73,7 @@ impl TDAClient {
             .get(format!("{}accounts/{}/savedorders", APIWWW, account))
     }
 }
-
+#[derive(Debug)]
 pub enum Account<> {
     Positions,
     Orders,
@@ -92,7 +92,7 @@ impl Account {
         [self.into(); 1]
     }
 }
-
+#[derive(Debug)]
 pub enum History<'a> {
     PeriodType(&'a str),
     Period(u8),
@@ -120,7 +120,7 @@ impl<'a> History<'a> {
         [self.into(); 1]
     }
 }
-
+#[derive(Debug)]
 pub enum OptionChain<'a> {
     ContractType(&'a str),
     StrikeCount(u8),
