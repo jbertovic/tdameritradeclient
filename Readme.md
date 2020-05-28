@@ -21,7 +21,7 @@ fn main() {
     let token = env::var("TDAUTHTOKEN").unwrap();
 
     // initiate client
-    let c = TDAClient::new(consumerkey, token);
+    let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
     let resptxt: String = c.getquotes("F,INTC,TRP").execute();
