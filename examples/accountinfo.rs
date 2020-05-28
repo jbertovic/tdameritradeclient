@@ -12,7 +12,7 @@ fn main() {
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
     titleprint("position info:");
-    prettyprint(&c.getaccount(accountid).params(&Account::Positions.pair()).execute());
+    prettyprint(&c.getaccount(accountid).params(&[Account::Positions.into()]).execute());
 
     titleprint("orders:");
     prettyprint(&c.getorders(accountid).execute());

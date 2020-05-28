@@ -41,8 +41,8 @@ Environment Variables required
 
 ## Current TODO
 - [X] grab account data (endpoint below /accounts)
-- [ ] How do I use the enum better to correspond to the proper endpoint?
-- [ ] able to view saved and current orders with filter (endpoint below /saveorders)
+- [X] How do I use the enum better to correspond to the proper endpoint?
+- [X] able to view saved and current orders with filter (endpoint below /saveorders)
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
 
 ## Future IDEAS
@@ -60,12 +60,15 @@ see [https://developer.tdameritrade.com/apis]
 - [X] GET /marketdata/quotes
 - [X] GET /marketdata/{}/pricehistory
 - [X] GET /marketdata/chains
+- [X] GET /accounts/{}?fields=positions
+- [X] GET /accounts/{}?fields=orders
+- [X] GET /accounts/{}?fields=positions,orders
+- [X] GET /marketdata/{}/pricehistory?parameters*  
+- [X] GET /marketdata/chains?parameters* 
+- [X] GET /accounts/{}/savedorders
 
 ## Endpoints working on
-- [ ] GET /accounts/{}?fields=positions
-- [ ] GET /accounts/{}?fields=balances
-- [ ] GET /marketdata/{}/pricehistory?parameters  (DONE but is there a betterway?)
-- [ ] GET /marketdata/chains?parameters (DONE but is there a betterway?)
-- [ ] GET /accounts/{}/savedorders (Build off of Account)
 - [ ] POST /accounts/{}/savedorders 
 - [ ] DELETE /accounts/{}/savedorders 
+- [ ] POST /accounts/{}/orders 
+- [ ] DELETE /accounts/{}/orders 
