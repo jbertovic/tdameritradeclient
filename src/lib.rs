@@ -31,14 +31,21 @@ impl TDAClient {
         }
     }
     /// get /userprincipals
-    pub fn getuserprincipals(&self) -> RequestBuilder {
-        self.client.get(format!("{}userprincipals", APIWWW))
+    pub fn getuserprincipals<T>(&self) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client.get(format!("{}userprincipals", APIWWW)).execute()
     }
     /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
-    pub fn getquotes(&self, quotequery: &str) -> RequestBuilder {
+    pub fn getquotes<T>(&self, quotequery: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
         self.client
             .get(format!("{}marketdata/quotes", APIWWW))
             .param("symbol", quotequery)
+            .execute()
     }
     /// get /marketdata/{SYM}/pricehistory
     /// additional query parameters need to be added from `History` Enum
@@ -56,8 +63,11 @@ impl TDAClient {
             .param("symbol", symbol)
     }
     /// get /accounts
-    pub fn getaccounts(&self) -> RequestBuilder {
-        self.client.get(format!("{}accounts", APIWWW))
+    pub fn getaccounts<T>(&self) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client.get(format!("{}accounts", APIWWW)).execute()
     }
     /// get /accounts/{account}
     /// additional query parameters need to be added from `Account` Enum
@@ -65,14 +75,20 @@ impl TDAClient {
         self.client.get(format!("{}accounts/{}", APIWWW, account))
     }
     /// get /accounts/{account}/orders
-    pub fn getorders(&self, account: &str) -> RequestBuilder {
+    pub fn getorders<T>(&self, account: &str) -> T 
+    where
+        RequestBuilder: Execute<T>,
+    {
         self.client
-            .get(format!("{}accounts/{}/orders", APIWWW, account))
+            .get(format!("{}accounts/{}/orders", APIWWW, account)).execute()
     }
     /// get /accounts/{account}/savedorders
-    pub fn getsavedorders(&self, account: &str) -> RequestBuilder {
+    pub fn getsavedorders<T>(&self, account: &str) -> T 
+    where
+        RequestBuilder: Execute<T>,
+    {
         self.client
-            .get(format!("{}accounts/{}/savedorders", APIWWW, account))
+            .get(format!("{}accounts/{}/savedorders", APIWWW, account)).execute()
     }
 }
 #[derive(Debug)]
@@ -200,21 +216,21 @@ mod tests_tdaclient {
 
     #[test]
     fn able_to_retrieve_user_data() {
-        let resptxt: String = initialize_client().getuserprincipals().execute();
+        let resptxt: String = initialize_client().getuserprincipals();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
     }
 
     #[test]
     fn able_to_retrieve_quotes() {
-        let resptxt: String = initialize_client().getquotes("F,INTC,TRP").execute();
+        let resptxt: String = initialize_client().getquotes("F,INTC,TRP");
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"assetType\""), true);
     }
 
     #[test]
     fn able_to_retrieve_tojson() {
-        let resptxt: serde_json::Value = initialize_client().getuserprincipals().execute();
+        let resptxt: serde_json::Value = initialize_client().getuserprincipals();
         println!("{:?}", resptxt);
         assert!(resptxt["userId"].is_string());
     }
@@ -246,7 +262,7 @@ mod tests_tdaclient {
 
     #[test]
     fn able_to_retrieve_all_accounts() {
-        let resptxt: String = initialize_client().getaccounts().execute();
+        let resptxt: String = initialize_client().getaccounts();
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
     }
@@ -254,7 +270,7 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_one_account() {
         let c = initialize_client();
-        let user: serde_json::Value = c.getuserprincipals().execute();
+        let user: serde_json::Value = c.getuserprincipals();
         let resptxt: String = c
             .getaccount(user["primaryAccountId"].as_str().unwrap())
             .execute();
@@ -265,10 +281,8 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_savedorders() {
         let c = initialize_client();
-        let user: serde_json::Value = c.getuserprincipals().execute();
-        let resptxt: String = c
-            .getsavedorders(user["primaryAccountId"].as_str().unwrap())
-            .execute();
+        let user: serde_json::Value = c.getuserprincipals();
+        let resptxt: String = c.getsavedorders(user["primaryAccountId"].as_str().unwrap());
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"orders\""), true);
     }
@@ -276,7 +290,7 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_account_positions() {
         let c = initialize_client();
-        let user: serde_json::Value = c.getuserprincipals().execute();
+        let user: serde_json::Value = c.getuserprincipals();
         //let (k, v) = Account::Positions.into();
         let resptxt: String = c
             .getaccount(user["primaryAccountId"].as_str().unwrap())
