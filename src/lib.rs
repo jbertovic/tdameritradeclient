@@ -42,6 +42,8 @@ impl TDAClient {
     }
     /// get /marketdata/{SYM}/pricehistory
     /// additional query parameters need to be added from `History` Enum
+    /// retrieved based on EPOCH datetime
+    /// also `History` Enum starttime and endtime is in EPOCH
     pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
         self.client
             .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))

@@ -44,6 +44,9 @@ Environment Variables required
 - [X] How do I use the enum better to correspond to the proper endpoint?
 - [X] able to view saved and current orders with filter (endpoint below /saveorders)
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
+- [ ] create example to pull history, optionchain, and quote
+- [ ] create example to create saved order
+- [ ] create feature options from serde_json and chrono
 
 ## Future IDEAS
 - [ ] use `refresh` token instead of actual token if maintaining a client
