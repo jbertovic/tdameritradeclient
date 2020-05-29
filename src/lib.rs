@@ -71,8 +71,16 @@ impl TDAClient {
     }
     /// get /accounts/{account}
     /// additional query parameters need to be added from `Account` Enum
-    pub fn getaccount(&self, account: &str) -> RequestBuilder {
-        self.client.get(format!("{}accounts/{}", APIWWW, account))
+    pub fn getaccount<T>(&self, account: &str, param: Option<Account>) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}accounts/{}", APIWWW, account));
+        if let Some(p) = param {
+            let (k, v) = p.into();
+            builder = builder.param(k,v);
+        }
+        builder.execute()
     }
     /// get /accounts/{account}/orders
     pub fn getorders<T>(&self, account: &str) -> T 
@@ -107,6 +115,18 @@ impl Into<(&'static str, String)> for Account {
         }
     }    
 }
+
+// impl Into<(&'static str, String)> for &Account {
+//     fn into(self) -> (&'static str, String) {
+//         match self {
+//             Account::Positions => ("fields", String::from("positions")),
+//             Account::Orders => ("fields", String::from("orders")),
+//             Account::PositionsAndOrders => ("fields", String::from("positions,orders")),
+//         }
+//     }    
+// }
+
+
 
 #[derive(Debug)]
 pub enum History<'a> {
@@ -272,8 +292,7 @@ mod tests_tdaclient {
         let c = initialize_client();
         let user: serde_json::Value = c.getuserprincipals();
         let resptxt: String = c
-            .getaccount(user["primaryAccountId"].as_str().unwrap())
-            .execute();
+            .getaccount(user["primaryAccountId"].as_str().unwrap(), None);
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
     }
@@ -293,10 +312,7 @@ mod tests_tdaclient {
         let user: serde_json::Value = c.getuserprincipals();
         //let (k, v) = Account::Positions.into();
         let resptxt: String = c
-            .getaccount(user["primaryAccountId"].as_str().unwrap())
-            //.param(k, v)
-            .params(&[Account::Positions.into()])
-            .execute();
+            .getaccount(user["primaryAccountId"].as_str().unwrap(), Some(Account::Positions));
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"positions\""), true);
     }
