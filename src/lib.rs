@@ -35,7 +35,9 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        self.client.get(format!("{}userprincipals", APIWWW)).execute()
+        self.client
+            .get(format!("{}userprincipals", APIWWW))
+            .execute()
     }
     /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
     pub fn getquotes<T>(&self, quotequery: &str) -> T
@@ -51,16 +53,34 @@ impl TDAClient {
     /// additional query parameters need to be added from `History` Enum
     /// retrieved based on EPOCH datetime
     /// also `History` Enum starttime and endtime is in EPOCH
-    pub fn gethistory(&self, symbol: &str) -> RequestBuilder {
-        self.client
-            .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol))
+    pub fn gethistory<T>(&self, symbol: &str, params: &[History]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self
+            .client
+            .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
     }
     /// get /marketdata/chains?symbol=SYM
     /// additional query parameters need to be added from `OptionChain` Enum
-    pub fn getoptionchain(&self, symbol: &str) -> RequestBuilder {
-        self.client
+    pub fn getoptionchain<T>(&self, symbol: &str, params: &[OptionChain]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self
+            .client
             .get(format!("{}marketdata/chains", APIWWW))
-            .param("symbol", symbol)
+            .param("symbol", symbol);
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
     }
     /// get /accounts
     pub fn getaccounts<T>(&self) -> T
@@ -71,32 +91,34 @@ impl TDAClient {
     }
     /// get /accounts/{account}
     /// additional query parameters need to be added from `Account` Enum
-    pub fn getaccount<T>(&self, account: &str, param: Option<Account>) -> T
+    pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
     where
         RequestBuilder: Execute<T>,
     {
         let mut builder = self.client.get(format!("{}accounts/{}", APIWWW, account));
-        if let Some(p) = param {
-            let (k, v) = p.into();
-            builder = builder.param(k,v);
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
         }
         builder.execute()
     }
     /// get /accounts/{account}/orders
-    pub fn getorders<T>(&self, account: &str) -> T 
+    pub fn getorders<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}accounts/{}/orders", APIWWW, account)).execute()
+            .get(format!("{}accounts/{}/orders", APIWWW, account))
+            .execute()
     }
     /// get /accounts/{account}/savedorders
-    pub fn getsavedorders<T>(&self, account: &str) -> T 
+    pub fn getsavedorders<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}accounts/{}/savedorders", APIWWW, account)).execute()
+            .get(format!("{}accounts/{}/savedorders", APIWWW, account))
+            .execute()
     }
 }
 #[derive(Debug)]
@@ -106,27 +128,15 @@ pub enum Account {
     PositionsAndOrders,
 }
 
-impl Into<(&'static str, String)> for Account {
+impl Into<(&'static str, String)> for &Account {
     fn into(self) -> (&'static str, String) {
         match self {
             Account::Positions => ("fields", String::from("positions")),
             Account::Orders => ("fields", String::from("orders")),
             Account::PositionsAndOrders => ("fields", String::from("positions,orders")),
         }
-    }    
+    }
 }
-
-// impl Into<(&'static str, String)> for &Account {
-//     fn into(self) -> (&'static str, String) {
-//         match self {
-//             Account::Positions => ("fields", String::from("positions")),
-//             Account::Orders => ("fields", String::from("orders")),
-//             Account::PositionsAndOrders => ("fields", String::from("positions,orders")),
-//         }
-//     }    
-// }
-
-
 
 #[derive(Debug)]
 pub enum History<'a> {
@@ -139,12 +149,12 @@ pub enum History<'a> {
     NeedExendedHoursData(bool),
 }
 
-impl<'a> Into<(&'static str, String)> for History<'a> {
+impl<'a> Into<(&'static str, String)> for &History<'a> {
     fn into(self) -> (&'static str, String) {
         match self {
-            History::PeriodType(s) => ("periodType", s.into()),
+            History::PeriodType(s) => ("periodType", s.to_string()),
             History::Period(i) => ("period", i.to_string()),
-            History::FrequencyType(s) => ("frequencyType", s.into()),
+            History::FrequencyType(s) => ("frequencyType", s.to_string()),
             History::Frequency(i) => ("frequency", i.to_string()),
             History::StartDate(i) => ("startDate", i.to_string()),
             History::EndDate(i) => ("endDate", i.to_string()),
@@ -152,6 +162,7 @@ impl<'a> Into<(&'static str, String)> for History<'a> {
         }
     }
 }
+
 #[derive(Debug)]
 pub enum OptionChain<'a> {
     ContractType(&'a str),
@@ -171,24 +182,24 @@ pub enum OptionChain<'a> {
     OptionType(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for OptionChain<'a> {
+impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
     fn into(self) -> (&'static str, String) {
         match self {
             OptionChain::ContractType(i) => ("contractType", i.to_string()),
-            OptionChain::Strategy(s) => ("strategy", s.into()),
+            OptionChain::Strategy(s) => ("strategy", s.to_string()),
             OptionChain::StrikeCount(i) => ("strikeCount", i.to_string()),
             OptionChain::Interval(i) => ("interval", i.to_string()),
             OptionChain::Strike(i) => ("strike", i.to_string()),
             OptionChain::IncludeQuotes(b) => ("includeQuotes", b.to_string()),
-            OptionChain::Range(s) => ("range", s.into()),
-            OptionChain::FromDate(s) => ("fromDate", s.into()),
-            OptionChain::ToDate(s) => ("toDate", s.into()),
+            OptionChain::Range(s) => ("range", s.to_string()),
+            OptionChain::FromDate(s) => ("fromDate", s.to_string()),
+            OptionChain::ToDate(s) => ("toDate", s.to_string()),
             OptionChain::Volatility(i) => ("volatility", i.to_string()),
             OptionChain::UnderlyingPrice(i) => ("underlyingPrice", i.to_string()),
             OptionChain::InterestRate(i) => ("interestRate", i.to_string()),
             OptionChain::DaysToExpiration(i) => ("daysToExpiration", i.to_string()),
-            OptionChain::ExpireMonth(s) => ("expireMonth", s.into()),
-            OptionChain::OptionType(s) => ("optionType", s.into()),
+            OptionChain::ExpireMonth(s) => ("expireMonth", s.to_string()),
+            OptionChain::OptionType(s) => ("optionType", s.to_string()),
         }
     }
 }
@@ -257,14 +268,15 @@ mod tests_tdaclient {
 
     #[test]
     fn able_to_retrieve_history() {
-        let resptxt: String = initialize_client()
-            .gethistory("TRP")
-            .params(
-                &[History::Period(1).into(),
-                History::PeriodType("month").into(),
-                History::Frequency(1).into(),
-                History::FrequencyType("daily").into()])
-            .execute();
+        let resptxt: String = initialize_client().gethistory(
+            "TRP",
+            &[
+                History::Period(1),
+                History::PeriodType("month"),
+                History::Frequency(1),
+                History::FrequencyType("daily"),
+            ],
+        );
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"candles\""), true);
     }
@@ -272,10 +284,8 @@ mod tests_tdaclient {
     #[test]
     fn able_to_retrieve_optionchain() {
         let resptxt: String = initialize_client()
-            .getoptionchain("TRP")
-            .params(&[OptionChain::StrikeCount(3).into()])
-            .params(&[OptionChain::ContractType("CALL").into()])
-            .execute();
+            .getoptionchain("TRP", 
+            &[OptionChain::StrikeCount(3),OptionChain::ContractType("CALL")]);
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"SUCCESS\""), true);
     }
@@ -291,13 +301,13 @@ mod tests_tdaclient {
     fn able_to_retrieve_one_account() {
         let c = initialize_client();
         let user: serde_json::Value = c.getuserprincipals();
-        let resptxt: String = c
-            .getaccount(user["primaryAccountId"].as_str().unwrap(), None);
+        let resptxt: String = c.getaccount(user["primaryAccountId"].as_str().unwrap(), &[]);
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
     }
 
     #[test]
+    #[ignore]
     fn able_to_retrieve_savedorders() {
         let c = initialize_client();
         let user: serde_json::Value = c.getuserprincipals();
@@ -311,8 +321,10 @@ mod tests_tdaclient {
         let c = initialize_client();
         let user: serde_json::Value = c.getuserprincipals();
         //let (k, v) = Account::Positions.into();
-        let resptxt: String = c
-            .getaccount(user["primaryAccountId"].as_str().unwrap(), Some(Account::Positions));
+        let resptxt: String = c.getaccount(
+            user["primaryAccountId"].as_str().unwrap(),
+            &[Account::Positions],
+        );
         println!("{:?}", resptxt);
         assert_eq!(resptxt.contains("\"positions\""), true);
     }
