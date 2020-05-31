@@ -1,6 +1,6 @@
 ## Description
 
-A client that uses the TD Ameritrade API as described on [developer.tdameritrade.com].  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
+A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
 
 This client uses a blocking web request client library [attohttps](https://github.com/sbstp/attohttpc).
 
@@ -10,10 +10,10 @@ I have matching projects in my repository;
 
 ## Example
 
-see unit tests in `lib.rs` for ideas
+see unit tests in `./tests/clienttests.rs` for ideas
 ```
 use std::env;
-use tdameritradeclient::{TDAClient, Execute}
+use tdameritradeclient::{TDAClient}
 
 fn main() {
 
@@ -24,7 +24,7 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.getquotes("F,INTC,TRP").execute();
+    let resptxt: String = c.getquotes("F,INTC,TRP");
 
     // output will be text string in json format
     println!("{:?}", resptxt);
@@ -43,16 +43,18 @@ Environment Variables required
 - [X] grab account data (endpoint below /accounts)
 - [X] How do I use the enum better to correspond to the proper endpoint?
 - [X] able to view saved and current orders with filter (endpoint below /saveorders)
+- [X] modified so param are forced to enum and removed builder from pub
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
 - [ ] create example to pull history, optionchain, and quote
 - [ ] create example to create saved order
-- [ ] create feature options from serde_json and chrono
+- [ ] create feature options from serde_json
 
 ## Future IDEAS
 - [ ] use `refresh` token instead of actual token if maintaining a client
 - [ ] add documentation
 - [ ] add better error checking
-- [ ] grouping param pairs on function call instead of only chaining
+- [X] grouping param pairs on function call instead of only chaining
+- [X] continue to add more restriction on query parameters and options to prevent errors
 
 
 ## Endpoints added
