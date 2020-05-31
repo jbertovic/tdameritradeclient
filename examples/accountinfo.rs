@@ -1,21 +1,21 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Execute, Account};
+use tdameritradeclient::{TDAClient, Account};
 
 fn main() {
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
     titleprint("user/account info:");
-    let resptxt: serde_json::Value = c.getuserprincipals().execute();
+    let resptxt: serde_json::Value = c.getuserprincipals();
     prettyprint(&resptxt);
 
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
     titleprint("position info:");
-    prettyprint(&c.getaccount(accountid).params(&[Account::Positions.into()]).execute());
+    prettyprint(&c.getaccount(accountid, &[Account::Positions]));
 
     titleprint("orders:");
-    prettyprint(&c.getorders(accountid).execute());
+    prettyprint(&c.getorders(accountid));
 }
 
 fn prettyprint(toprint: &serde_json::Value) {
