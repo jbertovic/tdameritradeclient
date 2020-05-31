@@ -45,7 +45,7 @@ Environment Variables required
 - [X] able to view saved and current orders with filter (endpoint below /saveorders)
 - [X] modified so param are forced to enum and removed builder from pub
 - [ ] able to create and delete saved order  (endpoint below with PUT and DELETE /saveorders)
-- [ ] create example to pull history, optionchain, and quote
+- [X] create example to pull history, optionchain, and quote
 - [ ] create example to create saved order
 - [ ] create feature options from serde_json
 
