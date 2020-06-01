@@ -1,3 +1,5 @@
+....Still in progress.  Drop me a line for any thoughts or features.  
+
 ## Description
 
 A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
@@ -37,7 +39,7 @@ fn main() {
 Environment Variables required
 |Property|Location|Description
 |---|---|---
-|TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com] 
+|TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com](http://developer.tdameritrade.com) 
 
 ## Current TODO
 - [X] grab account data (endpoint below /accounts)
@@ -58,7 +60,7 @@ Environment Variables required
 
 
 ## Endpoints added
-see [https://developer.tdameritrade.com/apis]
+see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
 
 - [X] GET /userprincipals
 - [X] GET /accounts/{}
