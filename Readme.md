@@ -37,7 +37,7 @@ fn main() {
 Environment Variables required
 |Property|Location|Description
 |---|---|---
-|TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com] 
+|TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com](http://developer.tdameritrade.com) 
 
 ## Current TODO
 - [X] grab account data (endpoint below /accounts)
@@ -58,7 +58,7 @@ Environment Variables required
 
 
 ## Endpoints added
-see [https://developer.tdameritrade.com/apis]
+see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
 
 - [X] GET /userprincipals
 - [X] GET /accounts/{}

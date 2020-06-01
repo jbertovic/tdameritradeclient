@@ -3,6 +3,7 @@
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 use crate::param::{History, OptionChain, Account};
+
 /// # TDA Client
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
@@ -11,7 +12,6 @@ use crate::param::{History, OptionChain, Account};
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
 ///
-
 #[derive(Debug)]
 pub struct TDAClient {
     // consumerkey: String,
@@ -22,6 +22,7 @@ pub struct TDAClient {
 #[allow(dead_code)]
 impl TDAClient {
     /// Create new bsae client that maintains Authorization Header
+    /// Requires valid auth token from tdameritrade
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
@@ -124,6 +125,8 @@ impl TDAClient {
 }
 
 // TODO: Execute should return a result to propogate error upward
+/// This isn't called directly as its built into the functions of the `TDAClient`
+///
 /// Sends formed request to be executed with a return to either
 /// 1) `String` - as text format
 /// 2) `serde_json::Value` - as a JSON object format
@@ -152,4 +155,14 @@ impl Execute<serde_json::Value> for RequestBuilder {
         )
         .expect("SERDE: Trouble parsing json text: ERROR")
     }
+}
+
+#[cfg(test)]
+mod tdaclient_tests{
+    #[test]
+    fn check_if_this_test_works() {
+        assert!(true);
+    }
+
+
 }
