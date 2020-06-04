@@ -1,5 +1,7 @@
 ....Still in progress.  Drop me a line for any thoughts or features.  
 
+[Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/)
+
 ## Description
 
 A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
