@@ -75,16 +75,6 @@ fn able_to_retrieve_one_account() {
 }
 
 #[test]
-#[ignore]
-fn able_to_retrieve_savedorders() {
-    let c = initialize_client();
-    let user: serde_json::Value = c.getuserprincipals();
-    let resptxt: String = c.getsavedorders(user["primaryAccountId"].as_str().unwrap());
-    println!("{:?}", resptxt);
-    assert_eq!(resptxt.contains("\"orders\""), true);
-}
-
-#[test]
 fn able_to_retrieve_account_positions() {
     let c = initialize_client();
     let user: serde_json::Value = c.getuserprincipals();

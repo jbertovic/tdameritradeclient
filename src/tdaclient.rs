@@ -93,7 +93,7 @@ impl TDAClient {
         self.client.get(format!("{}accounts", APIWWW)).execute()
     }
     /// get /accounts/{account}
-    /// grabs one account with account_id
+    /// grabs one account with `account_id`
     /// additional query parameters need to be added from `Account` Enum
     pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
     where
@@ -107,6 +107,8 @@ impl TDAClient {
         builder.execute()
     }
     /// get /accounts/{account}/orders
+    /// retrieve all working orders
+    /// TODO: Add order parameters to get what is filled, canceled or working
     pub fn getorders<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
@@ -115,15 +117,44 @@ impl TDAClient {
             .get(format!("{}accounts/{}/orders", APIWWW, account))
             .execute()
     }
-    /// get /accounts/{account}/savedorders
-    pub fn getsavedorders<T>(&self, account: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
+    /// Post /accounts/{account}/orders with JSON formated body
+    /// Creates a working order
+    /// if JSON body has error it will return json indicating what's wrong
+    /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
+    pub fn createorder(&self, account: &str, ordertxt: &str) -> String
     {
         self.client
-            .get(format!("{}accounts/{}/savedorders", APIWWW, account))
-            .execute()
+            .post(format!("{}accounts/{}/orders", APIWWW, account))
+            .header_append("Content-Type", "application/json")
+            .text(ordertxt)
+            .send()
+            .expect("Trouble Retrieving Response: ERROR")
+            .text().unwrap()
     }
+    /// Delete /accounts/{account}/orders/{order}
+    /// Creates a working order
+    pub fn deleteorder(&self, account: &str, order: &str) -> String
+    {
+        self.client
+            .delete(format!("{}accounts/{}/orders/{}", APIWWW, account, order))
+            .send()
+            .expect("Trouble Retrieving Response: ERROR")
+            .text().unwrap()
+    }
+
+    /// PUT /accounts/{account}/orders/{order} with JSON formated body
+    /// Replaces a working order with new order - allow the API to cancel and then creates new order
+    pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
+    {
+        self.client
+            .put(format!("{}accounts/{}/orders/{}", APIWWW, account, order))
+            .header_append("Content-Type", "application/json")
+            .text(ordertxt)
+            .send()
+            .expect("Trouble Retrieving Response: ERROR")
+            .text().unwrap()
+    }
+
 }
 
 // TODO: Execute should return a result to propogate error upward
