@@ -166,6 +166,8 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>, <span class="ident">clippy</span>::<span class="ident">pedantic</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">must_use_candidate</span>)]</span>
@@ -254,6 +256,7 @@
         <span class="ident">builder</span>.<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /accounts</span>
+    <span class="doccomment">/// if there are more than one account linked than it will retrieve an array of accounts</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getaccounts</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -261,6 +264,7 @@
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts&quot;</span>, <span class="ident">APIWWW</span>)).<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /accounts/{account}</span>
+    <span class="doccomment">/// grabs one account with account_id</span>
     <span class="doccomment">/// additional query parameters need to be added from `Account` Enum</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getaccount</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Account</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
     <span class="kw">where</span>
