@@ -85,6 +85,7 @@ impl TDAClient {
         builder.execute()
     }
     /// get /accounts
+    /// if there are more than one account linked than it will retrieve an array of accounts
     pub fn getaccounts<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
@@ -92,6 +93,7 @@ impl TDAClient {
         self.client.get(format!("{}accounts", APIWWW)).execute()
     }
     /// get /accounts/{account}
+    /// grabs one account with account_id
     /// additional query parameters need to be added from `Account` Enum
     pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
     where

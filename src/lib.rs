@@ -2,9 +2,9 @@
 //!
 //! TDAClient is the main module that lets you build requests to TDAmeritrade's API
 //! 
-//! See (developer.tdameritrade.com) for API documentation
+//! See [TD Ameritrade API](http://developer.tdameritrade.com) for API documentation
 //! 
-//! Create TDAClient with a valid Access Token - see (developer.tdameritrade.com) for info on creating token
+//! Create TDAClient with a valid Access Token - see [TD Ameritrade API](http://developer.tdameritrade.com) for info on creating token
 //! 
 //! Response output can be kept in text which comes out as JSON text or converted to a `serde_json::Value` object
 //!
