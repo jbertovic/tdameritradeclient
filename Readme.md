@@ -49,10 +49,9 @@ Environment Variables required
 - [X] able to view saved and current orders with filter (endpoint below /saveorders)
 - [X] modified so param are forced to enum and removed builder from pub
 - [*] **(NOT USED)**able to create and delete saved order  (endpoint below with POST and DELETE /saveorders)
-- [ ] able to specify type of orders to retrieve - add `Order` Enum
-- [ ] able to create and delete order (endpoint with POST and DELETE /orders)
-- [ ] able to change order
 - [X] create example to pull history, optionchain, and quote
+- [ ] able to specify type of orders to retrieve - add `Order` Enum
+- [ ] **(NEED TO TEST THROUGH EXAMPLE)** able to create, change and delete order (endpoint with POST, PUT and DELETE /orders)
 - [ ] create example to create order, change order and then delete order
 - [ ] create feature options from serde_json
 
@@ -80,8 +79,5 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /marketdata/chains?parameters* 
 - [X] GET / accounts/{}/orders
 - [X] POST /accounts/{}/orders
-
-
-## Endpoints working on
-- [ ] PUT /accounts/{}/orders 
-- [ ] DELETE /accounts/{}/orders 
+- [X] PUT /accounts/{}/orders 
+- [X] DELETE /accounts/{}/orders 
