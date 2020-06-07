@@ -1,4 +1,4 @@
-....Still in progress.  Drop me a line for any thoughts or features.  
+# tdameritradeclient
 
 [Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/)
 
