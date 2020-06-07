@@ -16,6 +16,26 @@ impl Into<(&'static str, String)> for &Account {
 }
 
 #[derive(Debug)]
+pub enum Order<'a> {
+    MaxResults(u8),
+    FromEnteredTime(&'a str),
+    ToEnteredTime(&'a str),
+    Status(&'a str),
+}
+
+impl<'a> Into<(&'static str, String)> for &Order<'a> {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            Order::MaxResults(i) => ("maxResults", (*i).to_string()),
+            Order::FromEnteredTime(s) => ("period", (*s).to_string()),
+            Order::ToEnteredTime(s) => ("period", (*s).to_string()),
+            Order::Status(s) => ("period", (*s).to_string()),
+        }
+    }
+}
+
+
+#[derive(Debug)]
 pub enum History<'a> {
     PeriodType(&'a str),
     Period(u8),

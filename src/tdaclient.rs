@@ -2,7 +2,9 @@
 #![allow(clippy::must_use_candidate)]
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
-use crate::param::{History, OptionChain, Account};
+use crate::param::{History, OptionChain, Account, Order};
+
+
 
 /// # TDA Client
 ///
@@ -109,18 +111,22 @@ impl TDAClient {
     /// get /accounts/{account}/orders
     /// retrieve all working orders
     /// TODO: Add order parameters to get what is filled, canceled or working
-    pub fn getorders<T>(&self, account: &str) -> T
+    pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        self.client
-            .get(format!("{}accounts/{}/orders", APIWWW, account))
-            .execute()
+        let mut builder = self.client.get(format!("{}accounts/{}/orders", APIWWW, account));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
     }
     /// Post /accounts/{account}/orders with JSON formated body
     /// Creates a working order
     /// if JSON body has error it will return json indicating what's wrong
     /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
+    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn createorder(&self, account: &str, ordertxt: &str) -> String
     {
         self.client
@@ -133,6 +139,7 @@ impl TDAClient {
     }
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
+    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn deleteorder(&self, account: &str, order: &str) -> String
     {
         self.client
@@ -144,6 +151,7 @@ impl TDAClient {
 
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
+    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
     {
         self.client

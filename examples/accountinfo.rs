@@ -15,7 +15,7 @@ fn main() {
     prettyprint(&c.getaccount(accountid, &[Account::Positions]));
 
     titleprint("orders:");
-    prettyprint(&c.getorders(accountid));
+    prettyprint(&c.getorders(accountid, &[]));
 }
 
 fn prettyprint(toprint: &serde_json::Value) {
