@@ -43,25 +43,13 @@ Environment Variables required
 |---|---|---
 |TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com](http://developer.tdameritrade.com) 
 
-## Current TODO
-- [X] grab account data (endpoint below /accounts)
-- [X] How do I use the enum better to correspond to the proper endpoint?
-- [X] able to view saved and current orders with filter (endpoint below /saveorders)
-- [X] modified so param are forced to enum and removed builder from pub
-- [*] **(NOT USED)**able to create and delete saved order  (endpoint below with POST and DELETE /saveorders)
-- [X] create example to pull history, optionchain, and quote
-- [X] able to specify type of orders to retrieve - add `Order` Enum
-- [X] able to create, change and delete order (endpoint with POST, PUT and DELETE /orders)
-- [X] create example to create order
-- [ ] create feature options from serde_json
 
 ## Future IDEAS
 - [ ] use `refresh` token instead of actual token if maintaining a client
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
 - [ ] continue to add documentation
-- [ ] add better error checking
-- [X] grouping param pairs on function call instead of only chaining
-- [X] continue to add more restriction on query parameters and options to prevent errors
+- [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
+- [ ] create feature options from serde_json
 
 
 ## Endpoints added

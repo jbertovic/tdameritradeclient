@@ -21,7 +21,7 @@ fn main() {
             "instruction": "Buy",
             "quantity": 100,
             "instrument": {
-              "symbol": "TRP",
+              "symbol": "INTC",
               "assetType": "EQUITY"
             }
           }

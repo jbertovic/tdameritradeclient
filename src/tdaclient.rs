@@ -4,8 +4,6 @@ static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 use crate::param::{History, OptionChain, Account, Order};
 
-
-
 /// # TDA Client
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
@@ -110,7 +108,6 @@ impl TDAClient {
     }
     /// get /accounts/{account}/orders
     /// retrieve all working orders
-    /// TODO: Add order parameters to get what is filled, canceled or working
     pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
     where
         RequestBuilder: Execute<T>,
@@ -126,7 +123,6 @@ impl TDAClient {
     /// Creates a working order
     /// if JSON body has error it will return json indicating what's wrong
     /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
-    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn createorder(&self, account: &str, ordertxt: &str) -> String
     {
         self.client
@@ -139,7 +135,6 @@ impl TDAClient {
     }
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
-    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn deleteorder(&self, account: &str, order: &str) -> String
     {
         self.client
@@ -151,7 +146,6 @@ impl TDAClient {
 
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
-    /// TODO: return an option -> none if no error or -> Some(Errorjson)
     pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
     {
         self.client
@@ -165,7 +159,6 @@ impl TDAClient {
 
 }
 
-// TODO: Execute should return a result to propogate error upward
 /// This isn't called directly as its built into the functions of the `TDAClient`
 ///
 /// Sends formed request to be executed with a return to either
