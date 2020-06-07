@@ -168,12 +168,53 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>, <span class="ident">clippy</span>::<span class="ident">pedantic</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">must_use_candidate</span>)]</span>
 <span class="kw">static</span> <span class="ident">APIWWW</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.tdameritrade.com/v1/&quot;</span>;
 <span class="kw">use</span> <span class="ident">attohttpc</span>::{<span class="ident">RequestBuilder</span>, <span class="ident">Session</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">param</span>::{<span class="ident">History</span>, <span class="ident">OptionChain</span>, <span class="ident">Account</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">param</span>::{<span class="ident">History</span>, <span class="ident">OptionChain</span>, <span class="ident">Account</span>, <span class="ident">Order</span>};
+
+
 
 <span class="doccomment">/// # TDA Client</span>
 <span class="doccomment">///</span>
@@ -264,7 +305,7 @@
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts&quot;</span>, <span class="ident">APIWWW</span>)).<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /accounts/{account}</span>
-    <span class="doccomment">/// grabs one account with account_id</span>
+    <span class="doccomment">/// grabs one account with `account_id`</span>
     <span class="doccomment">/// additional query parameters need to be added from `Account` Enum</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getaccount</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Account</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
     <span class="kw">where</span>
@@ -278,23 +319,60 @@
         <span class="ident">builder</span>.<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /accounts/{account}/orders</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getorders</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="doccomment">/// retrieve all working orders</span>
+    <span class="doccomment">/// TODO: Add order parameters to get what is filled, canceled or working</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getorders</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Order</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>))
-            .<span class="ident">execute</span>()
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>));
+        <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
+            <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">param</span>.<span class="ident">into</span>();
+            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">param</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+        }
+        <span class="ident">builder</span>.<span class="ident">execute</span>()
     }
-    <span class="doccomment">/// get /accounts/{account}/savedorders</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getsavedorders</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Post /accounts/{account}/orders with JSON formated body</span>
+    <span class="doccomment">/// Creates a working order</span>
+    <span class="doccomment">/// if JSON body has error it will return json indicating what&#39;s wrong</span>
+    <span class="doccomment">/// if nothing is returned than request was good - could add additional error checking for 201 or 200 response</span>
+    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">createorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/savedorders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>))
-            .<span class="ident">execute</span>()
+            .<span class="ident">post</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>))
+            .<span class="ident">header_append</span>(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)
+            .<span class="ident">text</span>(<span class="ident">ordertxt</span>)
+            .<span class="ident">send</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;Trouble Retrieving Response: ERROR&quot;</span>)
+            .<span class="ident">text</span>().<span class="ident">unwrap</span>()
     }
+    <span class="doccomment">/// Delete /accounts/{account}/orders/{order}</span>
+    <span class="doccomment">/// Creates a working order</span>
+    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deleteorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
+    {
+        <span class="self">self</span>.<span class="ident">client</span>
+            .<span class="ident">delete</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
+            .<span class="ident">send</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;Trouble Retrieving Response: ERROR&quot;</span>)
+            .<span class="ident">text</span>().<span class="ident">unwrap</span>()
+    }
+
+    <span class="doccomment">/// PUT /accounts/{account}/orders/{order} with JSON formated body</span>
+    <span class="doccomment">/// Replaces a working order with new order - allow the API to cancel and then creates new order</span>
+    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replaceorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
+    {
+        <span class="self">self</span>.<span class="ident">client</span>
+            .<span class="ident">put</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
+            .<span class="ident">header_append</span>(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)
+            .<span class="ident">text</span>(<span class="ident">ordertxt</span>)
+            .<span class="ident">send</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;Trouble Retrieving Response: ERROR&quot;</span>)
+            .<span class="ident">text</span>().<span class="ident">unwrap</span>()
+    }
+
 }
 
 <span class="comment">// TODO: Execute should return a result to propogate error upward</span>
