@@ -50,9 +50,9 @@ Environment Variables required
 - [X] modified so param are forced to enum and removed builder from pub
 - [*] **(NOT USED)**able to create and delete saved order  (endpoint below with POST and DELETE /saveorders)
 - [X] create example to pull history, optionchain, and quote
-- [ ] able to specify type of orders to retrieve - add `Order` Enum
-- [ ] **(NEED TO TEST THROUGH EXAMPLE)** able to create, change and delete order (endpoint with POST, PUT and DELETE /orders)
-- [ ] create example to create order, change order and then delete order
+- [X] able to specify type of orders to retrieve - add `Order` Enum
+- [X] able to create, change and delete order (endpoint with POST, PUT and DELETE /orders)
+- [X] create example to create order
 - [ ] create feature options from serde_json
 
 ## Future IDEAS
