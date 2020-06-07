@@ -43,9 +43,12 @@ Environment Variables required
 |---|---|---
 |TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com](http://developer.tdameritrade.com) 
 
+## Current TODOs
+- [ ] function to grab token from refresh_token
+- [ ] function to renew refresh_token
+
 
 ## Future IDEAS
-- [ ] use `refresh` token instead of actual token if maintaining a client
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
