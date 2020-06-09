@@ -14,14 +14,14 @@ I have matching projects in my repository;
 
 ## Example
 
-see unit tests in `./tests/clienttests.rs` for ideas
+see unit tests in `./tests/clienttests.rs` and examples in `./examples/` for ideas
 ```
 use std::env;
 use tdameritradeclient::{TDAClient}
 
 fn main() {
 
-    //set key and token from environment variables
+    //set token from environment variables
     let token = env::var("TDAUTHTOKEN").unwrap();
 
     // initiate client
