@@ -1,3 +1,6 @@
+**Disclaimer:** I'm in no way endorsing or affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
+
+
 # tdameritradeclient
 
 [Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/)
@@ -14,14 +17,14 @@ I have matching projects in my repository;
 
 ## Example
 
-see unit tests in `./tests/clienttests.rs` for ideas
+see unit tests in `./tests/clienttests.rs` and examples in `./examples/` for ideas
 ```
 use std::env;
 use tdameritradeclient::{TDAClient}
 
 fn main() {
 
-    //set key and token from environment variables
+    //set token from environment variables
     let token = env::var("TDAUTHTOKEN").unwrap();
 
     // initiate client
