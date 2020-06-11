@@ -17,9 +17,16 @@ impl Into<(&'static str, String)> for &Account {
 
 #[derive(Debug)]
 pub enum Order<'a> {
+    /// Max number of orders to retrieve
     MaxResults(u8),
+    /// Specifies that no orders entered before this time should be returned.
+    /// Must be 60 days from today's date
+    /// format yyyy-mm-dd
     FromEnteredTime(&'a str),
+    /// Specifies that no orders entered after this time should be returned.
+    /// format yyyy-mm-dd
     ToEnteredTime(&'a str),
+    /// specifies type of orders to be returned: WORKING, FILLED, EXPIRED, etc...
     Status(&'a str),
 }
 
@@ -27,9 +34,9 @@ impl<'a> Into<(&'static str, String)> for &Order<'a> {
     fn into(self) -> (&'static str, String) {
         match self {
             Order::MaxResults(i) => ("maxResults", (*i).to_string()),
-            Order::FromEnteredTime(s) => ("period", (*s).to_string()),
-            Order::ToEnteredTime(s) => ("period", (*s).to_string()),
-            Order::Status(s) => ("period", (*s).to_string()),
+            Order::FromEnteredTime(s) => ("fromEnteredTime", (*s).to_string()),
+            Order::ToEnteredTime(s) => ("toEnteredTime", (*s).to_string()),
+            Order::Status(s) => ("status", (*s).to_string()),
         }
     }
 }
