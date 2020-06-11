@@ -1,3 +1,6 @@
+**Disclaimer:** I'm in no way endorsing or affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
+
+
 # tdameritradeclient
 
 [Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/)
@@ -68,7 +71,7 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /accounts/{}?fields=positions,orders
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [X] GET / accounts/{}/orders
+- [X] GET / accounts/{}/orders?parameters*
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders 

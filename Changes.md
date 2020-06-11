@@ -1,5 +1,12 @@
 
-# V0.1.0
+# v0.1.1
+
+- added disclaimer
+- fixed `/src/param.rs` to correct bug for `Order` Enum
+- small corrections to `Readme.md`
+
+
+# v0.1.0
 
 Created initial version 
 
