@@ -69,20 +69,49 @@ impl<'a> Into<(&'static str, String)> for &History<'a> {
 
 #[derive(Debug)]
 pub enum OptionChain<'a> {
+    /// Type of contracts to return in the chain. Can be CALL, PUT, or ALL. Default is ALL.
     ContractType(&'a str),
+    /// The number of strikes to return above and below the at-the-money price.
     StrikeCount(u8),
+    ///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the 
+    /// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values), 
+    /// COVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY, CONDOR, DIAGONAL, COLLAR, or ROLL. Default is SINGLE.
     Strategy(&'a str),
+    /// Strike interval for spread strategy chains (see strategy param).
     Interval(u8),
+    /// Provide a strike price to return options only at that strike price.
     Strike(f64),
+    /// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.
     IncludeQuotes(bool),
+    /// Returns options for the given range. Possible values are:
+    ///  ITM: In-the-money
+    ///  NTM: Near-the-money
+    ///  OTM: Out-of-the-money
+    ///  SAK: Strikes Above Market
+    ///  SBK: Strikes Below Market
+    ///  SNK: Strikes Near Market
+    ///  ALL: All Strikes
+    ///  Default is ALL.
     Range(&'a str),
+    /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration 
+    ///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd'T'HH:mm:ssz.
     FromDate(&'a str),
+    /// Only return expirations before this date. For strategies, expiration refers to the nearest term expiration
+    ///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd'T'HH:mm:ssz.
     ToDate(&'a str),
+    /// Volatility to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param).
     Volatility(f64),
+    /// Underlying price to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param)
     UnderlyingPrice(f64),
+    /// Interest rate to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param)
     InterestRate(f64),
+    /// Days to expiration to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param).
     DaysToExpiration(f64),
+    /// 'Return only options expiring in the specified month. Month is given in the three character format.
+    ///   Example: JAN, Default is ALL.
     ExpireMonth(&'a str),
+    /// Type of contracts to return. Possible values are:
+    ///  S: Standard contracts, NS: Non-standard contracts, ALL: All contracts. Default is ALL.
     OptionType(&'a str),
 }
 
@@ -102,7 +131,7 @@ impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
             OptionChain::UnderlyingPrice(i) => ("underlyingPrice", (*i).to_string()),
             OptionChain::InterestRate(i) => ("interestRate", (*i).to_string()),
             OptionChain::DaysToExpiration(i) => ("daysToExpiration", (*i).to_string()),
-            OptionChain::ExpireMonth(s) => ("expireMonth", (*s).to_string()),
+            OptionChain::ExpireMonth(s) => ("expMonth", (*s).to_string()),
             OptionChain::OptionType(s) => ("optionType", (*s).to_string()),
         }
     }
