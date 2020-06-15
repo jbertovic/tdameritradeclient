@@ -200,21 +200,12 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>, <span class="ident">clippy</span>::<span class="ident">pedantic</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">must_use_candidate</span>)]</span>
 <span class="kw">static</span> <span class="ident">APIWWW</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.tdameritrade.com/v1/&quot;</span>;
 <span class="kw">use</span> <span class="ident">attohttpc</span>::{<span class="ident">RequestBuilder</span>, <span class="ident">Session</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">param</span>::{<span class="ident">History</span>, <span class="ident">OptionChain</span>, <span class="ident">Account</span>, <span class="ident">Order</span>};
-
-
 
 <span class="doccomment">/// # TDA Client</span>
 <span class="doccomment">///</span>
@@ -320,7 +311,6 @@
     }
     <span class="doccomment">/// get /accounts/{account}/orders</span>
     <span class="doccomment">/// retrieve all working orders</span>
-    <span class="doccomment">/// TODO: Add order parameters to get what is filled, canceled or working</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getorders</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Order</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -336,7 +326,6 @@
     <span class="doccomment">/// Creates a working order</span>
     <span class="doccomment">/// if JSON body has error it will return json indicating what&#39;s wrong</span>
     <span class="doccomment">/// if nothing is returned than request was good - could add additional error checking for 201 or 200 response</span>
-    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">createorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
@@ -349,7 +338,6 @@
     }
     <span class="doccomment">/// Delete /accounts/{account}/orders/{order}</span>
     <span class="doccomment">/// Creates a working order</span>
-    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deleteorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
@@ -361,7 +349,6 @@
 
     <span class="doccomment">/// PUT /accounts/{account}/orders/{order} with JSON formated body</span>
     <span class="doccomment">/// Replaces a working order with new order - allow the API to cancel and then creates new order</span>
-    <span class="doccomment">/// TODO: return an option -&gt; none if no error or -&gt; Some(Errorjson)</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replaceorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
@@ -375,7 +362,6 @@
 
 }
 
-<span class="comment">// TODO: Execute should return a result to propogate error upward</span>
 <span class="doccomment">/// This isn&#39;t called directly as its built into the functions of the `TDAClient`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Sends formed request to be executed with a return to either</span>

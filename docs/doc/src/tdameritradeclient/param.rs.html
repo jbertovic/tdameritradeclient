@@ -101,6 +101,42 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Account</span> {
@@ -121,9 +157,16 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Order</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Max number of orders to retrieve</span>
     <span class="ident">MaxResults</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// Specifies that no orders entered before this time should be returned.</span>
+    <span class="doccomment">/// Must be 60 days from today&#39;s date</span>
+    <span class="doccomment">/// format yyyy-mm-dd</span>
     <span class="ident">FromEnteredTime</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Specifies that no orders entered after this time should be returned.</span>
+    <span class="doccomment">/// format yyyy-mm-dd</span>
     <span class="ident">ToEnteredTime</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// specifies type of orders to be returned: WORKING, FILLED, EXPIRED, etc...</span>
     <span class="ident">Status</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
 }
 
@@ -131,9 +174,9 @@
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">String</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Order</span>::<span class="ident">MaxResults</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;maxResults&quot;</span>, (<span class="kw-2">*</span><span class="ident">i</span>).<span class="ident">to_string</span>()),
-            <span class="ident">Order</span>::<span class="ident">FromEnteredTime</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;period&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
-            <span class="ident">Order</span>::<span class="ident">ToEnteredTime</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;period&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
-            <span class="ident">Order</span>::<span class="ident">Status</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;period&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
+            <span class="ident">Order</span>::<span class="ident">FromEnteredTime</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;fromEnteredTime&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
+            <span class="ident">Order</span>::<span class="ident">ToEnteredTime</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;toEnteredTime&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
+            <span class="ident">Order</span>::<span class="ident">Status</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;status&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
         }
     }
 }
@@ -166,20 +209,49 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OptionChain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Type of contracts to return in the chain. Can be CALL, PUT, or ALL. Default is ALL.</span>
     <span class="ident">ContractType</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// The number of strikes to return above and below the at-the-money price.</span>
     <span class="ident">StrikeCount</span>(<span class="ident">u8</span>),
+    <span class="doccomment">///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the </span>
+    <span class="doccomment">/// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values), </span>
+    <span class="doccomment">/// COVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY, CONDOR, DIAGONAL, COLLAR, or ROLL. Default is SINGLE.</span>
     <span class="ident">Strategy</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Strike interval for spread strategy chains (see strategy param).</span>
     <span class="ident">Interval</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// Provide a strike price to return options only at that strike price.</span>
     <span class="ident">Strike</span>(<span class="ident">f64</span>),
+    <span class="doccomment">/// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.</span>
     <span class="ident">IncludeQuotes</span>(<span class="ident">bool</span>),
+    <span class="doccomment">/// Returns options for the given range. Possible values are:</span>
+    <span class="doccomment">///  ITM: In-the-money</span>
+    <span class="doccomment">///  NTM: Near-the-money</span>
+    <span class="doccomment">///  OTM: Out-of-the-money</span>
+    <span class="doccomment">///  SAK: Strikes Above Market</span>
+    <span class="doccomment">///  SBK: Strikes Below Market</span>
+    <span class="doccomment">///  SNK: Strikes Near Market</span>
+    <span class="doccomment">///  ALL: All Strikes</span>
+    <span class="doccomment">///  Default is ALL.</span>
     <span class="ident">Range</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration </span>
+    <span class="doccomment">///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd&#39;T&#39;HH:mm:ssz.</span>
     <span class="ident">FromDate</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Only return expirations before this date. For strategies, expiration refers to the nearest term expiration</span>
+    <span class="doccomment">///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd&#39;T&#39;HH:mm:ssz.</span>
     <span class="ident">ToDate</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Volatility to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param).</span>
     <span class="ident">Volatility</span>(<span class="ident">f64</span>),
+    <span class="doccomment">/// Underlying price to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param)</span>
     <span class="ident">UnderlyingPrice</span>(<span class="ident">f64</span>),
+    <span class="doccomment">/// Interest rate to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param)</span>
     <span class="ident">InterestRate</span>(<span class="ident">f64</span>),
+    <span class="doccomment">/// Days to expiration to use in calculations. Applies only to ANALYTICAL strategy chains (see strategy param).</span>
     <span class="ident">DaysToExpiration</span>(<span class="ident">f64</span>),
+    <span class="doccomment">/// &#39;Return only options expiring in the specified month. Month is given in the three character format.</span>
+    <span class="doccomment">///   Example: JAN, Default is ALL.</span>
     <span class="ident">ExpireMonth</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="doccomment">/// Type of contracts to return. Possible values are:</span>
+    <span class="doccomment">///  S: Standard contracts, NS: Non-standard contracts, ALL: All contracts. Default is ALL.</span>
     <span class="ident">OptionType</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
 }
 
@@ -199,7 +271,7 @@
             <span class="ident">OptionChain</span>::<span class="ident">UnderlyingPrice</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;underlyingPrice&quot;</span>, (<span class="kw-2">*</span><span class="ident">i</span>).<span class="ident">to_string</span>()),
             <span class="ident">OptionChain</span>::<span class="ident">InterestRate</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;interestRate&quot;</span>, (<span class="kw-2">*</span><span class="ident">i</span>).<span class="ident">to_string</span>()),
             <span class="ident">OptionChain</span>::<span class="ident">DaysToExpiration</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;daysToExpiration&quot;</span>, (<span class="kw-2">*</span><span class="ident">i</span>).<span class="ident">to_string</span>()),
-            <span class="ident">OptionChain</span>::<span class="ident">ExpireMonth</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;expireMonth&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
+            <span class="ident">OptionChain</span>::<span class="ident">ExpireMonth</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;expMonth&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
             <span class="ident">OptionChain</span>::<span class="ident">OptionType</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;optionType&quot;</span>, (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">to_string</span>()),
         }
     }
