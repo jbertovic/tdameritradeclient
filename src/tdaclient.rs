@@ -32,6 +32,18 @@ impl TDAClient {
             client,
         }
     }
+    /// get /oauth2/token
+    /// token endpoint returns an access token along with an optional refresh token
+    /// using `refresh_token` grant_type and stores new token inside client
+    pub fn gettoken(&self) {
+        unimplemented!();
+    }
+    /// get /oauth2/token
+    /// token endpoint returns an access token along with an optional refresh token
+    /// using `refresh_token` grant_type and retrieves new refresh_token while storing valid token inside client
+    pub fn getrefreshtoken(&self) -> String {
+        unimplemented!();
+    }
     /// get /userprincipals
     pub fn getuserprincipals<T>(&self) -> T
     where
