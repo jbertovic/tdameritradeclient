@@ -18,10 +18,9 @@ pub struct TDAClient {
     client: Session,
 }
 
-#[allow(dead_code)]
 impl TDAClient {
     /// Create new bsae client that maintains Authorization Header
-    /// Requires valid auth token from tdameritrade
+    /// Requires valid ***auth token*** from tdameritrade
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
@@ -31,19 +30,26 @@ impl TDAClient {
             client,
         }
     }
+    /// Create new bsae client that maintains Authorization Header
+    /// Requires valid ***refresh token*** from tdameritrade
+    pub fn usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
+        let mut client = TDAClient::new("notvalid".to_owned());
+        client.gettoken(refresh, clientid, false);
+        client
+    }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an refresh token
-    /// using `refresh_token` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
-    /// option included to update the refresh token
-    pub fn gettoken(&mut self, refresh: String, clientid: String, refreshupdate: bool) -> String 
+    /// using `refresh_token` grant_type and retrieves new refresh_token (optional) while storing valid token inside client
+    /// returns full response
+    pub fn gettoken(&mut self, refresh: &str, clientid: &str, refreshupdate: bool) -> String 
     {
         //create new Session since authorization will change
         self.client = Session::new();
 
         //body parameters
         let mut p = vec!(("grant_type", "refresh_token"),
-                ( "refresh_token", refresh.as_str()),
-                ("client_id", clientid.as_str()));
+                ( "refresh_token", refresh),
+                ("client_id", clientid));
         if refreshupdate {p.push(("access_type", "offline"));}
         let response = self.client
             .post(format!("{}oauth2/token", APIWWW))
@@ -53,13 +59,13 @@ impl TDAClient {
 
         let responsejson: serde_json::Value = serde_json::from_str(&response).expect("Error: No access token retrieved");
         self.authtoken = responsejson["access_token"].as_str().unwrap().to_owned();
-        println!("AUTHTOKEN: {}", self.authtoken);
         self.client.header("AUTHORIZATION", format!("Bearer {}", &self.authtoken));
         response
     }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
     /// using `authorization_code` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
+    /// returns full response
     pub fn gettokensfromcode(&self, _code: String, _clientid: String, _redirect_uri: String) -> String
     {
         //TODO: implement authorization_code grant_type
@@ -236,12 +242,20 @@ mod tdaclient_tests{
     }
     #[test]
     #[ignore]
-    fn check_if_auth_works() {
+    fn check_if_auth_works_gettoken() {
         let mut c = TDAClient::new("OLDTOKENTHATDOESNTWORK".to_owned());
         let r = env::var("TDREFRESHTOKEN").unwrap();
         let ck = format!("{}{}", env::var("TDCLIENTKEY").unwrap(), "@AMER.OAUTHAP");
-        println!("{}", c.gettoken(r, ck.to_owned(), true));
+        println!("{}", c.gettoken(&r, &ck, true));
         println!("client: {:?}", c);
+        println!("{}", c.getuserprincipals::<String>());
+    }
+    #[test]
+    #[ignore]
+    fn check_if_usingrefresh_creates_new_client() {
+        let r = env::var("TDREFRESHTOKEN").unwrap();
+        let ck = format!("{}{}", env::var("TDCLIENTKEY").unwrap(), "@AMER.OAUTHAP");
+        let c = TDAClient::usingrefresh(&r, &ck);
         println!("{}", c.getuserprincipals::<String>());
     }
 }

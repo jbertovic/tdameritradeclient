@@ -22,6 +22,8 @@ see unit tests in `./tests/clienttests.rs` and examples in `./examples/` for ide
 use std::env;
 use tdameritradeclient::{TDAClient}
 
+// Will need to set TDAUTHTOKEN as environmental variable containing a valid token
+
 fn main() {
 
     //set token from environment variables
@@ -41,21 +43,23 @@ fn main() {
 
 ## Setup
 
-Environment Variables required
-|Property|Location|Description
-|---|---|---
-|TDAUTHTOKEN|Used to create new `TDAClient`| you will need to manually create as per [developer.tdameritrade.com](http://developer.tdameritrade.com) 
+You will need to determine a way to supply a method of authorization to the client.  
 
-## Current TODOs
-- [ ] function to grab token from refresh_token
-- [ ] function to renew refresh_token
+You can implement the client in one of 3 ways:
+1) Supply valid ***token*** that will be used in the request as `Bearer <token>`
+2) Supply valid ***refresh*** token that will be used to request a valid token for the client as per 1
+3) Supply ***authorization code*** that can be used to grab a valid token for the client as per 1
+
+An easy way to do this is through **environmental variables** as can be seen in in `./tests/clienttests.rs` and examples in `./examples/`.
+
+See [developer.tdameritrade.com](http://developer.tdameritrade.com) on how to manually create either of the 3 auth codes listed above.
 
 
 ## Future IDEAS
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
-- [ ] create feature options from serde_json
+- [ ] create feature option from serde_json
 
 
 ## Endpoints added
@@ -74,4 +78,5 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET / accounts/{}/orders?parameters*
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
-- [X] DELETE /accounts/{}/orders 
+- [X] DELETE /accounts/{}/orders
+- [X] POST /oauth2/token
