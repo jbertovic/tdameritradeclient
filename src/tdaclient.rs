@@ -14,7 +14,6 @@ use crate::param::{History, OptionChain, Account, Order};
 ///
 #[derive(Debug)]
 pub struct TDAClient {
-    // consumerkey: String,
     authtoken: String,
     client: Session,
 }
@@ -33,15 +32,37 @@ impl TDAClient {
         }
     }
     /// get /oauth2/token
-    /// token endpoint returns an access token along with an optional refresh token
-    /// using `refresh_token` grant_type and stores new token inside client
-    pub fn gettoken(&self) {
-        unimplemented!();
+    /// token endpoint returns an access token along with an refresh token
+    /// using `refresh_token` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
+    /// option included to update the refresh token
+    pub fn gettoken(&mut self, refresh: String, clientid: String, refreshupdate: bool) -> String 
+    {
+        //create new Session since authorization will change
+        self.client = Session::new();
+
+        //body parameters
+        let mut p = vec!(("grant_type", "refresh_token"),
+                ( "refresh_token", refresh.as_str()),
+                ("client_id", clientid.as_str()));
+        if refreshupdate {p.push(("access_type", "offline"));}
+        let response = self.client
+            .post(format!("{}oauth2/token", APIWWW))
+            .form(&p).unwrap()
+            .send().unwrap()
+            .text().unwrap();
+
+        let responsejson: serde_json::Value = serde_json::from_str(&response).expect("Error: No access token retrieved");
+        self.authtoken = responsejson["access_token"].as_str().unwrap().to_owned();
+        println!("AUTHTOKEN: {}", self.authtoken);
+        self.client.header("AUTHORIZATION", format!("Bearer {}", &self.authtoken));
+        response
     }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
-    /// using `refresh_token` grant_type and retrieves new refresh_token while storing valid token inside client
-    pub fn getrefreshtoken(&self) -> String {
+    /// using `authorization_code` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
+    pub fn gettokensfromcode(&self, _code: String, _clientid: String, _redirect_uri: String) -> String
+    {
+        //TODO: implement authorization_code grant_type
         unimplemented!();
     }
     /// get /userprincipals
@@ -205,10 +226,22 @@ impl Execute<serde_json::Value> for RequestBuilder {
 
 #[cfg(test)]
 mod tdaclient_tests{
+
+    use super::TDAClient;
+    use std::env;
+
     #[test]
     fn check_if_this_test_works() {
         assert!(true);
     }
-
-
+    #[test]
+    #[ignore]
+    fn check_if_auth_works() {
+        let mut c = TDAClient::new("OLDTOKENTHATDOESNTWORK".to_owned());
+        let r = env::var("TDREFRESHTOKEN").unwrap();
+        let ck = format!("{}{}", env::var("TDCLIENTKEY").unwrap(), "@AMER.OAUTHAP");
+        println!("{}", c.gettoken(r, ck.to_owned(), true));
+        println!("client: {:?}", c);
+        println!("{}", c.getuserprincipals::<String>());
+    }
 }
