@@ -62,11 +62,18 @@ impl TDAClient {
         self.client.header("AUTHORIZATION", format!("Bearer {}", &self.authtoken));
         response
     }
+    /// used to get code manually from website with redirect URI as localhost
+    /// as per the directions on developer.tdameritrade.com
+    /// code can be used with `gettokensfromcode` to initiate a refreshtoken and token
+    pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
+        //TODO: Get weblink to tdameritrade site to grant authorization code needed for client to request token
+        unimplemented!();
+    }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
     /// using `authorization_code` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
     /// returns full response
-    pub fn gettokensfromcode(&self, _code: String, _clientid: String, _redirect_uri: String) -> String
+    pub fn gettokensfromcode(&self, _code: &str, _clientid: &str, _redirect_uri: &str) -> String
     {
         //TODO: implement authorization_code grant_type
         unimplemented!();

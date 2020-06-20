@@ -75,7 +75,7 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /accounts/{}?fields=positions,orders
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [X] GET / accounts/{}/orders?parameters*
+- [X] GET /accounts/{}/orders?parameters*
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders
