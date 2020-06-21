@@ -1,9 +1,10 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
+static APIKEY: &str = "@AMER.OAUTHAP";
 use attohttpc::{RequestBuilder, Session};
 use crate::param::{History, OptionChain, Account, Order};
-
+///
 /// # TDA Client
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
@@ -20,7 +21,7 @@ pub struct TDAClient {
 
 impl TDAClient {
     /// Create new bsae client that maintains Authorization Header
-    /// Requires valid ***auth token*** from tdameritrade
+    /// Requires valid ***token*** from tdameritrade
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
@@ -30,26 +31,31 @@ impl TDAClient {
             client,
         }
     }
-    /// Create new bsae client that maintains Authorization Header
+    /// Create new base client that maintains Authorization Header
     /// Requires valid ***refresh token*** from tdameritrade
-    pub fn usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
+    pub fn newusingrefresh(refresh: &str, clientid: &str) -> TDAClient {
         let mut client = TDAClient::new("notvalid".to_owned());
-        client.gettoken(refresh, clientid, false);
+        client.gettokenfromrefresh(refresh, clientid, false);
         client
+    }
+    /// Create new base client that maintains Authorization Header
+    /// Requires valid auth ***code*** from tdameritrade
+    pub fn newusingcode(code: &str, clientid: &str, redirect: &str) -> TDAClient {
+        unimplemented!();
     }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an refresh token
-    /// using `refresh_token` grant_type and retrieves new refresh_token (optional) while storing valid token inside client
+    /// using `refresh_token` grant type and retrieves new `refresh_token` (optional) while storing valid token inside client
     /// returns full response
-    pub fn gettoken(&mut self, refresh: &str, clientid: &str, refreshupdate: bool) -> String 
+    pub fn gettokenfromrefresh(&mut self, refresh: &str, clientid: &str, refreshupdate: bool) -> String 
     {
         //create new Session since authorization will change
         self.client = Session::new();
-
+        let fullclientid = format!("{}{}", clientid, APIKEY);
         //body parameters
         let mut p = vec!(("grant_type", "refresh_token"),
                 ( "refresh_token", refresh),
-                ("client_id", clientid));
+                ("client_id", &fullclientid));
         if refreshupdate {p.push(("access_type", "offline"));}
         let response = self.client
             .post(format!("{}oauth2/token", APIWWW))
@@ -62,21 +68,24 @@ impl TDAClient {
         self.client.header("AUTHORIZATION", format!("Bearer {}", &self.authtoken));
         response
     }
-    /// used to get code manually from website with redirect URI as localhost
-    /// as per the directions on developer.tdameritrade.com
+    /// used to get code manually from tdameritrade website with redirect URI as localhost
+    /// as per the directions on developer.tdameritrade.com -> you must register an app to get clientid and redirecturi
     /// code can be used with `gettokensfromcode` to initiate a refreshtoken and token
     pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
-        //TODO: Get weblink to tdameritrade site to grant authorization code needed for client to request token
-        unimplemented!();
+        let mut getcodeurl  = url::Url::parse("https://auth.tdameritrade.com/auth").unwrap();
+        getcodeurl.query_pairs_mut().append_pair("response_type", "code")
+            .append_pair("redirect_uri", redirecturi)
+            .append_pair("client_id", &format!("{}{}", clientid, "@AMER.OAUTHAP"));
+        getcodeurl.to_string()
     }
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
-    /// using `authorization_code` grant_type and retrieves new refresh_token (response returned) while storing valid token inside client
+    /// using `authorization_code` grant type and retrieves new `refresh_token` (response returned) while storing valid token inside client
     /// returns full response
-    pub fn gettokensfromcode(&self, _code: &str, _clientid: &str, _redirect_uri: &str) -> String
+    pub fn gettokenfromcode(&self, _code: &str, _clientid: &str, _redirect_uri: &str) -> String
     {
-        //TODO: implement authorization_code grant_type
         unimplemented!();
+        //TODO: implement authorization_code grant_type
     }
     /// get /userprincipals
     pub fn getuserprincipals<T>(&self) -> T
@@ -249,20 +258,38 @@ mod tdaclient_tests{
     }
     #[test]
     #[ignore]
-    fn check_if_auth_works_gettoken() {
+    fn check_if_auth_works_gettokenfromrefresh() {
         let mut c = TDAClient::new("OLDTOKENTHATDOESNTWORK".to_owned());
         let r = env::var("TDREFRESHTOKEN").unwrap();
         let ck = format!("{}{}", env::var("TDCLIENTKEY").unwrap(), "@AMER.OAUTHAP");
-        println!("{}", c.gettoken(&r, &ck, true));
+        println!("{}", c.gettokenfromrefresh(&r, &ck, true));
         println!("client: {:?}", c);
         println!("{}", c.getuserprincipals::<String>());
     }
     #[test]
     #[ignore]
-    fn check_if_usingrefresh_creates_new_client() {
+    fn check_if_newusingrefresh_creates_new_client() {
         let r = env::var("TDREFRESHTOKEN").unwrap();
         let ck = format!("{}{}", env::var("TDCLIENTKEY").unwrap(), "@AMER.OAUTHAP");
-        let c = TDAClient::usingrefresh(&r, &ck);
+        let c = TDAClient::newusingrefresh(&r, &ck);
         println!("{}", c.getuserprincipals::<String>());
     }
+    #[test]
+    #[ignore]
+    fn check_code_weblink_auth_works() {
+        let ck = env::var("TDCLIENTKEY").unwrap();
+        let redirect = env::var("TDREDIRECT").unwrap();
+        println!("{}",TDAClient::getcodeweblink(&ck, &redirect));
+    }
+    #[test]
+    #[ignore]
+    fn check_if_newusingcode_creates_new_client() {
+        unimplemented!();
+    }
+    #[test]
+    #[ignore]
+    fn check_if_auth_works_gettokenfromcode() {
+        unimplemented!();
+    }
+
 }

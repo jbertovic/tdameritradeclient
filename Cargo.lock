@@ -396,6 +396,7 @@ version = "0.2.0"
 dependencies = [
  "attohttpc",
  "serde_json",
+ "url",
 ]
 
 [[package]]
