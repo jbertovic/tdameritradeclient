@@ -96,6 +96,7 @@ impl TDauth {
             ("client_id", &self.clientid),
             ("redirect_uri", self.redirecturi.as_ref().unwrap()),
         ];
+
         let response = attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
             .form(&p)
             .unwrap()
@@ -103,9 +104,6 @@ impl TDauth {
             .unwrap()
             .text()
             .unwrap();
-
-        println!("{:?}", p);
-        println!("{}",response);
 
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
