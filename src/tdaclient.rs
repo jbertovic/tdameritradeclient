@@ -36,8 +36,11 @@ impl TDAClient {
     }
     /// Create new base client that maintains Authorization Header
     /// Requires valid auth ***code*** from tdameritrade
-    pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str) -> TDAClient {
-        TDAClient::new(gettoken_fromcode(code, clientid, redirecturi))
+    ///
+    /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
+    ///
+    pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
+        TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
     /// get /userprincipals
     pub fn getuserprincipals<T>(&self) -> T
@@ -213,14 +216,13 @@ mod tdaclient_tests{
         println!("{}", c.getuserprincipals::<String>());
     }
 
-    // TODO: Does not work
     #[test]
     #[ignore]
     fn check_if_newusingcode_creates_new_client() {
         let code = env::var("TDCODE").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let redirecturi = env::var("TDREDIRECT").unwrap();
-        let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi);
+        let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi, true);
         println!("{}", c.getuserprincipals::<String>());
     }
 
