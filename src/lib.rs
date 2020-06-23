@@ -12,8 +12,13 @@
 //! 
 //! Use the relevant associated Enums in param to add any parameters to the get function request on the TDAClient
 
+static APIWWW: &str = "https://api.tdameritrade.com/v1/";
+static APIKEY: &str = "@AMER.OAUTHAP";
+
 mod tdaclient;
 mod param;
+
+pub mod auth;
 
 pub use tdaclient::TDAClient as TDAClient;
 pub use param::{Account, OptionChain, History, Order};
