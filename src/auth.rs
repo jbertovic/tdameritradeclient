@@ -44,7 +44,7 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
 ///
 #[derive(Debug)]
-struct TDauth {
+pub struct TDauth {
     token: String,
     refresh: String,
     clientid: String,
@@ -52,8 +52,9 @@ struct TDauth {
 }
 
 impl TDauth {
-    /// retrieve valid token from refresh and clientid
-    fn new_fromrefresh(refresh: &str, clientid: &str) -> TDauth {
+    /// create new `TDauth` with `refresh_token` and `clientid`
+    /// if successful `TDauth` will carry original `refresh_token` and new valid `token`
+    pub fn new_fromrefresh(refresh: &str, clientid: &str) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: refresh.to_owned(),
@@ -63,11 +64,12 @@ impl TDauth {
         newauth.resolve_token_fromrefresh(false);
         newauth
     }
-    /// retrieve valid token from refresh and clientid
+    /// create new `TDauth` with `code`, `redirecturi` and `clientid`
+    /// if successful `TDauth` will carry both new `refresh_token` and new valid `token`
     ///
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
-    fn new_fromcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDauth {
+    pub fn new_fromcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: String::new(),
@@ -80,7 +82,9 @@ impl TDauth {
     /// get /oauth2/token
     /// token endpoint returns an access token along with an refresh token
     /// using `refresh_token` grant type and retrieves new `refresh_token` (optional)
+    ///
     /// returns full response and updates `TDauth` struct
+    ///
     pub fn resolve_token_fromrefresh(&mut self, refreshupdate: bool) -> String {
         //body parameters
         let mut p = vec![
@@ -107,7 +111,8 @@ impl TDauth {
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
     /// using `authorization_code` grant type and retrieves new `refresh_token` (response returned) while storing valid token inside client
-    /// returns full response
+    ///
+    /// returns full json response as text and updates TDAuth
     ///
     /// if grabbing code from browser as per the instructions on developer.tdameritrade.com
     /// then you will need to decode it.  As the code is encoded when put in post body.
