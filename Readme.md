@@ -7,7 +7,7 @@
 
 ## Description
 
-A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client does not currently handle authorization and assumes you have a valid auth token which is set through an environmental variable (see below). See tests as examples on how to use.
+A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client has a utility module `tdameritrade::auth::TDauth` to help with authorization or you can use the client directly with a valid auth token.  I typically use environmental variables to pass tokens and config (see below). I've included exmples in the `./exmples` folder and in some of the tests.
 
 This client uses a blocking web request client library [attohttps](https://github.com/sbstp/attohttpc).
 
