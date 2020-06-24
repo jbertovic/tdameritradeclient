@@ -1,9 +1,9 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 use attohttpc::{RequestBuilder, Session};
 use crate::param::{History, OptionChain, Account, Order};
-
+use crate::auth::{gettoken_fromrefresh, gettoken_fromcode};
+///
 /// # TDA Client
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
@@ -14,23 +14,33 @@ use crate::param::{History, OptionChain, Account, Order};
 ///
 #[derive(Debug)]
 pub struct TDAClient {
-    // consumerkey: String,
     authtoken: String,
     client: Session,
 }
 
-#[allow(dead_code)]
 impl TDAClient {
     /// Create new bsae client that maintains Authorization Header
-    /// Requires valid auth token from tdameritrade
+    /// Requires valid ***token*** from tdameritrade
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
-
         TDAClient {
             authtoken: token,
             client,
         }
+    }
+    /// Create new base client that maintains Authorization Header
+    /// Requires valid ***refresh token*** from tdameritrade
+    pub fn new_usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
+        TDAClient::new(gettoken_fromrefresh(refresh, clientid))
+    }
+    /// Create new base client that maintains Authorization Header
+    /// Requires valid auth ***code*** from tdameritrade
+    ///
+    /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
+    ///
+    pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
+        TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
     /// get /userprincipals
     pub fn getuserprincipals<T>(&self) -> T
@@ -38,7 +48,7 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}userprincipals", APIWWW))
+            .get(format!("{}userprincipals", crate::APIWWW))
             .execute()
     }
     /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
@@ -47,7 +57,7 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}marketdata/quotes", APIWWW))
+            .get(format!("{}marketdata/quotes", crate::APIWWW))
             .param("symbol", quotequery)
             .execute()
     }
@@ -61,7 +71,7 @@ impl TDAClient {
     {
         let mut builder = self
             .client
-            .get(format!("{}marketdata/{}/pricehistory", APIWWW, symbol));
+            .get(format!("{}marketdata/{}/pricehistory", crate::APIWWW, symbol));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -76,7 +86,7 @@ impl TDAClient {
     {
         let mut builder = self
             .client
-            .get(format!("{}marketdata/chains", APIWWW))
+            .get(format!("{}marketdata/chains", crate::APIWWW))
             .param("symbol", symbol);
         for param in params {
             let (k, v) = param.into();
@@ -90,7 +100,7 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        self.client.get(format!("{}accounts", APIWWW)).execute()
+        self.client.get(format!("{}accounts", crate::APIWWW)).execute()
     }
     /// get /accounts/{account}
     /// grabs one account with `account_id`
@@ -99,7 +109,7 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}", APIWWW, account));
+        let mut builder = self.client.get(format!("{}accounts/{}", crate::APIWWW, account));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -112,7 +122,7 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}/orders", APIWWW, account));
+        let mut builder = self.client.get(format!("{}accounts/{}/orders", crate::APIWWW, account));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -126,7 +136,7 @@ impl TDAClient {
     pub fn createorder(&self, account: &str, ordertxt: &str) -> String
     {
         self.client
-            .post(format!("{}accounts/{}/orders", APIWWW, account))
+            .post(format!("{}accounts/{}/orders", crate::APIWWW, account))
             .header_append("Content-Type", "application/json")
             .text(ordertxt)
             .send()
@@ -138,7 +148,7 @@ impl TDAClient {
     pub fn deleteorder(&self, account: &str, order: &str) -> String
     {
         self.client
-            .delete(format!("{}accounts/{}/orders/{}", APIWWW, account, order))
+            .delete(format!("{}accounts/{}/orders/{}", crate::APIWWW, account, order))
             .send()
             .expect("Trouble Retrieving Response: ERROR")
             .text().unwrap()
@@ -149,7 +159,7 @@ impl TDAClient {
     pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
     {
         self.client
-            .put(format!("{}accounts/{}/orders/{}", APIWWW, account, order))
+            .put(format!("{}accounts/{}/orders/{}", crate::APIWWW, account, order))
             .header_append("Content-Type", "application/json")
             .text(ordertxt)
             .send()
@@ -193,10 +203,27 @@ impl Execute<serde_json::Value> for RequestBuilder {
 
 #[cfg(test)]
 mod tdaclient_tests{
+
+    use super::TDAClient;
+    use std::env;
+
     #[test]
-    fn check_if_this_test_works() {
-        assert!(true);
+    #[ignore]
+    fn check_new_usingrefresh_creates_new_client() {
+        let refresh = env::var("TDREFRESHTOKEN").unwrap();
+        let clientid = env::var("TDCLIENTKEY").unwrap();
+        let c = TDAClient::new_usingrefresh(&refresh, &clientid);
+        println!("{}", c.getuserprincipals::<String>());
     }
 
+    #[test]
+    #[ignore]
+    fn check_if_newusingcode_creates_new_client() {
+        let code = env::var("TDCODE").unwrap();
+        let clientid = env::var("TDCLIENTKEY").unwrap();
+        let redirecturi = env::var("TDREDIRECT").unwrap();
+        let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi, true);
+        println!("{}", c.getuserprincipals::<String>());
+    }
 
 }

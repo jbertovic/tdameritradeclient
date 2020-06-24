@@ -200,13 +200,40 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy</span>::<span class="ident">all</span>, <span class="ident">clippy</span>::<span class="ident">pedantic</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">must_use_candidate</span>)]</span>
-<span class="kw">static</span> <span class="ident">APIWWW</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.tdameritrade.com/v1/&quot;</span>;
 <span class="kw">use</span> <span class="ident">attohttpc</span>::{<span class="ident">RequestBuilder</span>, <span class="ident">Session</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">param</span>::{<span class="ident">History</span>, <span class="ident">OptionChain</span>, <span class="ident">Account</span>, <span class="ident">Order</span>};
-
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">auth</span>::{<span class="ident">gettoken_fromrefresh</span>, <span class="ident">gettoken_fromcode</span>};
+<span class="doccomment">///</span>
 <span class="doccomment">/// # TDA Client</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration</span>
@@ -217,23 +244,33 @@
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TDAClient</span> {
-    <span class="comment">// consumerkey: String,</span>
     <span class="ident">authtoken</span>: <span class="ident">String</span>,
     <span class="ident">client</span>: <span class="ident">Session</span>,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TDAClient</span> {
     <span class="doccomment">/// Create new bsae client that maintains Authorization Header</span>
-    <span class="doccomment">/// Requires valid auth token from tdameritrade</span>
+    <span class="doccomment">/// Requires valid ***token*** from tdameritrade</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDAClient</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Session</span>::<span class="ident">new</span>();
         <span class="ident">client</span>.<span class="ident">header</span>(<span class="string">&quot;AUTHORIZATION&quot;</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Bearer {}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>));
-
         <span class="ident">TDAClient</span> {
             <span class="ident">authtoken</span>: <span class="ident">token</span>,
             <span class="ident">client</span>,
         }
+    }
+    <span class="doccomment">/// Create new base client that maintains Authorization Header</span>
+    <span class="doccomment">/// Requires valid ***refresh token*** from tdameritrade</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_usingrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDAClient</span> {
+        <span class="ident">TDAClient</span>::<span class="ident">new</span>(<span class="ident">gettoken_fromrefresh</span>(<span class="ident">refresh</span>, <span class="ident">clientid</span>))
+    }
+    <span class="doccomment">/// Create new base client that maintains Authorization Header</span>
+    <span class="doccomment">/// Requires valid auth ***code*** from tdameritrade</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_usingcode</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">redirecturi</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">codedecode</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDAClient</span> {
+        <span class="ident">TDAClient</span>::<span class="ident">new</span>(<span class="ident">gettoken_fromcode</span>(<span class="ident">code</span>, <span class="ident">clientid</span>, <span class="ident">redirecturi</span>, <span class="ident">codedecode</span>))
     }
     <span class="doccomment">/// get /userprincipals</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getuserprincipals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
@@ -241,7 +278,7 @@
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}userprincipals&quot;</span>, <span class="ident">APIWWW</span>))
+            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}userprincipals&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>))
             .<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....</span>
@@ -250,7 +287,7 @@
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/quotes&quot;</span>, <span class="ident">APIWWW</span>))
+            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/quotes&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>))
             .<span class="ident">param</span>(<span class="string">&quot;symbol&quot;</span>, <span class="ident">quotequery</span>)
             .<span class="ident">execute</span>()
     }
@@ -264,7 +301,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/{}/pricehistory&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">symbol</span>));
+            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/{}/pricehistory&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">symbol</span>));
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">param</span>.<span class="ident">into</span>();
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">param</span>(<span class="ident">k</span>, <span class="ident">v</span>);
@@ -279,7 +316,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">client</span>
-            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/chains&quot;</span>, <span class="ident">APIWWW</span>))
+            .<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}marketdata/chains&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>))
             .<span class="ident">param</span>(<span class="string">&quot;symbol&quot;</span>, <span class="ident">symbol</span>);
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">param</span>.<span class="ident">into</span>();
@@ -293,7 +330,7 @@
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts&quot;</span>, <span class="ident">APIWWW</span>)).<span class="ident">execute</span>()
+        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>)).<span class="ident">execute</span>()
     }
     <span class="doccomment">/// get /accounts/{account}</span>
     <span class="doccomment">/// grabs one account with `account_id`</span>
@@ -302,7 +339,7 @@
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">account</span>));
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">param</span>.<span class="ident">into</span>();
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">param</span>(<span class="ident">k</span>, <span class="ident">v</span>);
@@ -315,7 +352,7 @@
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">account</span>));
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">param</span>.<span class="ident">into</span>();
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">param</span>(<span class="ident">k</span>, <span class="ident">v</span>);
@@ -329,7 +366,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">createorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">post</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>))
+            .<span class="ident">post</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">account</span>))
             .<span class="ident">header_append</span>(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)
             .<span class="ident">text</span>(<span class="ident">ordertxt</span>)
             .<span class="ident">send</span>()
@@ -341,7 +378,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deleteorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">delete</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
+            .<span class="ident">delete</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
             .<span class="ident">send</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;Trouble Retrieving Response: ERROR&quot;</span>)
             .<span class="ident">text</span>().<span class="ident">unwrap</span>()
@@ -352,7 +389,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replaceorder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">order</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ordertxt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
     {
         <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">put</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
+            .<span class="ident">put</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}accounts/{}/orders/{}&quot;</span>, <span class="kw">crate</span>::<span class="ident">APIWWW</span>, <span class="ident">account</span>, <span class="ident">order</span>))
             .<span class="ident">header_append</span>(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)
             .<span class="ident">text</span>(<span class="ident">ordertxt</span>)
             .<span class="ident">send</span>()
@@ -396,11 +433,28 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tdaclient_tests</span>{
+
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">TDAClient</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
+
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">check_if_this_test_works</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="bool-val">true</span>);
+    <span class="attribute">#[<span class="ident">ignore</span>]</span>
+    <span class="kw">fn</span> <span class="ident">check_new_usingrefresh_creates_new_client</span>() {
+        <span class="kw">let</span> <span class="ident">refresh</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDREFRESHTOKEN&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">clientid</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDCLIENTKEY&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">TDAClient</span>::<span class="ident">new_usingrefresh</span>(<span class="kw-2">&amp;</span><span class="ident">refresh</span>, <span class="kw-2">&amp;</span><span class="ident">clientid</span>);
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>.<span class="ident">getuserprincipals</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>());
     }
 
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">ignore</span>]</span>
+    <span class="kw">fn</span> <span class="ident">check_if_newusingcode_creates_new_client</span>() {
+        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDCODE&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">clientid</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDCLIENTKEY&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">redirecturi</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDREDIRECT&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">TDAClient</span>::<span class="ident">new_usingcode</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>, <span class="kw-2">&amp;</span><span class="ident">clientid</span>, <span class="kw-2">&amp;</span><span class="ident">redirecturi</span>, <span class="bool-val">true</span>);
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>.<span class="ident">getuserprincipals</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>());
+    }
 
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "tdameritradeclient";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
