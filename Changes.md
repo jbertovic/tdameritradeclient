@@ -1,3 +1,17 @@
+# v0.2.0
+- added `/oauth2/token` endpoint for API through new `auth` module
+- to manage tokens added `TDauth` struct along with functions to use `/oauth2/token` endpoint
+- added `[ignore]` unit tests for `TDauth` to validate that fetch token works
+- `TDClient` can now be created with `refresh_token` or `code` which will fetch a valid `token`
+- added `[ignore]` unit tests for `TDClient` to make sure alternate constructors work
+- updated documentation throughout including `Readme.md`
+
+
+# v0.1.2
+
+- fixed `/src/param.rs` to correct bug for `OptionChain` Enum
+- updated documentation OptionChain parameters
+
 
 # v0.1.1
 

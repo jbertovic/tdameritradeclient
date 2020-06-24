@@ -185,6 +185,11 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">///</span>
 <span class="doccomment">/// used to get a valid `token` from `refresh_token` and `clientid`</span>
@@ -232,7 +237,7 @@
 <span class="doccomment">/// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.</span>
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">TDauth</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TDauth</span> {
     <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="ident">refresh</span>: <span class="ident">String</span>,
     <span class="ident">clientid</span>: <span class="ident">String</span>,
@@ -240,8 +245,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TDauth</span> {
-    <span class="doccomment">/// retrieve valid token from refresh and clientid</span>
-    <span class="kw">fn</span> <span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
+    <span class="doccomment">/// create new `TDauth` with `refresh_token` and `clientid`</span>
+    <span class="doccomment">/// if successful `TDauth` will carry original `refresh_token` and new valid `token`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span> {
             <span class="ident">token</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
             <span class="ident">refresh</span>: <span class="ident">refresh</span>.<span class="ident">to_owned</span>(),
@@ -251,11 +257,12 @@
         <span class="ident">newauth</span>.<span class="ident">resolve_token_fromrefresh</span>(<span class="bool-val">false</span>);
         <span class="ident">newauth</span>
     }
-    <span class="doccomment">/// retrieve valid token from refresh and clientid</span>
+    <span class="doccomment">/// create new `TDauth` with `code`, `redirecturi` and `clientid`</span>
+    <span class="doccomment">/// if successful `TDauth` will carry both new `refresh_token` and new valid `token`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**</span>
     <span class="doccomment">///</span>
-    <span class="kw">fn</span> <span class="ident">new_fromcode</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">redirecturi</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">codedecode</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fromcode</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">redirecturi</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">codedecode</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span> {
             <span class="ident">token</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
             <span class="ident">refresh</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
@@ -268,7 +275,9 @@
     <span class="doccomment">/// get /oauth2/token</span>
     <span class="doccomment">/// token endpoint returns an access token along with an refresh token</span>
     <span class="doccomment">/// using `refresh_token` grant type and retrieves new `refresh_token` (optional)</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// returns full response and updates `TDauth` struct</span>
+    <span class="doccomment">///</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_token_fromrefresh</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">refreshupdate</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="comment">//body parameters</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
@@ -295,7 +304,8 @@
     <span class="doccomment">/// get /oauth2/token</span>
     <span class="doccomment">/// token endpoint returns an access token along with an optional refresh token</span>
     <span class="doccomment">/// using `authorization_code` grant type and retrieves new `refresh_token` (response returned) while storing valid token inside client</span>
-    <span class="doccomment">/// returns full response</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// returns full json response as text and updates TDAuth</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if grabbing code from browser as per the instructions on developer.tdameritrade.com</span>
     <span class="doccomment">/// then you will need to decode it.  As the code is encoded when put in post body.</span>
