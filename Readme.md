@@ -17,11 +17,11 @@ I have matching CLI tool using this library in my repository: [tdacli](https://g
 
 see unit tests in [./tests/clienttests.rs](https://github.com/jbertovic/tdameritradeclient/blob/master/tests/clienttests.rs) and examples in [./examples/](https://github.com/jbertovic/tdameritradeclient/tree/master/examples) for ideas
 
-For the examples and tests to work you will need to set environmental variables for passing `token`.  The tests that are indicated `ignore` should be run one at a time.
+For the examples and tests to work you will need to set environmental variables for passing a `token`.  The tests that are indicated with `ignore` should be run one at a time.
 
 ```
 use std::env;
-use tdameritradeclient::TDAClient
+use tdameritradeclient::TDAClient;
 
 // Will need to set TDAUTHTOKEN as environmental variable containing a valid token
 
