@@ -32,7 +32,17 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
         .append_pair("client_id", &format!("{}{}", clientid, "@AMER.OAUTHAP"));
     getcodeurl.to_string()
 }
-
+///
+/// # TDauth 
+/// 
+/// These are tools to help manage authorization tokens with TD Ameritrade API
+///
+/// 1) `getcodeweblink` is a link created from parameters registered with deverloper.tdameritrade.com.  
+/// The link can be used to return a code to use to request a valid token and refresh token.  You will need to log in with your TDAmeritrade Credentials. 
+/// If you use a `redirect_uri` that points to localhost than you will see the code returned in the query bar of the browser
+/// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
+/// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
+///
 #[derive(Debug)]
 struct TDauth {
     token: String,
