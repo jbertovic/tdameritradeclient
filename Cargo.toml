@@ -1,6 +1,6 @@
 [package]
 name = "tdameritradeclient"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Jas Bertovic <jas@bertovic.net>"]
 edition = "2018"
 

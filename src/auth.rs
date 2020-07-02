@@ -1,11 +1,22 @@
+static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
+static R_ERR: &str = "Error: Trouble making request and parsing response";
 ///
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
 pub fn gettoken_fromrefresh(refresh: &str, clientid: &str) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
-    let newauth = TDauth::new_fromrefresh(refresh, clientid);
+    let newauth = TDauth::new_fromrefresh(refresh, clientid, false);
     newauth.token
+}
+///
+/// used to get a valid `refresh` from `refresh_token` and `clientid`
+///
+pub fn getrefresh_fromrefresh(refresh: &str, clientid: &str) -> String {
+    // create new TDauth struct using refresh / clientid
+    // return token
+    let newauth = TDauth::new_fromrefresh(refresh, clientid, true);
+    newauth.refresh
 }
 ///
 /// used to get a valid `token` and `refresh_token` from `code`, `clientid` and `redirecturi`
@@ -53,15 +64,16 @@ pub struct TDauth {
 
 impl TDauth {
     /// create new `TDauth` with `refresh_token` and `clientid`
-    /// if successful `TDauth` will carry original `refresh_token` and new valid `token`
-    pub fn new_fromrefresh(refresh: &str, clientid: &str) -> TDauth {
+    /// if successful `TDauth` will carry new valid `token`
+    /// if refreshupdate is true than `refresh_token` will also be updated
+    pub fn new_fromrefresh(refresh: &str, clientid: &str, refreshupdate: bool) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: refresh.to_owned(),
             clientid: format!("{}{}", clientid, crate::APIKEY),
             redirecturi: None,
         };
-        newauth.resolve_token_fromrefresh(false);
+        newauth.resolve_token_fromrefresh(refreshupdate);
         newauth
     }
     /// create new `TDauth` with `code`, `redirecturi` and `clientid`
@@ -99,13 +111,16 @@ impl TDauth {
             .form(&p)
             .unwrap()
             .send()
-            .unwrap()
+            .expect(R_ERR)
             .text()
-            .unwrap();
+            .expect(R_ERR);
 
         let responsejson: serde_json::Value =
-            serde_json::from_str(&response).expect("Error: No access token retrieved");
-        self.token = responsejson["access_token"].as_str().unwrap().to_owned();
+            serde_json::from_str(&response).expect(T_ERR);
+        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
+        if refreshupdate {
+            self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
+        }
         response
     }
     /// get /oauth2/token
@@ -145,15 +160,19 @@ impl TDauth {
             .form(&p)
             .unwrap()
             .send()
-            .unwrap()
+            .expect(R_ERR)
             .text()
-            .unwrap();
+            .expect(R_ERR);
 
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
-        self.token = responsejson["access_token"].as_str().unwrap().to_owned();
-        self.refresh = responsejson["refresh_token"].as_str().unwrap().to_owned();
+        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
+        self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
         response
+    }
+
+    pub fn gettokens(&self) -> (&str, &str) {
+        (&self.token, &self.refresh)
     }
 }
 
@@ -186,7 +205,8 @@ mod auth_tests {
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
-        let newtdauth = TDauth::new_fromrefresh(&refresh, &clientid);
-        println!("{:?}", newtdauth);
+        let newtdauth = TDauth::new_fromrefresh(&refresh, &clientid, false);
+        let (t, r) = newtdauth.gettokens();
+        println!("token: {} \nrefresh: {} \n", t, r);
     }
 }
