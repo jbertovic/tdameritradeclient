@@ -190,15 +190,46 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">static</span> <span class="ident">T_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Error: Response returned no access token.  Check input parameters&quot;</span>;
+<span class="kw">static</span> <span class="ident">R_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Error: Trouble making request and parsing response&quot;</span>;
 <span class="doccomment">///</span>
 <span class="doccomment">/// used to get a valid `token` from `refresh_token` and `clientid`</span>
 <span class="doccomment">///</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gettoken_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
     <span class="comment">// create new TDauth struct using refresh / clientid</span>
     <span class="comment">// return token</span>
-    <span class="kw">let</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span>::<span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>, <span class="ident">clientid</span>);
+    <span class="kw">let</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span>::<span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>, <span class="ident">clientid</span>, <span class="bool-val">false</span>);
     <span class="ident">newauth</span>.<span class="ident">token</span>
+}
+<span class="doccomment">///</span>
+<span class="doccomment">/// used to get a valid `refresh` from `refresh_token` and `clientid`</span>
+<span class="doccomment">///</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">getrefresh_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="comment">// create new TDauth struct using refresh / clientid</span>
+    <span class="comment">// return token</span>
+    <span class="kw">let</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span>::<span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>, <span class="ident">clientid</span>, <span class="bool-val">true</span>);
+    <span class="ident">newauth</span>.<span class="ident">refresh</span>
 }
 <span class="doccomment">///</span>
 <span class="doccomment">/// used to get a valid `token` and `refresh_token` from `code`, `clientid` and `redirecturi`</span>
@@ -246,15 +277,16 @@
 
 <span class="kw">impl</span> <span class="ident">TDauth</span> {
     <span class="doccomment">/// create new `TDauth` with `refresh_token` and `clientid`</span>
-    <span class="doccomment">/// if successful `TDauth` will carry original `refresh_token` and new valid `token`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
+    <span class="doccomment">/// if successful `TDauth` will carry new valid `token`</span>
+    <span class="doccomment">/// if refreshupdate is true than `refresh_token` will also be updated</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_fromrefresh</span>(<span class="ident">refresh</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">clientid</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">refreshupdate</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TDauth</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth</span> {
             <span class="ident">token</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
             <span class="ident">refresh</span>: <span class="ident">refresh</span>.<span class="ident">to_owned</span>(),
             <span class="ident">clientid</span>: <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">clientid</span>, <span class="kw">crate</span>::<span class="ident">APIKEY</span>),
             <span class="ident">redirecturi</span>: <span class="prelude-val">None</span>,
         };
-        <span class="ident">newauth</span>.<span class="ident">resolve_token_fromrefresh</span>(<span class="bool-val">false</span>);
+        <span class="ident">newauth</span>.<span class="ident">resolve_token_fromrefresh</span>(<span class="ident">refreshupdate</span>);
         <span class="ident">newauth</span>
     }
     <span class="doccomment">/// create new `TDauth` with `code`, `redirecturi` and `clientid`</span>
@@ -292,13 +324,16 @@
             .<span class="ident">form</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>)
             .<span class="ident">unwrap</span>()
             .<span class="ident">send</span>()
-            .<span class="ident">unwrap</span>()
+            .<span class="ident">expect</span>(<span class="ident">R_ERR</span>)
             .<span class="ident">text</span>()
-            .<span class="ident">unwrap</span>();
+            .<span class="ident">expect</span>(<span class="ident">R_ERR</span>);
 
         <span class="kw">let</span> <span class="ident">responsejson</span>: <span class="ident">serde_json</span>::<span class="ident">Value</span> <span class="op">=</span>
-            <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="ident">expect</span>(<span class="string">&quot;Error: No access token retrieved&quot;</span>);
-        <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;access_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
+            <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="ident">expect</span>(<span class="ident">T_ERR</span>);
+        <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;access_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">expect</span>(<span class="ident">T_ERR</span>).<span class="ident">to_owned</span>();
+        <span class="kw">if</span> <span class="ident">refreshupdate</span> {
+            <span class="self">self</span>.<span class="ident">refresh</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;refresh_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">expect</span>(<span class="ident">T_ERR</span>).<span class="ident">to_owned</span>();
+        }
         <span class="ident">response</span>
     }
     <span class="doccomment">/// get /oauth2/token</span>
@@ -338,15 +373,19 @@
             .<span class="ident">form</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>)
             .<span class="ident">unwrap</span>()
             .<span class="ident">send</span>()
-            .<span class="ident">unwrap</span>()
+            .<span class="ident">expect</span>(<span class="ident">R_ERR</span>)
             .<span class="ident">text</span>()
-            .<span class="ident">unwrap</span>();
+            .<span class="ident">expect</span>(<span class="ident">R_ERR</span>);
 
         <span class="kw">let</span> <span class="ident">responsejson</span>: <span class="ident">serde_json</span>::<span class="ident">Value</span> <span class="op">=</span>
             <span class="ident">serde_json</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="ident">expect</span>(<span class="string">&quot;Error: No access token retrieved&quot;</span>);
-        <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;access_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
-        <span class="self">self</span>.<span class="ident">refresh</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;refresh_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
+        <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;access_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">expect</span>(<span class="ident">T_ERR</span>).<span class="ident">to_owned</span>();
+        <span class="self">self</span>.<span class="ident">refresh</span> <span class="op">=</span> <span class="ident">responsejson</span>[<span class="string">&quot;refresh_token&quot;</span>].<span class="ident">as_str</span>().<span class="ident">expect</span>(<span class="ident">T_ERR</span>).<span class="ident">to_owned</span>();
         <span class="ident">response</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gettokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">refresh</span>)
     }
 }
 
@@ -379,8 +418,9 @@
     <span class="kw">fn</span> <span class="ident">check_new_fromrefresh_constructs_tdauth</span>() {
         <span class="kw">let</span> <span class="ident">refresh</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDREFRESHTOKEN&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">clientid</span> <span class="op">=</span> <span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;TDCLIENTKEY&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">newtdauth</span> <span class="op">=</span> <span class="ident">TDauth</span>::<span class="ident">new_fromrefresh</span>(<span class="kw-2">&amp;</span><span class="ident">refresh</span>, <span class="kw-2">&amp;</span><span class="ident">clientid</span>);
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">newtdauth</span>);
+        <span class="kw">let</span> <span class="ident">newtdauth</span> <span class="op">=</span> <span class="ident">TDauth</span>::<span class="ident">new_fromrefresh</span>(<span class="kw-2">&amp;</span><span class="ident">refresh</span>, <span class="kw-2">&amp;</span><span class="ident">clientid</span>, <span class="bool-val">false</span>);
+        <span class="kw">let</span> (<span class="ident">t</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">newtdauth</span>.<span class="ident">gettokens</span>();
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;token: {} \nrefresh: {} \n&quot;</span>, <span class="ident">t</span>, <span class="ident">r</span>);
     }
 }
 </pre></div>

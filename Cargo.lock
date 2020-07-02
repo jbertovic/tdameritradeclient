@@ -392,7 +392,7 @@ checksum = "c7cb5678e1615754284ec264d9bb5b4c27d2018577fd90ac0ceb578591ed5ee4"
 
 [[package]]
 name = "tdameritradeclient"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "attohttpc",
  "serde_json",
