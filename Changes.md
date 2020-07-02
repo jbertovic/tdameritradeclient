@@ -1,3 +1,10 @@
+# v0.2.1
+- added expect() on any unwraps for error panic messages
+- able to refresh the refresh token - added bool: new_fromrefresh(refresh: &str, clientid: &str, refreshupdate: bool)
+- getter method to retrieve tokens: gettokens(&self) -> (&str, &str)
+- convenience method to get updated refresh token: getrefresh_fromrefresh(refresh: &str, clientid: &str)
+
+
 # v0.2.0
 - added `/oauth2/token` endpoint for API through new `auth` module
 - to manage tokens added `TDauth` struct along with functions to use `/oauth2/token` endpoint
