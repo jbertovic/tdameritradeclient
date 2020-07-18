@@ -84,6 +84,7 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 
 ## Future IDEAS
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
+- [ ] add log crate
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
 - [ ] create feature option from serde_json
