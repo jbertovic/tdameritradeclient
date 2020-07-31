@@ -88,6 +88,7 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
 - [ ] create feature option from serde_json
+- [ ] build structs that match json return structures
 
 
 ## Endpoints added
@@ -101,9 +102,13 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /accounts/{}?fields=positions
 - [X] GET /accounts/{}?fields=orders
 - [X] GET /accounts/{}?fields=positions,orders
+- [X] GET /accounts/{}/orders?parameters*
+- [X] GET /accounts/{}/transactions?parameters*
+- [X] GET /accounts/{}/transactions/{}
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [X] GET /accounts/{}/orders?parameters*
+- [ ] GET /instruments?parameters*
+- [ ] GET /instruments/{}
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders
