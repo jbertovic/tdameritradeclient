@@ -7,7 +7,7 @@
 
 ## Description
 
-A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client has a utility module `tdameritrade::auth::TDauth` to help with authorization or you can use the client directly with a valid auth token.  I typically use environmental variables to pass tokens and config (see below). I've included exmples in the `./exmples` folder and in some of the tests.
+A client that uses the TD Ameritrade API as described on (http://developer.tdameritrade.com).  The client has a utility module `tdameritrade::auth::TDauth` to help with authorization or you can use the client directly with a valid auth token.  I typically use environmental variables to pass tokens and config (see below). I've included examples in the `./examples` folder and in some of the tests.
 
 This client uses a blocking web request client library [attohttps](https://github.com/sbstp/attohttpc).
 
@@ -84,9 +84,11 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 
 ## Future IDEAS
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
+- [ ] add log crate
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
 - [ ] create feature option from serde_json
+- [ ] build structs that match json return structures
 
 
 ## Endpoints added
@@ -100,9 +102,13 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /accounts/{}?fields=positions
 - [X] GET /accounts/{}?fields=orders
 - [X] GET /accounts/{}?fields=positions,orders
+- [X] GET /accounts/{}/orders?parameters*
+- [X] GET /accounts/{}/transactions?parameters*
+- [X] GET /accounts/{}/transactions/{}
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [X] GET /accounts/{}/orders?parameters*
+- [ ] GET /instruments?parameters*
+- [ ] GET /instruments/{}
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders

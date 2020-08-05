@@ -1,6 +1,6 @@
 static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
 static R_ERR: &str = "Error: Trouble making request and parsing response";
-///
+/// 
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
 pub fn gettoken_fromrefresh(refresh: &str, clientid: &str) -> String {
@@ -44,8 +44,6 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
     getcodeurl.to_string()
 }
 ///
-/// # TDauth 
-/// 
 /// These are tools to help manage authorization tokens with TD Ameritrade API
 ///
 /// 1) `getcodeweblink` is a link created from parameters registered with deverloper.tdameritrade.com.  

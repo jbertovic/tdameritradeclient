@@ -1,10 +1,11 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 use attohttpc::{RequestBuilder, Session};
-use crate::param::{History, OptionChain, Account, Order};
+use crate::param::{History, OptionChain, Account, Order, Transactions, Instruments};
 use crate::auth::{gettoken_fromrefresh, gettoken_fromcode};
+use std::time::Duration;
 ///
-/// # TDA Client
+/// Main client to access TD Ameritrade endpoints
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
 ///
@@ -19,8 +20,10 @@ pub struct TDAClient {
 }
 
 impl TDAClient {
-    /// Create new bsae client that maintains Authorization Header
+    ///
+    /// Create new base client that maintains Authorization Header
     /// Requires valid ***token*** from tdameritrade
+    ///
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
@@ -29,11 +32,14 @@ impl TDAClient {
             client,
         }
     }
+    ///
     /// Create new base client that maintains Authorization Header
     /// Requires valid ***refresh token*** from tdameritrade
+    ///
     pub fn new_usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
         TDAClient::new(gettoken_fromrefresh(refresh, clientid))
     }
+    ///
     /// Create new base client that maintains Authorization Header
     /// Requires valid auth ***code*** from tdameritrade
     ///
@@ -42,7 +48,15 @@ impl TDAClient {
     pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
         TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
+    /// 
+    /// change timeout configuration of Session
+    /// 
+    pub fn sesion_timeout(&mut self, duration: Duration) {
+        self.client.read_timeout(duration);
+    }
+    ///
     /// get /userprincipals
+    /// 
     pub fn getuserprincipals<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
@@ -51,6 +65,7 @@ impl TDAClient {
             .get(format!("{}userprincipals", crate::APIWWW))
             .execute()
     }
+    ///
     /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
     pub fn getquotes<T>(&self, quotequery: &str) -> T
     where
@@ -61,6 +76,35 @@ impl TDAClient {
             .param("symbol", quotequery)
             .execute()
     }
+    ///
+    /// get /instruments
+    /// 
+    /// Search or retrieve instrument data, including fundamental data.
+    /// 
+    pub fn getinstruments<T>(&self, params: &[Instruments]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}instruments", crate::APIWWW));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
+    }
+    ///
+    /// get /instruments/cusip
+    /// 
+    /// Get an instrument by CUSIP
+    /// 
+    pub fn getinstrument<T>(&self, cusip: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client
+            .get(format!("{}instruments/{}", crate::APIWWW, cusip)).execute()
+    }
+    ///
     /// get /marketdata/{SYM}/pricehistory
     /// additional query parameters need to be added from `History` Enum
     /// retrieved based on EPOCH datetime
@@ -78,22 +122,21 @@ impl TDAClient {
         }
         builder.execute()
     }
+    ///
     /// get /marketdata/chains?symbol=SYM
     /// additional query parameters need to be added from `OptionChain` Enum
-    pub fn getoptionchain<T>(&self, symbol: &str, params: &[OptionChain]) -> T
+    pub fn getoptionchain<T>(&self, params: &[OptionChain]) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self
-            .client
-            .get(format!("{}marketdata/chains", crate::APIWWW))
-            .param("symbol", symbol);
+        let mut builder = self.client.get(format!("{}marketdata/chains", crate::APIWWW));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
         }
         builder.execute()
     }
+    ///
     /// get /accounts
     /// if there are more than one account linked than it will retrieve an array of accounts
     pub fn getaccounts<T>(&self) -> T
@@ -102,6 +145,7 @@ impl TDAClient {
     {
         self.client.get(format!("{}accounts", crate::APIWWW)).execute()
     }
+    ///
     /// get /accounts/{account}
     /// grabs one account with `account_id`
     /// additional query parameters need to be added from `Account` Enum
@@ -116,6 +160,30 @@ impl TDAClient {
         }
         builder.execute()
     }
+    ///
+    /// get /accounts/{account}/transactions
+    /// retrieve a specified transaction by Id
+    pub fn gettransactions<T>(&self, account: &str, params: &[Transactions]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}accounts/{}/transactions", crate::APIWWW, account));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
+    }
+    ///
+    /// get /accounts/{account}/transactions/{transactionId}
+    /// retrieve a specified transaction by Id
+    pub fn gettransaction<T>(&self, account: &str, transaction: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client.get(format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, transaction)).execute()
+    }
+    ///
     /// get /accounts/{account}/orders
     /// retrieve all working orders
     pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
@@ -129,6 +197,7 @@ impl TDAClient {
         }
         builder.execute()
     }
+    ///
     /// Post /accounts/{account}/orders with JSON formated body
     /// Creates a working order
     /// if JSON body has error it will return json indicating what's wrong
@@ -143,6 +212,7 @@ impl TDAClient {
             .expect("Trouble Retrieving Response: ERROR")
             .text().unwrap()
     }
+    ///
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
     pub fn deleteorder(&self, account: &str, order: &str) -> String
@@ -153,7 +223,7 @@ impl TDAClient {
             .expect("Trouble Retrieving Response: ERROR")
             .text().unwrap()
     }
-
+    ///
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
     pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
@@ -166,8 +236,11 @@ impl TDAClient {
             .expect("Trouble Retrieving Response: ERROR")
             .text().unwrap()
     }
-
 }
+
+//TODO: Search Instruments /v1/instruments  -> you can use this to retrieve the CUSIP
+//TODO: Get Instruments /v1/instruments/cusip
+
 
 /// This isn't called directly as its built into the functions of the `TDAClient`
 ///

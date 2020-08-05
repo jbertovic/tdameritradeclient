@@ -1,3 +1,7 @@
+
+///
+/// Query Parameters for /v1/accounts/
+///
 #[derive(Debug)]
 pub enum Account {
     Positions,
@@ -15,6 +19,9 @@ impl Into<(&'static str, String)> for &Account {
     }
 }
 
+///
+/// Query Parameters for /v1/orders/
+///
 #[derive(Debug)]
 pub enum Order<'a> {
     /// Max number of orders to retrieve
@@ -41,7 +48,9 @@ impl<'a> Into<(&'static str, String)> for &Order<'a> {
     }
 }
 
-
+///
+/// Query Parameters for /v1/marketdata/{symbol}/pricehistory
+///
 #[derive(Debug)]
 pub enum History<'a> {
     PeriodType(&'a str),
@@ -67,8 +76,13 @@ impl<'a> Into<(&'static str, String)> for &History<'a> {
     }
 }
 
+///
+/// Query Parameters for /v1/marketdata/chains
+///
 #[derive(Debug)]
 pub enum OptionChain<'a> {
+    /// Underlying symbol <Required>
+    Symbol(&'a str),
     /// Type of contracts to return in the chain. Can be CALL, PUT, or ALL. Default is ALL.
     ContractType(&'a str),
     /// The number of strikes to return above and below the at-the-money price.
@@ -118,6 +132,7 @@ pub enum OptionChain<'a> {
 impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
     fn into(self) -> (&'static str, String) {
         match self {
+            OptionChain::Symbol(s) => ("symbol", (*s).to_string()),
             OptionChain::ContractType(i) => ("contractType", (*i).to_string()),
             OptionChain::Strategy(s) => ("strategy", (*s).to_string()),
             OptionChain::StrikeCount(i) => ("strikeCount", (*i).to_string()),
@@ -136,4 +151,64 @@ impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
         }
     }
 }
+///
+/// Query Parameters for /account/transactions
+///
+#[derive(Debug)]
+pub enum Transactions<'a> {
+    ///
+    /// type = ALL, TRADE, BUY_ONLY, SELL_ONLY, CASH_IN_OR_CASH_OUT, CHECKING, DIVIDEND, INTEREST
+    ///        OTHER, ADVISOR_FEES
+    /// default = ALL
+    TransactionType(&'a str),
+    /// Specify symbol, otherwise all symbols
+    Symbol(&'a str),
+    /// Start Date in "yyyy-mm-dd"
+    /// Maximum date range is one year
+    StartDate(&'a str),
+    /// End Date in "yyyy-mm-dd"
+    /// Maximum data range is one year
+    EndDate(&'a str),
+}
 
+impl<'a> Into<(&'static str, String)> for &Transactions<'a> {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            Transactions::TransactionType(s) => ("type", (*s).to_string()),
+            Transactions::Symbol(s) => ("symbol", (*s).to_string()),
+            Transactions::StartDate(s) => ("startDate", (*s).to_string()),
+            Transactions::EndDate(s) => ("endDate", (*s).to_string()),
+        }
+    }
+}
+
+///
+/// Query Parameters for /v1/instruments
+///
+#[derive(Debug)]
+pub enum Instruments<'a> {
+    /// Specify symbol or search parameter
+    Symbol(&'a str),
+    ///
+    /// Type of Request
+    /// symbol-search: Retrieve instrument data of a specific symbol or cusip
+    /// symbol-regex: Retrieve instrument data for all symbols matching regex. 
+    ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
+    /// desc-search: Retrieve instrument data for instruments whose description 
+    ///      contains the word supplied. Example: symbol=FakeCompany will return 
+    ///      all instruments with FakeCompany in the description.
+    /// desc-regex: Search description with full regex support. 
+    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions 
+    ///      contain a word beginning with XYZ followed by a character A through C.
+    /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
+    SearchType(&'a str),
+}
+
+impl<'a> Into<(&'static str, String)> for &Instruments<'a> {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            Instruments::Symbol(s) => ("symbol", (*s).to_string()),
+            Instruments::SearchType(s) => ("projection", (*s).to_string()),
+        }
+    }
+}

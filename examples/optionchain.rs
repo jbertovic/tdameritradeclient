@@ -6,7 +6,7 @@ fn main() {
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
     titleprint("Option Chain:");
-    prettyprint(&c.getoptionchain("SPY",
+    prettyprint(&c.getoptionchain(
     &[
         OptionChain::StrikeCount(3),
         OptionChain::ContractType("CALL"),
