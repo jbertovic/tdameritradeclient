@@ -151,7 +151,9 @@ impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
         }
     }
 }
-
+///
+/// Query Parameters for /account/transactions
+///
 #[derive(Debug)]
 pub enum Transactions<'a> {
     ///
@@ -176,6 +178,37 @@ impl<'a> Into<(&'static str, String)> for &Transactions<'a> {
             Transactions::Symbol(s) => ("symbol", (*s).to_string()),
             Transactions::StartDate(s) => ("startDate", (*s).to_string()),
             Transactions::EndDate(s) => ("endDate", (*s).to_string()),
+        }
+    }
+}
+
+///
+/// Query Parameters for /v1/instruments
+///
+#[derive(Debug)]
+pub enum Instruments<'a> {
+    /// Specify symbol or search parameter
+    Symbol(&'a str),
+    ///
+    /// Type of Request
+    /// symbol-search: Retrieve instrument data of a specific symbol or cusip
+    /// symbol-regex: Retrieve instrument data for all symbols matching regex. 
+    ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
+    /// desc-search: Retrieve instrument data for instruments whose description 
+    ///      contains the word supplied. Example: symbol=FakeCompany will return 
+    ///      all instruments with FakeCompany in the description.
+    /// desc-regex: Search description with full regex support. 
+    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions 
+    ///      contain a word beginning with XYZ followed by a character A through C.
+    /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
+    SearchType(&'a str),
+}
+
+impl<'a> Into<(&'static str, String)> for &Instruments<'a> {
+    fn into(self) -> (&'static str, String) {
+        match self {
+            Instruments::Symbol(s) => ("symbol", (*s).to_string()),
+            Instruments::SearchType(s) => ("projection", (*s).to_string()),
         }
     }
 }

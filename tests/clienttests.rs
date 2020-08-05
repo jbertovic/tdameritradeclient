@@ -2,7 +2,7 @@
 // These are more like examples
 // REQUIRES an active TD ameritrade account and valid token
 
-use tdameritradeclient::{TDAClient, History, Account, OptionChain};
+use tdameritradeclient::{TDAClient, History, Account, OptionChain, Instruments};
 use std::env;
 
 fn initialize_client() -> TDAClient {
@@ -100,4 +100,24 @@ fn able_to_retrieve_transactions() {
     );
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"transactionItem\""), true);
+}
+
+#[test]
+fn able_to_retrieve_instrument_cusip() {
+    let c = initialize_client();
+    let resptxt: String = c.getinstrument("458140100");
+    println!("{:?}", resptxt);
+    assert_eq!(resptxt.contains("\"cusip\""), true);
+}
+
+#[test]
+fn able_to_retrieve_instrument_search() {
+    let c = initialize_client();
+    let resptxt: String = c.getinstruments(
+        &[
+            Instruments::Symbol("INTC"),
+            Instruments::SearchType("fundamental")],
+    );
+    println!("{:?}", resptxt);
+    assert_eq!(resptxt.contains("\"cusip\""), true);
 }

@@ -1,3 +1,9 @@
+# v0.2.2
+- added endpoint `/instruments/` and `/instruments/{cusip}`
+- added endpoint `/accounts/transactions/` and `/accounts/transactions/{transactionid}`
+- added additional option for timeout on `attohttpc::session`
+
+
 # v0.2.1
 - added expect() on any unwraps for error panic messages
 - able to refresh the refresh token - added bool: new_fromrefresh(refresh: &str, clientid: &str, refreshupdate: bool)

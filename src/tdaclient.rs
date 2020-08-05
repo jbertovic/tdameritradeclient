@@ -1,10 +1,11 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 use attohttpc::{RequestBuilder, Session};
-use crate::param::{History, OptionChain, Account, Order, Transactions};
+use crate::param::{History, OptionChain, Account, Order, Transactions, Instruments};
 use crate::auth::{gettoken_fromrefresh, gettoken_fromcode};
+use std::time::Duration;
 ///
-/// # TDA Client
+/// Main client to access TD Ameritrade endpoints
 ///
 /// Uses `attohttpc::RequestBuilder` to build requests and `attohttpc::Session` to maintain the same client configuration
 ///
@@ -20,7 +21,7 @@ pub struct TDAClient {
 
 impl TDAClient {
     ///
-    /// Create new bsae client that maintains Authorization Header
+    /// Create new base client that maintains Authorization Header
     /// Requires valid ***token*** from tdameritrade
     ///
     pub fn new(token: String) -> TDAClient {
@@ -47,8 +48,15 @@ impl TDAClient {
     pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
         TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
+    /// 
+    /// change timeout configuration of Session
+    /// 
+    pub fn sesion_timeout(&mut self, duration: Duration) {
+        self.client.read_timeout(duration);
+    }
     ///
     /// get /userprincipals
+    /// 
     pub fn getuserprincipals<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
@@ -67,6 +75,34 @@ impl TDAClient {
             .get(format!("{}marketdata/quotes", crate::APIWWW))
             .param("symbol", quotequery)
             .execute()
+    }
+    ///
+    /// get /instruments
+    /// 
+    /// Search or retrieve instrument data, including fundamental data.
+    /// 
+    pub fn getinstruments<T>(&self, params: &[Instruments]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}instruments", crate::APIWWW));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
+    }
+    ///
+    /// get /instruments/cusip
+    /// 
+    /// Get an instrument by CUSIP
+    /// 
+    pub fn getinstrument<T>(&self, cusip: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client
+            .get(format!("{}instruments/{}", crate::APIWWW, cusip)).execute()
     }
     ///
     /// get /marketdata/{SYM}/pricehistory

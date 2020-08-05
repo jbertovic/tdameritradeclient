@@ -1,6 +1,6 @@
 //! # tdameritradeclient 
 //!
-//! TDAClient is the main module that lets you build requests to TDAmeritrade's API
+//! TDAClient is the main struct that lets you build requests to TDAmeritrade's API
 //! 
 //! See [TD Ameritrade API](http://developer.tdameritrade.com) for API documentation
 //! 
@@ -11,6 +11,12 @@
 //! # Query parameters through Enum
 //! 
 //! Use the relevant associated Enums in param to add any parameters to the get function request on the TDAClient
+//! 
+//! # Auth module
+//! 
+//! Auth module can be used separately to renew tokens or to construct a weblink to grab an authroization code.
+//! See instructions in module.
+//! 
 
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
@@ -18,8 +24,17 @@ static APIKEY: &str = "@AMER.OAUTHAP";
 mod tdaclient;
 mod param;
 
+///
+/// utility module to help with authorization token, refresh token and grant code
+/// 
+/// You can use the public functions or the `TDauth` struct.  `TDauth` allows you to store the information 
+/// for reuse. 
+/// 
 pub mod auth;
 
+///
+/// Move to front of crate
+/// 
 pub use tdaclient::TDAClient as TDAClient;
-pub use param::{Account, OptionChain, History, Order};
+pub use param::{Account, OptionChain, History, Order, Transactions, Instruments};
 
