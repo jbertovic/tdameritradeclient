@@ -84,7 +84,7 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 
 ## Future IDEAS
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
-- [ ] add log crate
+- [X] add log crate
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
 - [ ] create feature option from serde_json
@@ -107,8 +107,8 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] GET /accounts/{}/transactions/{}
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [ ] GET /instruments?parameters*
-- [ ] GET /instruments/{}
+- [X] GET /instruments?parameters*
+- [X] GET /instruments/{}
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders

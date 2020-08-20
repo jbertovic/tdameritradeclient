@@ -1,9 +1,10 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use attohttpc::{RequestBuilder, Session};
+use attohttpc::{RequestBuilder, Response, Session};
 use crate::param::{History, OptionChain, Account, Order, Transactions, Instruments};
 use crate::auth::{gettoken_fromrefresh, gettoken_fromcode};
 use std::time::Duration;
+use log::{info};
 ///
 /// Main client to access TD Ameritrade endpoints
 ///
@@ -26,6 +27,7 @@ impl TDAClient {
     ///
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
+        info!("New Client initialized - from token");
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
         TDAClient {
             authtoken: token,
@@ -37,6 +39,7 @@ impl TDAClient {
     /// Requires valid ***refresh token*** from tdameritrade
     ///
     pub fn new_usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
+        info!("New Client initialized - from refresh token");
         TDAClient::new(gettoken_fromrefresh(refresh, clientid))
     }
     ///
@@ -46,6 +49,7 @@ impl TDAClient {
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
     pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
+        info!("New Client initialized - from authorization code");
         TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
     /// 
@@ -238,10 +242,6 @@ impl TDAClient {
     }
 }
 
-//TODO: Search Instruments /v1/instruments  -> you can use this to retrieve the CUSIP
-//TODO: Get Instruments /v1/instruments/cusip
-
-
 /// This isn't called directly as its built into the functions of the `TDAClient`
 ///
 /// Sends formed request to be executed with a return to either
@@ -254,24 +254,32 @@ pub trait Execute<T> {
 
 impl Execute<String> for RequestBuilder {
     fn execute(self) -> String {
-        self.send()
-            .expect("Trouble Retrieving Response: ERROR")
-            .text()
-            .expect("Response did not return JSON: ERROR")
+        let response = preexecute(self);
+        response.text()
+            .expect("Response did not return BODY: ERROR")
     }
 }
 
 impl Execute<serde_json::Value> for RequestBuilder {
     fn execute(self) -> serde_json::Value {
+        let response = preexecute(self);
         serde_json::from_str(
-            self.send()
-                .expect("Trouble Retrieving Response: ERROR")
-                .text()
+            response.text()
                 .expect("Response did not return JSON: ERROR")
                 .as_str(),
         )
         .expect("SERDE: Trouble parsing json text: ERROR")
     }
+}
+
+/// created to help with logging
+fn preexecute(req: RequestBuilder) -> Response {
+    let mut prepared = req.prepare();
+    info!("Request: {}-{}", prepared.method(), prepared.url());
+    let response = prepared.send()
+        .expect("Trouble Retrieving Response: ERROR");
+    info!("Response: Status:{}", response.status());
+    response
 }
 
 #[cfg(test)]

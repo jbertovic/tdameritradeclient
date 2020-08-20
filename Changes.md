@@ -1,3 +1,7 @@
+# v0.3.0
+- add log crate and inserted a few log outputs for ERROR and INFO
+
+
 # v0.2.2
 - added endpoint `/instruments/` and `/instruments/{cusip}`
 - added endpoint `/accounts/transactions/` and `/accounts/transactions/{transactionid}`
