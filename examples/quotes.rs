@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient};
+use tdameritradeclient::TDAClient;
 
 fn main() {
     env_logger::init();

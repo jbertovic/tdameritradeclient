@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient};
+use tdameritradeclient::TDAClient;
 
 fn main() {
     env_logger::init();
@@ -29,14 +29,13 @@ fn main() {
       }
     "#;
 
-    let resptxt = c.createorder(&accountid, order_def); 
+    let resptxt = c.createorder(&accountid, order_def);
     println!("Order Created: {}", resptxt); // list working orders
 
-    let resptxt: serde_json::Value = c.getorders(&accountid,&[]); // get working orders and find the order above
+    let resptxt: serde_json::Value = c.getorders(&accountid, &[]); // get working orders and find the order above
     prettyprint(&resptxt);
 }
 
 fn prettyprint(toprint: &serde_json::Value) {
     println!("{}\n", serde_json::to_string_pretty(toprint).unwrap());
 }
-

@@ -1,10 +1,10 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
+use crate::auth::{gettoken_fromcode, gettoken_fromrefresh};
+use crate::param::{Account, History, Instruments, OptionChain, Order, Transactions};
 use attohttpc::{RequestBuilder, Response, Session};
-use crate::param::{History, OptionChain, Account, Order, Transactions, Instruments};
-use crate::auth::{gettoken_fromrefresh, gettoken_fromcode};
+use log::info;
 use std::time::Duration;
-use log::{info};
 ///
 /// Main client to access TD Ameritrade endpoints
 ///
@@ -48,19 +48,24 @@ impl TDAClient {
     ///
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
-    pub fn new_usingcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDAClient {
+    pub fn new_usingcode(
+        code: &str,
+        clientid: &str,
+        redirecturi: &str,
+        codedecode: bool,
+    ) -> TDAClient {
         info!("New Client initialized - from authorization code");
         TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
     }
-    /// 
+    ///
     /// change timeout configuration of Session
-    /// 
+    ///
     pub fn sesion_timeout(&mut self, duration: Duration) {
         self.client.read_timeout(duration);
     }
     ///
     /// get /userprincipals
-    /// 
+    ///
     pub fn getuserprincipals<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
@@ -82,9 +87,9 @@ impl TDAClient {
     }
     ///
     /// get /instruments
-    /// 
+    ///
     /// Search or retrieve instrument data, including fundamental data.
-    /// 
+    ///
     pub fn getinstruments<T>(&self, params: &[Instruments]) -> T
     where
         RequestBuilder: Execute<T>,
@@ -98,15 +103,16 @@ impl TDAClient {
     }
     ///
     /// get /instruments/cusip
-    /// 
+    ///
     /// Get an instrument by CUSIP
-    /// 
+    ///
     pub fn getinstrument<T>(&self, cusip: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}instruments/{}", crate::APIWWW, cusip)).execute()
+            .get(format!("{}instruments/{}", crate::APIWWW, cusip))
+            .execute()
     }
     ///
     /// get /marketdata/{SYM}/pricehistory
@@ -117,9 +123,11 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self
-            .client
-            .get(format!("{}marketdata/{}/pricehistory", crate::APIWWW, symbol));
+        let mut builder = self.client.get(format!(
+            "{}marketdata/{}/pricehistory",
+            crate::APIWWW,
+            symbol
+        ));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -133,7 +141,9 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}marketdata/chains", crate::APIWWW));
+        let mut builder = self
+            .client
+            .get(format!("{}marketdata/chains", crate::APIWWW));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -147,7 +157,9 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        self.client.get(format!("{}accounts", crate::APIWWW)).execute()
+        self.client
+            .get(format!("{}accounts", crate::APIWWW))
+            .execute()
     }
     ///
     /// get /accounts/{account}
@@ -157,7 +169,9 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}", crate::APIWWW, account));
+        let mut builder = self
+            .client
+            .get(format!("{}accounts/{}", crate::APIWWW, account));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -171,7 +185,11 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}/transactions", crate::APIWWW, account));
+        let mut builder = self.client.get(format!(
+            "{}accounts/{}/transactions",
+            crate::APIWWW,
+            account
+        ));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -185,7 +203,14 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        self.client.get(format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, transaction)).execute()
+        self.client
+            .get(format!(
+                "{}accounts/{}/transactions/{}",
+                crate::APIWWW,
+                account,
+                transaction
+            ))
+            .execute()
     }
     ///
     /// get /accounts/{account}/orders
@@ -194,7 +219,9 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}/orders", crate::APIWWW, account));
+        let mut builder = self
+            .client
+            .get(format!("{}accounts/{}/orders", crate::APIWWW, account));
         for param in params {
             let (k, v) = param.into();
             builder = builder.param(k, v);
@@ -206,39 +233,49 @@ impl TDAClient {
     /// Creates a working order
     /// if JSON body has error it will return json indicating what's wrong
     /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
-    pub fn createorder(&self, account: &str, ordertxt: &str) -> String
-    {
+    pub fn createorder(&self, account: &str, ordertxt: &str) -> String {
         self.client
             .post(format!("{}accounts/{}/orders", crate::APIWWW, account))
             .header_append("Content-Type", "application/json")
             .text(ordertxt)
             .send()
             .expect("Trouble Retrieving Response: ERROR")
-            .text().unwrap()
+            .text()
+            .unwrap()
     }
     ///
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
-    pub fn deleteorder(&self, account: &str, order: &str) -> String
-    {
+    pub fn deleteorder(&self, account: &str, order: &str) -> String {
         self.client
-            .delete(format!("{}accounts/{}/orders/{}", crate::APIWWW, account, order))
+            .delete(format!(
+                "{}accounts/{}/orders/{}",
+                crate::APIWWW,
+                account,
+                order
+            ))
             .send()
             .expect("Trouble Retrieving Response: ERROR")
-            .text().unwrap()
+            .text()
+            .unwrap()
     }
     ///
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
-    pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String
-    {
+    pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String {
         self.client
-            .put(format!("{}accounts/{}/orders/{}", crate::APIWWW, account, order))
+            .put(format!(
+                "{}accounts/{}/orders/{}",
+                crate::APIWWW,
+                account,
+                order
+            ))
             .header_append("Content-Type", "application/json")
             .text(ordertxt)
             .send()
             .expect("Trouble Retrieving Response: ERROR")
-            .text().unwrap()
+            .text()
+            .unwrap()
     }
 }
 
@@ -255,7 +292,8 @@ pub trait Execute<T> {
 impl Execute<String> for RequestBuilder {
     fn execute(self) -> String {
         let response = preexecute(self);
-        response.text()
+        response
+            .text()
             .expect("Response did not return BODY: ERROR")
     }
 }
@@ -264,7 +302,8 @@ impl Execute<serde_json::Value> for RequestBuilder {
     fn execute(self) -> serde_json::Value {
         let response = preexecute(self);
         serde_json::from_str(
-            response.text()
+            response
+                .text()
                 .expect("Response did not return JSON: ERROR")
                 .as_str(),
         )
@@ -276,14 +315,13 @@ impl Execute<serde_json::Value> for RequestBuilder {
 fn preexecute(req: RequestBuilder) -> Response {
     let mut prepared = req.prepare();
     info!("Request: {}-{}", prepared.method(), prepared.url());
-    let response = prepared.send()
-        .expect("Trouble Retrieving Response: ERROR");
+    let response = prepared.send().expect("Trouble Retrieving Response: ERROR");
     info!("Response: Status:{}", response.status());
     response
 }
 
 #[cfg(test)]
-mod tdaclient_tests{
+mod tdaclient_tests {
 
     use super::TDAClient;
     use std::env;
@@ -306,5 +344,4 @@ mod tdaclient_tests{
         let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi, true);
         println!("{}", c.getuserprincipals::<String>());
     }
-
 }

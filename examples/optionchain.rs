@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient, OptionChain};
+use tdameritradeclient::{OptionChain, TDAClient};
 
 fn main() {
     env_logger::init();
@@ -7,8 +7,7 @@ fn main() {
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
     titleprint("Option Chain:");
-    prettyprint(&c.getoptionchain(
-    &[
+    prettyprint(&c.getoptionchain(&[
         OptionChain::StrikeCount(3),
         OptionChain::ContractType("CALL"),
     ]));

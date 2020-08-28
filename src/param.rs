@@ -1,4 +1,3 @@
-
 ///
 /// Query Parameters for /v1/accounts/
 ///
@@ -87,8 +86,8 @@ pub enum OptionChain<'a> {
     ContractType(&'a str),
     /// The number of strikes to return above and below the at-the-money price.
     StrikeCount(u8),
-    ///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the 
-    /// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values), 
+    ///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the
+    /// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values),
     /// COVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY, CONDOR, DIAGONAL, COLLAR, or ROLL. Default is SINGLE.
     Strategy(&'a str),
     /// Strike interval for spread strategy chains (see strategy param).
@@ -107,7 +106,7 @@ pub enum OptionChain<'a> {
     ///  ALL: All Strikes
     ///  Default is ALL.
     Range(&'a str),
-    /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration 
+    /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration
     ///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd'T'HH:mm:ssz.
     FromDate(&'a str),
     /// Only return expirations before this date. For strategies, expiration refers to the nearest term expiration
@@ -192,13 +191,13 @@ pub enum Instruments<'a> {
     ///
     /// Type of Request
     /// symbol-search: Retrieve instrument data of a specific symbol or cusip
-    /// symbol-regex: Retrieve instrument data for all symbols matching regex. 
+    /// symbol-regex: Retrieve instrument data for all symbols matching regex.
     ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
-    /// desc-search: Retrieve instrument data for instruments whose description 
-    ///      contains the word supplied. Example: symbol=FakeCompany will return 
+    /// desc-search: Retrieve instrument data for instruments whose description
+    ///      contains the word supplied. Example: symbol=FakeCompany will return
     ///      all instruments with FakeCompany in the description.
-    /// desc-regex: Search description with full regex support. 
-    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions 
+    /// desc-regex: Search description with full regex support.
+    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions
     ///      contain a word beginning with XYZ followed by a character A through C.
     /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
     SearchType(&'a str),

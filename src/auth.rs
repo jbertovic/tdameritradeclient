@@ -1,6 +1,6 @@
 static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
 static R_ERR: &str = "Error: Trouble making request and parsing response";
-/// 
+///
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
 pub fn gettoken_fromrefresh(refresh: &str, clientid: &str) -> String {
@@ -23,7 +23,12 @@ pub fn getrefresh_fromrefresh(refresh: &str, clientid: &str) -> String {
 ///
 /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
 ///
-pub fn gettoken_fromcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> String {
+pub fn gettoken_fromcode(
+    code: &str,
+    clientid: &str,
+    redirecturi: &str,
+    codedecode: bool,
+) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
     let newauth = TDauth::new_fromcode(code, clientid, redirecturi, codedecode);
@@ -47,7 +52,7 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
 /// These are tools to help manage authorization tokens with TD Ameritrade API
 ///
 /// 1) `getcodeweblink` is a link created from parameters registered with deverloper.tdameritrade.com.  
-/// The link can be used to return a code to use to request a valid token and refresh token.  You will need to log in with your TDAmeritrade Credentials. 
+/// The link can be used to return a code to use to request a valid token and refresh token.  You will need to log in with your TDAmeritrade Credentials.
 /// If you use a `redirect_uri` that points to localhost than you will see the code returned in the query bar of the browser
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
@@ -113,11 +118,16 @@ impl TDauth {
             .text()
             .expect(R_ERR);
 
-        let responsejson: serde_json::Value =
-            serde_json::from_str(&response).expect(T_ERR);
-        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
+        let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
+        self.token = responsejson["access_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
         if refreshupdate {
-            self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
+            self.refresh = responsejson["refresh_token"]
+                .as_str()
+                .expect(T_ERR)
+                .to_owned();
         }
         response
     }
@@ -133,14 +143,13 @@ impl TDauth {
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
     pub fn resolve_token_fromcode(&mut self, code: &str, codedecode: bool) -> String {
-
         // is code already decoded or not? - ask did it come from a query parameter (codedecode=true) or some other way (codedecode=false)
         let decoded_code = if codedecode {
             let (_, decoded) = url::form_urlencoded::parse(format!("code={}", code).as_bytes())
                 .into_owned()
                 .next()
                 .unwrap();
-            decoded    
+            decoded
         } else {
             code.to_owned()
         };
@@ -164,8 +173,14 @@ impl TDauth {
 
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
-        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
-        self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
+        self.token = responsejson["access_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
+        self.refresh = responsejson["refresh_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
         response
     }
 

@@ -2,8 +2,8 @@
 // These are more like examples
 // REQUIRES an active TD ameritrade account and valid token
 
-use tdameritradeclient::{TDAClient, History, Account, OptionChain, Instruments};
 use std::env;
+use tdameritradeclient::{Account, History, Instruments, OptionChain, TDAClient};
 
 fn initialize_client() -> TDAClient {
     TDAClient::new(env::var("TDAUTHTOKEN").unwrap())
@@ -12,7 +12,10 @@ fn initialize_client() -> TDAClient {
 fn initialize_client_accountid() -> (TDAClient, String) {
     let c = initialize_client();
     let user: serde_json::Value = c.getuserprincipals();
-    let accountid = user["primaryAccountId"].as_str().expect("Trouble Parsing Primary AccountId").to_owned();
+    let accountid = user["primaryAccountId"]
+        .as_str()
+        .expect("Trouble Parsing Primary AccountId")
+        .to_owned();
     return (c, accountid);
 }
 
@@ -54,13 +57,11 @@ fn able_to_retrieve_history() {
 
 #[test]
 fn able_to_retrieve_optionchain() {
-    let resptxt: String = initialize_client().getoptionchain(
-        &[
-            OptionChain::Symbol("SPY"),
-            OptionChain::StrikeCount(3),
-            OptionChain::ContractType("CALL"),
-        ],
-    );
+    let resptxt: String = initialize_client().getoptionchain(&[
+        OptionChain::Symbol("SPY"),
+        OptionChain::StrikeCount(3),
+        OptionChain::ContractType("CALL"),
+    ]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"SUCCESS\""), true);
 }
@@ -83,10 +84,7 @@ fn able_to_retrieve_one_account() {
 #[test]
 fn able_to_retrieve_account_positions() {
     let (c, accountid) = initialize_client_accountid();
-    let resptxt: String = c.getaccount(
-        &accountid,
-        &[Account::Positions],
-    );
+    let resptxt: String = c.getaccount(&accountid, &[Account::Positions]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"positions\""), true);
 }
@@ -94,10 +92,7 @@ fn able_to_retrieve_account_positions() {
 #[test]
 fn able_to_retrieve_transactions() {
     let (c, accountid) = initialize_client_accountid();
-    let resptxt: String = c.gettransactions(
-        &accountid,
-        &[],
-    );
+    let resptxt: String = c.gettransactions(&accountid, &[]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"transactionItem\""), true);
 }
@@ -113,11 +108,10 @@ fn able_to_retrieve_instrument_cusip() {
 #[test]
 fn able_to_retrieve_instrument_search() {
     let c = initialize_client();
-    let resptxt: String = c.getinstruments(
-        &[
-            Instruments::Symbol("INTC"),
-            Instruments::SearchType("fundamental")],
-    );
+    let resptxt: String = c.getinstruments(&[
+        Instruments::Symbol("INTC"),
+        Instruments::SearchType("fundamental"),
+    ]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"cusip\""), true);
 }
