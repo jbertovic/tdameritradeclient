@@ -1,7 +1,9 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
 use crate::auth::{gettoken_fromcode, gettoken_fromrefresh};
-use crate::param::{Account, History, Instruments, OptionChain, Order, Transactions};
+use crate::param::{
+    convert_to_pairs, Account, History, Instruments, OptionChain, Order, Transactions,
+};
 use attohttpc::{RequestBuilder, Response, Session};
 use log::info;
 use std::time::Duration;
@@ -94,12 +96,10 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}instruments", crate::APIWWW));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!("{}instruments", crate::APIWWW))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /instruments/cusip
@@ -123,16 +123,14 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!(
-            "{}marketdata/{}/pricehistory",
-            crate::APIWWW,
-            symbol
-        ));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!(
+                "{}marketdata/{}/pricehistory",
+                crate::APIWWW,
+                symbol
+            ))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /marketdata/chains?symbol=SYM
@@ -141,14 +139,10 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self
-            .client
-            .get(format!("{}marketdata/chains", crate::APIWWW));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!("{}marketdata/chains", crate::APIWWW))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts
@@ -169,14 +163,11 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self
-            .client
-            .get(format!("{}accounts/{}", crate::APIWWW, account));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        //        let builder = self
+        self.client
+            .get(format!("{}accounts/{}", crate::APIWWW, account))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts/{account}/transactions
@@ -185,16 +176,14 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!(
-            "{}accounts/{}/transactions",
-            crate::APIWWW,
-            account
-        ));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!(
+                "{}accounts/{}/transactions",
+                crate::APIWWW,
+                account
+            ))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts/{account}/transactions/{transactionId}
@@ -219,14 +208,10 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self
-            .client
-            .get(format!("{}accounts/{}/orders", crate::APIWWW, account));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!("{}accounts/{}/orders", crate::APIWWW, account))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// Post /accounts/{account}/orders with JSON formated body

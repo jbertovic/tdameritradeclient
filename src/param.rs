@@ -1,5 +1,26 @@
+/// Query parameters must implement Pair trait to allow us to use Url crate in
+/// underlying http client to create the proper query_string
+pub trait Pair<'a> {
+    fn pair(self) -> (&'a str, String);
+}
+/// function to convert a collection of query parameters in to a vector of pairs
+pub fn convert_to_pairs<'a, T>(queryparams: T) -> Vec<(&'a str, String)>
+where
+    T: IntoIterator,
+    T::Item: Pair<'a>,
+{
+    let mut params: Vec<(&str, String)> = vec![];
+    for qenum in queryparams.into_iter() {
+        params.push(qenum.pair())
+    }
+    params
+}
+
 ///
 /// Query Parameters for /v1/accounts/
+///
+/// Balances displayed by default, additional fields can be added here by adding
+/// positions or orders
 ///
 #[derive(Debug)]
 pub enum Account {
@@ -8,8 +29,8 @@ pub enum Account {
     PositionsAndOrders,
 }
 
-impl Into<(&'static str, String)> for &Account {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Account {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Account::Positions => ("fields", String::from("positions")),
             Account::Orders => ("fields", String::from("orders")),
@@ -36,8 +57,8 @@ pub enum Order<'a> {
     Status(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Order<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Order<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Order::MaxResults(i) => ("maxResults", (*i).to_string()),
             Order::FromEnteredTime(s) => ("fromEnteredTime", (*s).to_string()),
@@ -52,17 +73,42 @@ impl<'a> Into<(&'static str, String)> for &Order<'a> {
 ///
 #[derive(Debug)]
 pub enum History<'a> {
+    /// The type of period to show. Valid values are day, month, year, or
+    /// ytd (year to date). Default is day.
     PeriodType(&'a str),
+    /// Number of periods to show. Valid by `PeriodType` (* is default)
+    /// day: 1, 2, 3, 4, 5, 10*
+    /// month: 1*, 2, 3, 6
+    /// year: 1*, 2, 3, 5, 10, 15, 20
+    /// ytd: 1*
     Period(u8),
+    /// the type of frequency with which a new candle is formed.
+    /// Valid frequencyTypes by periodType (defaults marked with an asterisk):
+    /// day: minute*
+    /// month: daily, weekly*
+    /// year: daily, weekly, monthly*
+    /// ytd: daily, weekly*
     FrequencyType(&'a str),
+    /// the number of the frequencyType to be included in each candle.
+    /// Valid frequencies by frequencyType (defaults marked with an asterisk):
+    /// minute: 1*, 5, 10, 15, 30
+    /// daily: 1*
+    /// weekly: 1*
+    /// monthly: 1*
     Frequency(u8),
+    /// Start date as milliseconds since epoch. If startDate and endDate
+    /// are provided, period should not be provided.
     StartDate(u64),
+    /// End date as milliseconds since epoch. If startDate and endDate are
+    /// provided, period should not be provided. Default is previous trading day.
     EndDate(u64),
+    /// true to return extended hours data, false for regular market hours only.
+    /// Default is true
     NeedExendedHoursData(bool),
 }
 
-impl<'a> Into<(&'static str, String)> for &History<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &History<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             History::PeriodType(s) => ("periodType", (*s).to_string()),
             History::Period(i) => ("period", (*i).to_string()),
@@ -128,8 +174,8 @@ pub enum OptionChain<'a> {
     OptionType(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &OptionChain<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             OptionChain::Symbol(s) => ("symbol", (*s).to_string()),
             OptionChain::ContractType(i) => ("contractType", (*i).to_string()),
@@ -170,8 +216,8 @@ pub enum Transactions<'a> {
     EndDate(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Transactions<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Transactions<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Transactions::TransactionType(s) => ("type", (*s).to_string()),
             Transactions::Symbol(s) => ("symbol", (*s).to_string()),
@@ -203,8 +249,8 @@ pub enum Instruments<'a> {
     SearchType(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Instruments<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Instruments<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Instruments::Symbol(s) => ("symbol", (*s).to_string()),
             Instruments::SearchType(s) => ("projection", (*s).to_string()),
