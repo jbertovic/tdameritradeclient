@@ -163,7 +163,6 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        //        let builder = self
         self.client
             .get(format!("{}accounts/{}", crate::APIWWW, account))
             .params(convert_to_pairs(params))
@@ -231,7 +230,10 @@ impl TDAClient {
     ///
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
-    pub fn deleteorder(&self, account: &str, order: &str) -> String {
+    pub fn deleteorder<T>(&self, account: &str, order: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
         self.client
             .delete(format!(
                 "{}accounts/{}/orders/{}",
@@ -239,11 +241,8 @@ impl TDAClient {
                 account,
                 order
             ))
-            .send()
-            .expect("Trouble Retrieving Response: ERROR")
-            .text()
-            .unwrap()
-    }
+            .execute()
+       }
     ///
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
