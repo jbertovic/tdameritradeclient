@@ -242,7 +242,7 @@ impl TDAClient {
                 order
             ))
             .execute()
-       }
+    }
     ///
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order

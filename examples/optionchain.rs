@@ -5,9 +5,10 @@ fn main() {
     env_logger::init();
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
-
+    // TODO: add symbol in params
     titleprint("Option Chain:");
     prettyprint(&c.getoptionchain(&[
+        OptionChain::Symbol("SPY"),
         OptionChain::StrikeCount(3),
         OptionChain::ContractType("CALL"),
     ]));
