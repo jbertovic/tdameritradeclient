@@ -172,9 +172,6 @@ impl TDauth {
     pub fn gettokens(&self) -> (&str, &str) {
         (&self.token, &self.refresh)
     }
-    pub fn getaccess(&self) -> String {
-        &self.token
-    }
 }
 
 #[cfg(test)]
