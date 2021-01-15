@@ -92,7 +92,7 @@ pub enum OptionChain<'a> {
     /// COVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY, CONDOR, DIAGONAL, COLLAR, or ROLL. Default is SINGLE.
     Strategy(&'a str),
     /// Strike interval for spread strategy chains (see strategy param).
-    Interval(u8),
+    Interval(f64),
     /// Provide a strike price to return options only at that strike price.
     Strike(f64),
     /// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.
