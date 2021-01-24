@@ -87,6 +87,7 @@ impl TDAClient {
             .param("symbol", quotequery)
             .execute()
     }
+    
     ///
     /// get /instruments
     ///
@@ -184,6 +185,19 @@ impl TDAClient {
             .params(convert_to_pairs(params))
             .execute()
     }
+    pub fn get_watchlists<T>(&self) -> T
+    where
+        RequestBuilder:Execute<T>,
+    {
+        self.client
+            .get(format!(
+                "{}accounts/{}/watchlists",
+                crate::APIWWW,
+                account
+            ))
+            .execute()
+    }
+    
     ///
     /// get /accounts/{account}/transactions/{transactionId}
     /// retrieve a specified transaction by Id
