@@ -188,8 +188,8 @@ impl TDAClient {
     
     ///
     /// get /accounts/{account}/watchlists
-    /// get /accounts/{account}/watchlists
-    pub fn get_watchlists<T>(&self) -> T
+    /// retrieves all watchlists for an account
+    pub fn get_watchlists<T>(&self, account: &str) -> T
     where
         RequestBuilder:Execute<T>,
     {
