@@ -87,7 +87,29 @@ impl TDAClient {
             .param("symbol", quotequery)
             .execute()
     }
-    
+    ///
+    /// get /marketdata/{MARKET}/hours
+    /// retrieve todays market hours for given market
+    pub fn get_todays_market_hours<T>(&self, market: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client
+            .get(format!("{}marketdate/{}/hours", crate::APIWWW, market))
+            .execute()
+    }
+    ///
+    /// get /marketdata/{MARKET}/hours
+    /// retrieve todays market hours for given market
+    pub fn get_dates_market_hours<T>(&self, market: &str, date: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        self.client
+            .get(format!("{}marketdate/{}/hours", crate::APIWWW, market))
+            .param("date", date)
+            .execute()
+    }
     ///
     /// get /instruments
     ///
