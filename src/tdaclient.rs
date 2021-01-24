@@ -185,6 +185,9 @@ impl TDAClient {
             .params(convert_to_pairs(params))
             .execute()
     }
+    
+    ///
+    /// get /accounts/{account}/watchlists
     pub fn get_watchlists<T>(&self) -> T
     where
         RequestBuilder:Execute<T>,
