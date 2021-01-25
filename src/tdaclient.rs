@@ -95,7 +95,7 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}marketdate/{}/hours", crate::APIWWW, market))
+            .get(format!("{}marketdata/{}/hours", crate::APIWWW, market))
             .execute()
     }
     ///
@@ -106,7 +106,7 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}marketdate/{}/hours", crate::APIWWW, market))
+            .get(format!("{}marketdata/{}/hours", crate::APIWWW, market))
             .param("date", date)
             .execute()
     }
