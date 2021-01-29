@@ -100,7 +100,7 @@ impl TDAClient {
     }
     ///
     /// get /marketdata/{MARKET}/hours
-    /// retrieve todays market hours for given market
+    /// retrieve market hours for given market and date
     pub fn get_dates_market_hours<T>(&self, market: &str, date: &str) -> T
     where
         RequestBuilder: Execute<T>,
@@ -207,23 +207,6 @@ impl TDAClient {
             .params(convert_to_pairs(params))
             .execute()
     }
-    
-    ///
-    /// get /accounts/{account}/watchlists
-    /// retrieves all watchlists for an account
-    pub fn get_watchlists<T>(&self, account: &str) -> T
-    where
-        RequestBuilder:Execute<T>,
-    {
-        self.client
-            .get(format!(
-                "{}accounts/{}/watchlists",
-                crate::APIWWW,
-                account
-            ))
-            .execute()
-    }
-    
     ///
     /// get /accounts/{account}/transactions/{transactionId}
     /// retrieve a specified transaction by Id
@@ -237,6 +220,21 @@ impl TDAClient {
                 crate::APIWWW,
                 account,
                 transaction
+            ))
+            .execute()
+    }
+    ///
+    /// get /accounts/{account}/watchlists
+    /// retrieves all watchlists for an account
+    pub fn get_watchlists<T>(&self, account: &str) -> T
+    where
+        RequestBuilder:Execute<T>,
+    {
+        self.client
+            .get(format!(
+                "{}accounts/{}/watchlists",
+                crate::APIWWW,
+                account
             ))
             .execute()
     }
