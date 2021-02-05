@@ -180,16 +180,36 @@ impl TDAClient {
     }
     ///
     /// get /accounts/{account}
-    /// grabs one account with `account_id`
+    /// grabs one account's balances with `account_id`
     /// additional query parameters need to be added from `Account` Enum
-    pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
+    pub fn getaccount<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        self.client
-            .get(format!("{}accounts/{}", crate::APIWWW, account))
-            .params(convert_to_pairs(params))
-            .execute()
+        let mut builder = self.client.get(format!("{}accounts/{}", crate::APIWWW, account)).execute()
+    }
+    ///
+    /// get /accounts/{account}/positions
+    /// grabs one accounts positions with `account_id`
+    pub fn getpositions<T>(&self, account: &str) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}accounts/{}/positions", crate::APIWWW, account)).execute()
+    }
+    ///
+    /// get /accounts/{account}/orders
+    /// retrieve all working orders
+    pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
+    where
+        RequestBuilder: Execute<T>,
+    {
+        let mut builder = self.client.get(format!("{}accounts/{}/orders", crate::APIWWW, account));
+        for param in params {
+            let (k, v) = param.into();
+            builder = builder.param(k, v);
+        }
+        builder.execute()
     }
     ///
     /// get /accounts/{account}/transactions
@@ -236,18 +256,6 @@ impl TDAClient {
                 crate::APIWWW,
                 account
             ))
-            .execute()
-    }
-    ///
-    /// get /accounts/{account}/orders
-    /// retrieve all working orders
-    pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}accounts/{}/orders", crate::APIWWW, account))
-            .params(convert_to_pairs(params))
             .execute()
     }
     ///
