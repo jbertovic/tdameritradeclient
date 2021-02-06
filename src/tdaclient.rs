@@ -180,13 +180,16 @@ impl TDAClient {
     }
     ///
     /// get /accounts/{account}
-    /// grabs one account's balances with `account_id`
+    /// grabs one account with `account_id`
     /// additional query parameters need to be added from `Account` Enum
-    pub fn getaccount<T>(&self, account: &str) -> T
+    pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}", crate::APIWWW, account)).execute()
+        self.client
+            .get(format!("{}accounts/{}", crate::APIWWW, account))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts/{account}/positions
@@ -195,7 +198,10 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}/positions", crate::APIWWW, account)).execute()
+        self.client
+            .get(format!("{}accounts/{}/field=positions", crate::APIWWW, account))
+            //.params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts/{account}/orders
@@ -204,12 +210,10 @@ impl TDAClient {
     where
         RequestBuilder: Execute<T>,
     {
-        let mut builder = self.client.get(format!("{}accounts/{}/orders", crate::APIWWW, account));
-        for param in params {
-            let (k, v) = param.into();
-            builder = builder.param(k, v);
-        }
-        builder.execute()
+        self.client
+            .get(format!("{}accounts/{}/orders", crate::APIWWW, account))
+            .params(convert_to_pairs(params))
+            .execute()
     }
     ///
     /// get /accounts/{account}/transactions
