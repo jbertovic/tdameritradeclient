@@ -249,14 +249,10 @@ impl TDAClient {
     /// retrieves all watchlists for an account
     pub fn getwatchlists<T>(&self, account: &str) -> T
     where
-        RequestBuilder:Execute<T>,
+        RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!(
-                "{}accounts/{}/watchlists",
-                crate::APIWWW,
-                account
-            ))
+            .get(format!("{}accounts/{}/watchlists", crate::APIWWW, account))
             .execute()
     }
     ///
