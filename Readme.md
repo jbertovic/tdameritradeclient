@@ -95,13 +95,14 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
 
 - [X] GET /userprincipals
-- [X] GET /accounts/{}
-- [X] GET /marketdata/quotes
+- [X] GET /marketdata/quotes?symbol
+- [X] GET /marketdata/{}/hours
+- [X] GET /marketdata/{}/hours?date
 - [X] GET /marketdata/{}/pricehistory
 - [X] GET /marketdata/chains
-- [X] GET /accounts/{}?fields=positions
-- [X] GET /accounts/{}?fields=orders
-- [X] GET /accounts/{}?fields=positions,orders
+- [X] GET /accounts/{}
+- [X] GET /accounts/{}/watchlists
+- [X] GET /accounts/{}?parameters*
 - [X] GET /accounts/{}/orders?parameters*
 - [X] GET /accounts/{}/transactions?parameters*
 - [X] GET /accounts/{}/transactions/{}
