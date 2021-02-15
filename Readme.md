@@ -95,6 +95,8 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
 
 - [X] GET /userprincipals
+- [ ] GET /userprincipals?parameters*
+- [ ] GET /userprincipals/streamersubscriptionkeys
 - [X] GET /marketdata/quotes?symbol
 - [X] GET /marketdata/{}/hours
 - [X] GET /marketdata/{}/hours?date
@@ -114,3 +116,5 @@ see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders
 - [X] POST /oauth2/token
+
+parameters* indicates that the fields are specified in the enums located in src/params.rs 
