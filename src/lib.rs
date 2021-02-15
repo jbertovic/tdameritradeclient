@@ -33,6 +33,11 @@ mod tdaclient;
 pub mod auth;
 
 pub use param::{Account, History, Instruments, OptionChain, Order, Transactions};
+
+///
+///Module containing custom struct for getting and holding accoun balances, positions, and orders
+///
+pub mod account;
 ///
 /// Move to front of crate
 ///
