@@ -23,7 +23,7 @@ fn initialize_client_accountid() -> (TDAClient, String) {
 fn able_to_retrieve_user_data() {
     let resptxt: String = initialize_client().get_user_principals();
     println!("{:?}", resptxt);
-    assert_eq!(resptxt.starts_with("{\n  \"authToken\""), true);
+    assert_eq!(resptxt.contains("\"userId\""), true);
 }
 
 #[test]
