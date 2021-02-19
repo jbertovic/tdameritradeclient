@@ -8,12 +8,12 @@ use serde::{Serialize, Deserialize};
 //
 //Gets JSON of balances and positions
 fn get_positions(client: &TDAClient, accountid: &str) -> std::io::Result<serde_json::Value> {
-    Ok(client.getaccount(accountid, &[Account::Positions]))
+    Ok(client.get_account(accountid, &[Account::Positions]))
 }
 //
 //Gets JSON of balances and orders
 fn get_orders(client: &TDAClient, accountid: &str) -> std::io::Result<serde_json::Value> {
-    Ok(client.getaccount(accountid, &[Account::Orders]))
+    Ok(client.get_account(accountid, &[Account::Orders]))
 }
 //
 //Gets the account's balances and positions and deserializes the response into a custom struct
