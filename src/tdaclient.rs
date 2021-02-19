@@ -1,6 +1,6 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use crate::auth::{gettoken_fromcode, gettoken_fromrefresh};
+use crate::auth::{get_token_from_code, get_token_from_refresh};
 use crate::param::{
     convert_to_pairs, Account, History, Instruments, OptionChain, Order, Transactions,
 };
@@ -18,7 +18,7 @@ use std::time::Duration;
 ///
 #[derive(Debug)]
 pub struct TDAClient {
-    authtoken: String,
+    auth_token: String,
     client: Session,
 }
 
@@ -32,7 +32,7 @@ impl TDAClient {
         info!("New Client initialized - from token");
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
         TDAClient {
-            authtoken: token,
+            auth_token: token,
             client,
         }
     }
@@ -42,7 +42,7 @@ impl TDAClient {
     ///
     pub fn new_usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
         info!("New Client initialized - from refresh token");
-        TDAClient::new(gettoken_fromrefresh(refresh, clientid))
+        TDAClient::new(get_token_from_refresh(refresh, clientid))
     }
     ///
     /// Create new base client that maintains Authorization Header
@@ -57,18 +57,18 @@ impl TDAClient {
         codedecode: bool,
     ) -> TDAClient {
         info!("New Client initialized - from authorization code");
-        TDAClient::new(gettoken_fromcode(code, clientid, redirecturi, codedecode))
+        TDAClient::new(get_token_from_code(code, clientid, redirecturi, codedecode))
     }
     ///
     /// change timeout configuration of Session
     ///
-    pub fn sesion_timeout(&mut self, duration: Duration) {
+    pub fn session_timeout(&mut self, duration: Duration) {
         self.client.read_timeout(duration);
     }
     ///
     /// get /userprincipals
     ///
-    pub fn getuserprincipals<T>(&self) -> T
+    pub fn get_user_principals<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -78,7 +78,7 @@ impl TDAClient {
     }
     ///
     /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
-    pub fn getquotes<T>(&self, quotequery: &str) -> T
+    pub fn get_quotes<T>(&self, quotequery: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -90,7 +90,7 @@ impl TDAClient {
     ///
     /// get /marketdata/{MARKET}/hours
     /// retrieve todays market hours for given market
-    pub fn getmarkethours<T>(&self, market: &str) -> T
+    pub fn get_todays_market_hours<T>(&self, market: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -101,7 +101,7 @@ impl TDAClient {
     ///
     /// get /marketdata/{MARKET}/hours
     /// retrieve market hours for given market and date
-    pub fn getmarkethoursatdate<T>(&self, market: &str, date: &str) -> T
+    pub fn get_dates_market_hours<T>(&self, market: &str, date: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -115,7 +115,7 @@ impl TDAClient {
     ///
     /// Search or retrieve instrument data, including fundamental data.
     ///
-    pub fn getinstruments<T>(&self, params: &[Instruments]) -> T
+    pub fn get_instruments<T>(&self, params: &[Instruments]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -129,7 +129,7 @@ impl TDAClient {
     ///
     /// Get an instrument by CUSIP
     ///
-    pub fn getinstrument<T>(&self, cusip: &str) -> T
+    pub fn get_instrument<T>(&self, cusip: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -142,7 +142,7 @@ impl TDAClient {
     /// additional query parameters need to be added from `History` Enum
     /// retrieved based on EPOCH datetime
     /// also `History` Enum starttime and endtime is in EPOCH
-    pub fn gethistory<T>(&self, symbol: &str, params: &[History]) -> T
+    pub fn get_history<T>(&self, symbol: &str, params: &[History]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -158,7 +158,7 @@ impl TDAClient {
     ///
     /// get /marketdata/chains?symbol=SYM
     /// additional query parameters need to be added from `OptionChain` Enum
-    pub fn getoptionchain<T>(&self, params: &[OptionChain]) -> T
+    pub fn get_option_chain<T>(&self, params: &[OptionChain]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -170,7 +170,7 @@ impl TDAClient {
     ///
     /// get /accounts
     /// if there are more than one account linked than it will retrieve an array of accounts
-    pub fn getaccounts<T>(&self) -> T
+    pub fn get_accounts<T>(&self) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -182,7 +182,7 @@ impl TDAClient {
     /// get /accounts/{account}
     /// grabs one account with `account_id`
     /// additional query parameters need to be added from `Account` Enum
-    pub fn getaccount<T>(&self, account: &str, params: &[Account]) -> T
+    pub fn get_account<T>(&self, account: &str, params: &[Account]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -194,16 +194,20 @@ impl TDAClient {
     ///
     /// get /accounts/{account}/positions
     /// grabs one accounts positions with `account_id`
-    pub fn getpositions<T>(&self, account: &str) -> T
+    pub fn get_positions<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        self.getaccount(account, &[Account::Positions])
+        self.client
+            .get(format!("{}accounts/{}/field=positions", crate::APIWWW, account))
+            //.params(convert_to_pairs(params))
+            .execute()
+
     }
     ///
     /// get /accounts/{account}/orders
     /// retrieve all working orders
-    pub fn getorders<T>(&self, account: &str, params: &[Order]) -> T
+    pub fn get_orders<T>(&self, account: &str, params: &[Order]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -215,7 +219,7 @@ impl TDAClient {
     ///
     /// get /accounts/{account}/transactions
     /// retrieve a specified transaction by Id
-    pub fn gettransactions<T>(&self, account: &str, params: &[Transactions]) -> T
+    pub fn get_transactions<T>(&self, account: &str, params: &[Transactions]) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -231,7 +235,7 @@ impl TDAClient {
     ///
     /// get /accounts/{account}/transactions/{transactionId}
     /// retrieve a specified transaction by Id
-    pub fn gettransaction<T>(&self, account: &str, transaction: &str) -> T
+    pub fn get_transaction<T>(&self, account: &str, transaction: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -247,12 +251,18 @@ impl TDAClient {
     ///
     /// get /accounts/{account}/watchlists
     /// retrieves all watchlists for an account
-    pub fn getwatchlists<T>(&self, account: &str) -> T
+    pub fn get_watchlists<T>(&self, account: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}accounts/{}/watchlists", crate::APIWWW, account))
+
+            .get(format!(
+                "{}accounts/{}/watchlists",
+                crate::APIWWW,
+                account
+            ))
+
             .execute()
     }
     ///
@@ -260,7 +270,7 @@ impl TDAClient {
     /// Creates a working order
     /// if JSON body has error it will return json indicating what's wrong
     /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
-    pub fn createorder(&self, account: &str, ordertxt: &str) -> String {
+    pub fn create_order(&self, account: &str, ordertxt: &str) -> String {
         self.client
             .post(format!("{}accounts/{}/orders", crate::APIWWW, account))
             .header_append("Content-Type", "application/json")
@@ -273,7 +283,7 @@ impl TDAClient {
     ///
     /// Delete /accounts/{account}/orders/{order}
     /// Creates a working order
-    pub fn deleteorder<T>(&self, account: &str, order: &str) -> T
+    pub fn delete_order<T>(&self, account: &str, order: &str) -> T
     where
         RequestBuilder: Execute<T>,
     {
@@ -289,7 +299,7 @@ impl TDAClient {
     ///
     /// PUT /accounts/{account}/orders/{order} with JSON formated body
     /// Replaces a working order with new order - allow the API to cancel and then creates new order
-    pub fn replaceorder(&self, account: &str, order: &str, ordertxt: &str) -> String {
+    pub fn replace_order(&self, account: &str, order: &str, ordertxt: &str) -> String {
         self.client
             .put(format!(
                 "{}accounts/{}/orders/{}",
@@ -359,7 +369,7 @@ mod tdaclient_tests {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let c = TDAClient::new_usingrefresh(&refresh, &clientid);
-        println!("{}", c.getuserprincipals::<String>());
+        println!("{}", c.get_user_principals::<String>());
     }
 
     #[test]
@@ -369,6 +379,6 @@ mod tdaclient_tests {
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let redirecturi = env::var("TDREDIRECT").unwrap();
         let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi, true);
-        println!("{}", c.getuserprincipals::<String>());
+        println!("{}", c.get_user_principals::<String>());
     }
 }
