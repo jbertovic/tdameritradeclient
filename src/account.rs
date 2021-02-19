@@ -1,8 +1,24 @@
 //Module for working with the account endpoint.
 //Contains structs for balances, positions, and orders. Also includes the functions for getting and making them
 use super::*;
+//use attohttpc::Result;
 use serde::{Deserialize, Serialize};
 //use tdameritradeclient::{TDAClient, Account};
+
+// get primary account number
+pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
+    let resptxt: serde_json::Value = client.get_user_principals();
+    match resptxt["primaryAccountId"].as_str() {
+        Some(account_id) => Ok(account_id.to_string()),
+        None => Err(std::io::Error::new(std::io::ErrorKind::Other, "No account id")),
+    }
+}
+
+// get all account numbers linked with client
+// fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>> {
+
+// }
+
 
 //Functions for getting data and serlializing/deserializing it to custom structs:
 //
@@ -52,6 +68,7 @@ struct OrderLegCollection {
 #[serde(rename_all = "camelCase")]
 struct OrderStrategies {
     account_id: f64,
+    #[serde(default)]
     cancel_time: String,
     cancelable: bool,
     complex_order_strategy_type: String,
@@ -70,6 +87,7 @@ struct OrderStrategies {
     requested_destination: String,
     session: String,
     status: String,
+    #[serde(default)]
     tag: String,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -211,10 +229,17 @@ impl SecuritiesAccount {
     }
 }
 
-/* //TODO: Tests currently broken because I used functions from a unincluded crate.
+//TODO: Tests currently broken because I used functions from a unincluded crate.
 #[cfg(test)]
 mod tests{
     use super::*;
+    use std::env;
+
+    fn new_client_for_testing() -> TDAClient {
+        let refresh = env::var("TDREFRESHTOKEN").unwrap();
+        let clientid = env::var("TDCLIENTKEY").unwrap();
+        TDAClient::new_usingrefresh(&refresh, &clientid)
+    }
     //
     //Create a SecuritesAccount struct with known fields for testing
     fn new_teststruct() -> std::io::Result<SecuritiesAccount>{
@@ -259,39 +284,30 @@ mod tests{
     }
     #[test]
     fn test_get_positions() -> std::io::Result<()>{
-        tokens::renew_access()?;
-        let client = TDAClient::new(tokens::read_access().unwrap());
-        let userprincipals: serde_json::Value = tokens::read_principals()?;
-        let accountid = tokens::get_accountid(&userprincipals)?;
-        let _testvalue: serde_json::Value = get_positions(&client, accountid)?;
+        let client = new_client_for_testing();
+        let accountid = get_primary_account_id(&client)?;
+        let _testvalue: serde_json::Value = get_positions(&client, &accountid)?;
         Ok(())
     }
     #[test]
     fn test_get_positions_struct() -> std::io::Result<()>{
-        tokens::renew_access()?;
-        let client = TDAClient::new(tokens::read_access().unwrap());
-        let userprincipals: serde_json::Value = tokens::read_principals()?;
-        let accountid = tokens::get_accountid(&userprincipals)?;
-        let _teststruct: SecuritiesAccount = get_positions_struct(&client, accountid)?;
+        let client = new_client_for_testing();
+        let accountid = get_primary_account_id(&client)?;
+        let _teststruct: SecuritiesAccount = get_positions_struct(&client, &accountid)?;
         Ok(())
     }
     #[test]
     fn test_get_orders() -> std::io::Result<()>{
-        tokens::renew_access()?;
-        let client = TDAClient::new(tokens::read_access().unwrap());
-        let userprincipals: serde_json::Value = tokens::read_principals()?;
-        let accountid = tokens::get_accountid(&userprincipals)?;
-        let _testvalue: serde_json::Value = get_orders(&client, accountid)?;
+        let client = new_client_for_testing();
+        let accountid = get_primary_account_id(&client)?;
+        let _testvalue: serde_json::Value = get_orders(&client, &accountid)?;
         Ok(())
     }
     #[test]
     fn test_get_orders_struct() -> std::io::Result<()>{
-        tokens::renew_access()?;
-        let client = TDAClient::new(tokens::read_access().unwrap());
-        let userprincipals: serde_json::Value = tokens::read_principals()?;
-        let accountid = tokens::get_accountid(&userprincipals)?;
-        let _teststruct: SecuritiesAccount = get_orders_struct(&client, accountid)?;
+        let client = new_client_for_testing();
+        let accountid = get_primary_account_id(&client)?;
+        let _teststruct: SecuritiesAccount = get_orders_struct(&client, &accountid)?;
         Ok(())
     }
 }
-*/
