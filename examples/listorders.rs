@@ -6,10 +6,10 @@ fn main() {
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
-    let resptxt: serde_json::Value = c.getuserprincipals();
+    let resptxt: serde_json::Value = c.get_user_principals();
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    let resptxt: serde_json::Value = c.getorders(&accountid, &[]); // get working orders
+    let resptxt: serde_json::Value = c.get_orders(&accountid, &[]); // get working orders
     prettyprint(&resptxt);
 }
 

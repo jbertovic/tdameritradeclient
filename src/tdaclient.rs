@@ -199,10 +199,13 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}accounts/{}/field=positions", crate::APIWWW, account))
+            .get(format!(
+                "{}accounts/{}/field=positions",
+                crate::APIWWW,
+                account
+            ))
             //.params(convert_to_pairs(params))
             .execute()
-
     }
     ///
     /// get /accounts/{account}/orders
@@ -256,13 +259,7 @@ impl TDAClient {
         RequestBuilder: Execute<T>,
     {
         self.client
-
-            .get(format!(
-                "{}accounts/{}/watchlists",
-                crate::APIWWW,
-                account
-            ))
-
+            .get(format!("{}accounts/{}/watchlists", crate::APIWWW, account))
             .execute()
     }
     ///

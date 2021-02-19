@@ -9,12 +9,12 @@ fn main() {
 
     println!("orderid to delete: {}", orderid);
 
-    let resptxt: serde_json::Value = c.getuserprincipals();
+    let resptxt: serde_json::Value = c.get_user_principals();
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    let resptxt: serde_json::Value = c.deleteorder(&accountid, &orderid);
+    let _: serde_json::Value = c.delete_order(&accountid, &orderid);
 
-    let resptxt: serde_json::Value = c.getorders(&accountid, &[]); // get working orders
+    let resptxt: serde_json::Value = c.get_orders(&accountid, &[]); // get working orders
     println!("orders remaining: ");
     prettyprint(&resptxt);
 }

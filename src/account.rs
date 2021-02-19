@@ -1,7 +1,7 @@
 //Module for working with the account endpoint.
 //Contains structs for balances, positions, and orders. Also includes the functions for getting and making them
 use super::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 //use tdameritradeclient::{TDAClient, Account};
 
 //Functions for getting data and serlializing/deserializing it to custom structs:
@@ -17,18 +17,27 @@ fn get_orders(client: &TDAClient, accountid: &str) -> std::io::Result<serde_json
 }
 //
 //Gets the account's balances and positions and deserializes the response into a custom struct
-pub fn get_positions_struct(client: &TDAClient, accountid: &str) -> std::io::Result<SecuritiesAccount>{
+pub fn get_positions_struct(
+    client: &TDAClient,
+    accountid: &str,
+) -> std::io::Result<SecuritiesAccount> {
     let value = account::get_positions(client, accountid)?; //Get JSON
     let pos_struct = serde_json::from_value(value["securitiesAccount"].clone())?; //Convert JSON to rust struct
-    Ok(pos_struct)//Return struct or error
+    Ok(pos_struct) //Return struct or error
 }
 //
 //Gets the account's balances and positions and deserializes the response into a custom struct containing only the orders
-pub fn get_orders_struct(client: &TDAClient, accountid: &str) -> std::io::Result<SecuritiesAccount>{
+pub fn get_orders_struct(
+    client: &TDAClient,
+    accountid: &str,
+) -> std::io::Result<SecuritiesAccount> {
     //One line way of doing the same things as get_positions_struct
-    Ok(serde_json::from_value(account::get_orders(client, accountid)?["securitiesAccount"].clone())?)}
+    Ok(serde_json::from_value(
+        account::get_orders(client, accountid)?["securitiesAccount"].clone(),
+    )?)
+}
 //
-//Structs for holding balances, positions and orders 
+//Structs for holding balances, positions and orders
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 struct OrderLegCollection {
@@ -37,7 +46,7 @@ struct OrderLegCollection {
     leg_id: u8,
     order_leg_type: String,
     position_effect: String,
-    quantity: f64
+    quantity: f64,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
@@ -61,7 +70,7 @@ struct OrderStrategies {
     requested_destination: String,
     session: String,
     status: String,
-    tag: String
+    tag: String,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
@@ -74,11 +83,11 @@ struct ProjectedBalances {
     is_in_call: bool,
     maintenance_call: f64,
     reg_t_call: f64,
-    stock_buying_power: f64
+    stock_buying_power: f64,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
-struct Positions {
+pub struct Positions {
     average_price: f64,
     current_day_profit_loss: f64,
     current_day_profit_loss_percentage: f64,
@@ -88,14 +97,14 @@ struct Positions {
     market_value: f64,
     settled_long_quantity: f64,
     settled_short_quantity: f64,
-    short_quantity: f64
+    short_quantity: f64,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 struct Instrument {
     asset_type: String,
     cusip: String,
-    symbol: String
+    symbol: String,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase", default)]
@@ -131,7 +140,7 @@ struct InitialBalances {
     short_margin_value: f64,
     short_option_market_value: f64,
     short_stock_value: f64,
-    total_cash: f64
+    total_cash: f64,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase", default)]
@@ -163,7 +172,7 @@ struct CurrentBalances {
     short_margin_value: f64,
     short_market_value: f64,
     short_option_market_value: f64,
-    sma: f64
+    sma: f64,
 }
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
@@ -179,22 +188,23 @@ pub struct SecuritiesAccount {
     positions: Vec<Positions>,
     projected_balances: ProjectedBalances,
     round_trips: u8,
-    r#type: String
+    r#type: String,
 }
 //Methods and helper functions
 impl SecuritiesAccount {
     //
     //Retrieves a Vector of references for all positions for a given symbol
-    fn get_position(&self, symbol: &str) -> std::io::Result<Vec<&account::Positions>>{
-        let matchingpositions: Vec<&account::Positions> = self.positions
+    pub fn get_position(&self, symbol: &str) -> std::io::Result<Vec<&account::Positions>> {
+        let matchingpositions: Vec<&account::Positions> = self
+            .positions
             .iter()
             .filter(|x| x.instrument.symbol == symbol)
             .collect();
         Ok(matchingpositions)
     }
     //
-    //Totals all positions for a symbol 
-    fn total_position(position: Vec<&account::Positions>) -> std::io::Result<f64>{
+    //Totals all positions for a symbol
+    pub fn total_position(position: Vec<&account::Positions>) -> std::io::Result<f64> {
         let mut total = 0.0;
         position.iter().for_each(|x| total += x.market_value);
         Ok(total)
@@ -241,7 +251,7 @@ mod tests{
     fn test_retreive_position() -> std::io::Result<()> {
         //Assemble test struct for testing
         let teststruct: SecuritiesAccount = account::tests::new_teststruct()?;
-        
+
         //Test retreive positions
         let testpostions = teststruct.get_position("FRO")?;
         assert!(testpostions.len() > 0);

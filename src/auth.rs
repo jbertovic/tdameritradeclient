@@ -84,7 +84,12 @@ impl TDauth {
     ///
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
-    pub fn new_from_code(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDauth {
+    pub fn new_from_code(
+        code: &str,
+        clientid: &str,
+        redirecturi: &str,
+        codedecode: bool,
+    ) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: String::new(),
