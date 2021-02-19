@@ -192,22 +192,6 @@ impl TDAClient {
             .execute()
     }
     ///
-    /// get /accounts/{account}/positions
-    /// grabs one accounts positions with `account_id`
-    pub fn get_positions<T>(&self, account: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!(
-                "{}accounts/{}/field=positions",
-                crate::APIWWW,
-                account
-            ))
-            //.params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
     /// get /accounts/{account}/orders
     /// retrieve all working orders
     pub fn get_orders<T>(&self, account: &str, params: &[Order]) -> T
