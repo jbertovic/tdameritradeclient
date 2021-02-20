@@ -2,7 +2,7 @@
 //Contains structs for balances, positions, and orders. Also includes the functions for getting
 
 //TODO: create example in using the securitiesaccount struct <NEW>
-//TODO: get all account numbers linked with client - fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>> 
+//TODO: get all account numbers linked with client - fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>>
 //TODO: clean up with clippy/fmt and update documentation and comments
 //TODO: Issue version 0.3.0
 
@@ -14,14 +14,26 @@ pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
     let resptxt: serde_json::Value = client.get_user_principals();
     match resptxt["primaryAccountId"].as_str() {
         Some(account_id) => Ok(account_id.to_string()),
-        None => Err(std::io::Error::new(std::io::ErrorKind::Other, "No account id")),
+        None => Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "No account id",
+        )),
     }
+}
+
+// get all account numbers linked to client access
+pub fn get_account_ids(_client: &TDAClient) -> std::io::Result<Vec<String>> {
+    unimplemented!();
 }
 
 //
 // Get the account's balances, positions and any orders into `SecuritiesAccount` struct
-pub fn get_account_model(client: &TDAClient, account_id: &str) -> std::io::Result<SecuritiesAccount> {
-    let account_json: serde_json::Value = client.get_account(account_id, &[Account::PositionsAndOrders]);
+pub fn get_account_model(
+    client: &TDAClient,
+    account_id: &str,
+) -> std::io::Result<SecuritiesAccount> {
+    let account_json: serde_json::Value =
+        client.get_account(account_id, &[Account::PositionsAndOrders]);
     let account_model = serde_json::from_value(account_json["securitiesAccount"].clone())?;
     Ok(account_model)
 }
@@ -208,7 +220,7 @@ impl SecuritiesAccount {
 
 //TODO: Tests currently broken because I used functions from a unincluded crate.
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
     use std::env;
 
@@ -219,13 +231,13 @@ mod tests{
     }
     //
     //Create a SecuritesAccount struct with known fields for testing
-    fn new_teststruct() -> std::io::Result<SecuritiesAccount>{
+    fn new_teststruct() -> std::io::Result<SecuritiesAccount> {
         //Assemble test struct for testing
         let mut teststruct: SecuritiesAccount = Default::default();
         let testinstrument = Instrument {
-                asset_type:  "EQUITY".to_string(),
-                cusip: "G3682E192".to_string(),
-                symbol: "FRO".to_string()
+            asset_type: "EQUITY".to_string(),
+            cusip: "G3682E192".to_string(),
+            symbol: "FRO".to_string(),
         };
         let testpositions = Positions {
             average_price: 6.47,
@@ -237,15 +249,16 @@ mod tests{
             market_value: 6.49,
             settled_long_quantity: 0.0,
             settled_short_quantity: 0.0,
-            short_quantity: 0.0
+            short_quantity: 0.0,
         };
         teststruct.positions.push(testpositions);
         Ok(teststruct)
     }
     #[test]
-    fn test_total_postion() -> std::io::Result<()>{
+    fn test_total_postion() -> std::io::Result<()> {
         let teststruct = new_teststruct().unwrap();
-        let total = account::SecuritiesAccount::total_position(teststruct.get_position("FRO").unwrap())?;
+        let total =
+            account::SecuritiesAccount::total_position(teststruct.get_position("FRO").unwrap())?;
         assert_eq!(total, 6.49); // Check total is equal to the known value of the position we created for testing
         Ok(())
     }
@@ -260,15 +273,10 @@ mod tests{
         Ok(())
     }
     #[test]
-    fn test_get_account_details_into_account_struct() -> std::io::Result<()>{
+    fn test_get_account_details_into_account_struct() -> std::io::Result<()> {
         let client = new_client_for_testing();
         let accountid = get_primary_account_id(&client)?;
         let _teststruct: SecuritiesAccount = get_account_model(&client, &accountid)?;
-        println!("{:?}", _teststruct);
-        println!("\n");
-        println!("{:?}", _teststruct.order_strategies);
-        println!("\n");
-        println!("{:?}", _teststruct.positions);
         Ok(())
     }
 }
