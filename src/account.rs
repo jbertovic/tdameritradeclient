@@ -1,9 +1,13 @@
 //Module for working with the account endpoint.
-//Contains structs for balances, positions, and orders. Also includes the functions for getting and making them
+//Contains structs for balances, positions, and orders. Also includes the functions for getting
+
+//TODO: create example in using the securitiesaccount struct <NEW>
+//TODO: get all account numbers linked with client - fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>> 
+//TODO: clean up with clippy/fmt and update documentation and comments
+//TODO: Issue version 0.3.0
+
 use super::*;
-//use attohttpc::Result;
 use serde::{Deserialize, Serialize};
-//use tdameritradeclient::{TDAClient, Account};
 
 // get primary account number
 pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
@@ -14,44 +18,14 @@ pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
     }
 }
 
-// get all account numbers linked with client
-// fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>> {
+//
+// Get the account's balances, positions and any orders into `SecuritiesAccount` struct
+pub fn get_account_model(client: &TDAClient, account_id: &str) -> std::io::Result<SecuritiesAccount> {
+    let account_json: serde_json::Value = client.get_account(account_id, &[Account::PositionsAndOrders]);
+    let account_model = serde_json::from_value(account_json["securitiesAccount"].clone())?;
+    Ok(account_model)
+}
 
-// }
-
-
-//Functions for getting data and serlializing/deserializing it to custom structs:
-//
-//Gets JSON of balances and positions
-fn get_positions(client: &TDAClient, accountid: &str) -> std::io::Result<serde_json::Value> {
-    Ok(client.get_account(accountid, &[Account::Positions]))
-}
-//
-//Gets JSON of balances and orders
-fn get_orders(client: &TDAClient, accountid: &str) -> std::io::Result<serde_json::Value> {
-    Ok(client.get_account(accountid, &[Account::Orders]))
-}
-//
-//Gets the account's balances and positions and deserializes the response into a custom struct
-pub fn get_positions_struct(
-    client: &TDAClient,
-    accountid: &str,
-) -> std::io::Result<SecuritiesAccount> {
-    let value = account::get_positions(client, accountid)?; //Get JSON
-    let pos_struct = serde_json::from_value(value["securitiesAccount"].clone())?; //Convert JSON to rust struct
-    Ok(pos_struct) //Return struct or error
-}
-//
-//Gets the account's balances and positions and deserializes the response into a custom struct containing only the orders
-pub fn get_orders_struct(
-    client: &TDAClient,
-    accountid: &str,
-) -> std::io::Result<SecuritiesAccount> {
-    //One line way of doing the same things as get_positions_struct
-    Ok(serde_json::from_value(
-        account::get_orders(client, accountid)?["securitiesAccount"].clone(),
-    )?)
-}
 //
 //Structs for holding balances, positions and orders
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -111,6 +85,7 @@ pub struct Positions {
     current_day_profit_loss_percentage: f64,
     instrument: Instrument,
     long_quantity: f64,
+    #[serde(default)]
     maintenance_requirement: f64,
     market_value: f64,
     settled_long_quantity: f64,
@@ -146,6 +121,7 @@ struct InitialBalances {
     long_option_market_value: f64,
     long_stock_value: f64,
     maintenance_call: f64,
+    #[serde(default)]
     maintenance_requirement: f64,
     margin: f64,
     margin_balance: f64,
@@ -179,6 +155,7 @@ struct CurrentBalances {
     long_market_value: f64,
     long_option_market_value: f64,
     maintenance_call: f64,
+    #[serde(default)]
     maintenance_requirement: f64,
     margin_balance: f64,
     money_market_fund: f64,
@@ -283,31 +260,15 @@ mod tests{
         Ok(())
     }
     #[test]
-    fn test_get_positions() -> std::io::Result<()>{
+    fn test_get_account_details_into_account_struct() -> std::io::Result<()>{
         let client = new_client_for_testing();
         let accountid = get_primary_account_id(&client)?;
-        let _testvalue: serde_json::Value = get_positions(&client, &accountid)?;
-        Ok(())
-    }
-    #[test]
-    fn test_get_positions_struct() -> std::io::Result<()>{
-        let client = new_client_for_testing();
-        let accountid = get_primary_account_id(&client)?;
-        let _teststruct: SecuritiesAccount = get_positions_struct(&client, &accountid)?;
-        Ok(())
-    }
-    #[test]
-    fn test_get_orders() -> std::io::Result<()>{
-        let client = new_client_for_testing();
-        let accountid = get_primary_account_id(&client)?;
-        let _testvalue: serde_json::Value = get_orders(&client, &accountid)?;
-        Ok(())
-    }
-    #[test]
-    fn test_get_orders_struct() -> std::io::Result<()>{
-        let client = new_client_for_testing();
-        let accountid = get_primary_account_id(&client)?;
-        let _teststruct: SecuritiesAccount = get_orders_struct(&client, &accountid)?;
+        let _teststruct: SecuritiesAccount = get_account_model(&client, &accountid)?;
+        println!("{:?}", _teststruct);
+        println!("\n");
+        println!("{:?}", _teststruct.order_strategies);
+        println!("\n");
+        println!("{:?}", _teststruct.positions);
         Ok(())
     }
 }
