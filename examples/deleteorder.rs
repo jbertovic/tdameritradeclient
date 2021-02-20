@@ -12,7 +12,7 @@ fn main() {
     let resptxt: serde_json::Value = c.get_user_principals();
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    let _: serde_json::Value = c.delete_order(&accountid, &orderid);
+    let _: String = c.delete_order(&accountid, &orderid);
 
     let resptxt: serde_json::Value = c.get_orders(&accountid, &[]); // get working orders
     println!("orders remaining: ");
