@@ -3,5 +3,3 @@ config.txt
 updateenv.sh
 /.vscode
 launch.json
-/docs/debug
-docs/.rustc_info.json

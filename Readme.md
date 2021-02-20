@@ -34,7 +34,7 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.getquotes("F,INTC,TRP");
+    let resptxt: String = c.get_quotes("F,INTC,TRP");
 
     // output will be text string in json format
     println!("{:?}", resptxt);

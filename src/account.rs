@@ -1,15 +1,16 @@
 //Module for working with the account endpoint.
 //Contains structs for balances, positions, and orders. Also includes the functions for getting
 
+//TODO: update documentation
+//TODO: Issue version 0.3.0
 //TODO: create example in using the securitiesaccount struct <NEW>
 //TODO: get all account numbers linked with client - fn get_account_ids(client: &TDAClient) -> std::io::Result<Vec<&str>>
-//TODO: clean up with clippy/fmt and update documentation and comments
-//TODO: Issue version 0.3.0
 
 use super::*;
 use serde::{Deserialize, Serialize};
-
-// get primary account number
+///
+/// get primary account number attached to client
+///
 pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
     let resptxt: serde_json::Value = client.get_user_principals();
     match resptxt["primaryAccountId"].as_str() {
@@ -20,15 +21,17 @@ pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
         )),
     }
 }
-
-// get all account numbers linked to client access
+///
+/// get all account numbers linked to client access (unimplemented)
+///
 pub fn get_account_ids(_client: &TDAClient) -> std::io::Result<Vec<String>> {
     unimplemented!();
 }
 
-//
-// Get the account's balances, positions and any orders into `SecuritiesAccount` struct
-pub fn get_account_model(
+///
+/// Create `SecuritiesAccount` struct from client and account id.
+///
+pub fn create_account_model(
     client: &TDAClient,
     account_id: &str,
 ) -> std::io::Result<SecuritiesAccount> {
@@ -89,6 +92,9 @@ struct ProjectedBalances {
     reg_t_call: f64,
     stock_buying_power: f64,
 }
+///
+/// Holds position details
+///
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Positions {
@@ -181,6 +187,9 @@ struct CurrentBalances {
     short_option_market_value: f64,
     sma: f64,
 }
+///
+/// Holds account information that contains account information, balances, positions and orders
+///
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SecuritiesAccount {
@@ -199,8 +208,9 @@ pub struct SecuritiesAccount {
 }
 //Methods and helper functions
 impl SecuritiesAccount {
-    //
-    //Retrieves a Vector of references for all positions for a given symbol
+    ///
+    /// Retrieves a Vector of references for all positions for a given symbol
+    ///
     pub fn get_position(&self, symbol: &str) -> std::io::Result<Vec<&account::Positions>> {
         let matchingpositions: Vec<&account::Positions> = self
             .positions
@@ -209,8 +219,9 @@ impl SecuritiesAccount {
             .collect();
         Ok(matchingpositions)
     }
-    //
-    //Totals all positions for a symbol
+    ///
+    /// Totals all positions for a symbol and returns total market value
+    ///
     pub fn total_position(position: Vec<&account::Positions>) -> std::io::Result<f64> {
         let mut total = 0.0;
         position.iter().for_each(|x| total += x.market_value);
@@ -276,7 +287,7 @@ mod tests {
     fn test_get_account_details_into_account_struct() -> std::io::Result<()> {
         let client = new_client_for_testing();
         let accountid = get_primary_account_id(&client)?;
-        let _teststruct: SecuritiesAccount = get_account_model(&client, &accountid)?;
+        let _teststruct: SecuritiesAccount = create_account_model(&client, &accountid)?;
         Ok(())
     }
 }
