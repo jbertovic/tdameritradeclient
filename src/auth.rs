@@ -1,21 +1,21 @@
 static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
 static R_ERR: &str = "Error: Trouble making request and parsing response";
-/// 
+///
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
-pub fn gettoken_fromrefresh(refresh: &str, clientid: &str) -> String {
+pub fn get_token_from_refresh(refresh: &str, clientid: &str) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
-    let newauth = TDauth::new_fromrefresh(refresh, clientid, false);
+    let newauth = TDauth::new_from_refresh(refresh, clientid, false);
     newauth.token
 }
 ///
 /// used to get a valid `refresh` from `refresh_token` and `clientid`
 ///
-pub fn getrefresh_fromrefresh(refresh: &str, clientid: &str) -> String {
+pub fn get_refresh_from_refresh(refresh: &str, clientid: &str) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
-    let newauth = TDauth::new_fromrefresh(refresh, clientid, true);
+    let newauth = TDauth::new_from_refresh(refresh, clientid, true);
     newauth.refresh
 }
 ///
@@ -23,10 +23,15 @@ pub fn getrefresh_fromrefresh(refresh: &str, clientid: &str) -> String {
 ///
 /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
 ///
-pub fn gettoken_fromcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> String {
+pub fn get_token_from_code(
+    code: &str,
+    clientid: &str,
+    redirecturi: &str,
+    codedecode: bool,
+) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
-    let newauth = TDauth::new_fromcode(code, clientid, redirecturi, codedecode);
+    let newauth = TDauth::new_from_code(code, clientid, redirecturi, codedecode);
     newauth.token
 }
 ///
@@ -34,7 +39,7 @@ pub fn gettoken_fromcode(code: &str, clientid: &str, redirecturi: &str, codedeco
 /// as per the directions on developer.tdameritrade.com -> you must register an app to get clientid and redirecturi
 /// code can be used with `gettokenfromcode` to initiate a refreshtoken and token
 ///
-pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
+pub fn get_code_weblink(clientid: &str, redirecturi: &str) -> String {
     let mut getcodeurl = url::Url::parse("https://auth.tdameritrade.com/auth").unwrap();
     getcodeurl
         .query_pairs_mut()
@@ -47,7 +52,7 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
 /// These are tools to help manage authorization tokens with TD Ameritrade API
 ///
 /// 1) `getcodeweblink` is a link created from parameters registered with deverloper.tdameritrade.com.  
-/// The link can be used to return a code to use to request a valid token and refresh token.  You will need to log in with your TDAmeritrade Credentials. 
+/// The link can be used to return a code to use to request a valid token and refresh token.  You will need to log in with your TDAmeritrade Credentials.
 /// If you use a `redirect_uri` that points to localhost than you will see the code returned in the query bar of the browser
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
@@ -56,22 +61,22 @@ pub fn getcodeweblink(clientid: &str, redirecturi: &str) -> String {
 pub struct TDauth {
     token: String,
     refresh: String,
-    clientid: String,
-    redirecturi: Option<String>,
+    client_id: String,
+    redirect_uri: Option<String>,
 }
 
 impl TDauth {
     /// create new `TDauth` with `refresh_token` and `clientid`
     /// if successful `TDauth` will carry new valid `token`
     /// if refreshupdate is true than `refresh_token` will also be updated
-    pub fn new_fromrefresh(refresh: &str, clientid: &str, refreshupdate: bool) -> TDauth {
+    pub fn new_from_refresh(refresh: &str, clientid: &str, refreshupdate: bool) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: refresh.to_owned(),
-            clientid: format!("{}{}", clientid, crate::APIKEY),
-            redirecturi: None,
+            client_id: format!("{}{}", clientid, crate::APIKEY),
+            redirect_uri: None,
         };
-        newauth.resolve_token_fromrefresh(refreshupdate);
+        newauth.resolve_token_from_refresh(refreshupdate);
         newauth
     }
     /// create new `TDauth` with `code`, `redirecturi` and `clientid`
@@ -79,12 +84,17 @@ impl TDauth {
     ///
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
-    pub fn new_fromcode(code: &str, clientid: &str, redirecturi: &str, codedecode: bool) -> TDauth {
+    pub fn new_from_code(
+        code: &str,
+        clientid: &str,
+        redirecturi: &str,
+        codedecode: bool,
+    ) -> TDauth {
         let mut newauth = TDauth {
             token: String::new(),
             refresh: String::new(),
-            clientid: format!("{}{}", clientid, crate::APIKEY),
-            redirecturi: Some(redirecturi.to_owned()),
+            client_id: format!("{}{}", clientid, crate::APIKEY),
+            redirect_uri: Some(redirecturi.to_owned()),
         };
         newauth.resolve_token_fromcode(code, codedecode);
         newauth
@@ -95,12 +105,12 @@ impl TDauth {
     ///
     /// returns full response and updates `TDauth` struct
     ///
-    pub fn resolve_token_fromrefresh(&mut self, refreshupdate: bool) -> String {
+    pub fn resolve_token_from_refresh(&mut self, refreshupdate: bool) -> String {
         //body parameters
         let mut p = vec![
             ("grant_type", "refresh_token"),
             ("refresh_token", &self.refresh),
-            ("client_id", &self.clientid),
+            ("client_id", &self.client_id),
         ];
         if refreshupdate {
             p.push(("access_type", "offline"));
@@ -113,11 +123,16 @@ impl TDauth {
             .text()
             .expect(R_ERR);
 
-        let responsejson: serde_json::Value =
-            serde_json::from_str(&response).expect(T_ERR);
-        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
+        let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
+        self.token = responsejson["access_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
         if refreshupdate {
-            self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
+            self.refresh = responsejson["refresh_token"]
+                .as_str()
+                .expect(T_ERR)
+                .to_owned();
         }
         response
     }
@@ -133,14 +148,13 @@ impl TDauth {
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
     pub fn resolve_token_fromcode(&mut self, code: &str, codedecode: bool) -> String {
-
         // is code already decoded or not? - ask did it come from a query parameter (codedecode=true) or some other way (codedecode=false)
         let decoded_code = if codedecode {
             let (_, decoded) = url::form_urlencoded::parse(format!("code={}", code).as_bytes())
                 .into_owned()
                 .next()
                 .unwrap();
-            decoded    
+            decoded
         } else {
             code.to_owned()
         };
@@ -150,8 +164,8 @@ impl TDauth {
             ("grant_type", "authorization_code"),
             ("access_type", "offline"),
             ("code", &decoded_code),
-            ("client_id", &self.clientid),
-            ("redirect_uri", self.redirecturi.as_ref().unwrap()),
+            ("client_id", &self.client_id),
+            ("redirect_uri", self.redirect_uri.as_ref().unwrap()),
         ];
 
         let response = attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
@@ -164,12 +178,18 @@ impl TDauth {
 
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
-        self.token = responsejson["access_token"].as_str().expect(T_ERR).to_owned();
-        self.refresh = responsejson["refresh_token"].as_str().expect(T_ERR).to_owned();
+        self.token = responsejson["access_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
+        self.refresh = responsejson["refresh_token"]
+            .as_str()
+            .expect(T_ERR)
+            .to_owned();
         response
     }
 
-    pub fn gettokens(&self) -> (&str, &str) {
+    pub fn get_tokens(&self) -> (&str, &str) {
         (&self.token, &self.refresh)
     }
 }
@@ -185,7 +205,7 @@ mod auth_tests {
     fn check_code_weblink_auth_works() {
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let redirecturi = env::var("TDREDIRECT").unwrap();
-        println!("{}", crate::auth::getcodeweblink(&clientid, &redirecturi));
+        println!("{}", crate::auth::get_code_weblink(&clientid, &redirecturi));
     }
 
     #[test]
@@ -194,7 +214,7 @@ mod auth_tests {
         let code = env::var("TDCODE").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let redirecturi = env::var("TDREDIRECT").unwrap();
-        let newtdauth = TDauth::new_fromcode(&code, &clientid, &redirecturi, true);
+        let newtdauth = TDauth::new_from_code(&code, &clientid, &redirecturi, true);
         println!("{:?}", newtdauth);
     }
 
@@ -203,8 +223,8 @@ mod auth_tests {
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
-        let newtdauth = TDauth::new_fromrefresh(&refresh, &clientid, false);
-        let (t, r) = newtdauth.gettokens();
+        let newtdauth = TDauth::new_from_refresh(&refresh, &clientid, false);
+        let (t, r) = newtdauth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);
     }
 }

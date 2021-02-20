@@ -1,6 +1,26 @@
+/// Query parameters must implement Pair trait to allow us to use Url crate in
+/// underlying http client to create the proper query_string
+pub trait Pair<'a> {
+    fn pair(self) -> (&'a str, String);
+}
+/// function to convert a collection of query parameters in to a vector of pairs
+pub fn convert_to_pairs<'a, T>(queryparams: T) -> Vec<(&'a str, String)>
+where
+    T: IntoIterator,
+    T::Item: Pair<'a>,
+{
+    let mut params: Vec<(&str, String)> = vec![];
+    for qenum in queryparams.into_iter() {
+        params.push(qenum.pair())
+    }
+    params
+}
 
 ///
 /// Query Parameters for /v1/accounts/
+///
+/// Balances displayed by default, additional fields can be added here by adding
+/// positions or orders
 ///
 #[derive(Debug)]
 pub enum Account {
@@ -9,8 +29,8 @@ pub enum Account {
     PositionsAndOrders,
 }
 
-impl Into<(&'static str, String)> for &Account {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Account {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Account::Positions => ("fields", String::from("positions")),
             Account::Orders => ("fields", String::from("orders")),
@@ -37,8 +57,8 @@ pub enum Order<'a> {
     Status(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Order<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Order<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Order::MaxResults(i) => ("maxResults", (*i).to_string()),
             Order::FromEnteredTime(s) => ("fromEnteredTime", (*s).to_string()),
@@ -53,17 +73,42 @@ impl<'a> Into<(&'static str, String)> for &Order<'a> {
 ///
 #[derive(Debug)]
 pub enum History<'a> {
+    /// The type of period to show. Valid values are day, month, year, or
+    /// ytd (year to date). Default is day.
     PeriodType(&'a str),
+    /// Number of periods to show. Valid by `PeriodType` (* is default)
+    /// day: 1, 2, 3, 4, 5, 10*
+    /// month: 1*, 2, 3, 6
+    /// year: 1*, 2, 3, 5, 10, 15, 20
+    /// ytd: 1*
     Period(u8),
+    /// the type of frequency with which a new candle is formed.
+    /// Valid frequencyTypes by periodType (defaults marked with an asterisk):
+    /// day: minute*
+    /// month: daily, weekly*
+    /// year: daily, weekly, monthly*
+    /// ytd: daily, weekly*
     FrequencyType(&'a str),
+    /// the number of the frequencyType to be included in each candle.
+    /// Valid frequencies by frequencyType (defaults marked with an asterisk):
+    /// minute: 1*, 5, 10, 15, 30
+    /// daily: 1*
+    /// weekly: 1*
+    /// monthly: 1*
     Frequency(u8),
+    /// Start date as milliseconds since epoch. If startDate and endDate
+    /// are provided, period should not be provided.
     StartDate(u64),
+    /// End date as milliseconds since epoch. If startDate and endDate are
+    /// provided, period should not be provided. Default is previous trading day.
     EndDate(u64),
+    /// true to return extended hours data, false for regular market hours only.
+    /// Default is true
     NeedExendedHoursData(bool),
 }
 
-impl<'a> Into<(&'static str, String)> for &History<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &History<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             History::PeriodType(s) => ("periodType", (*s).to_string()),
             History::Period(i) => ("period", (*i).to_string()),
@@ -87,12 +132,12 @@ pub enum OptionChain<'a> {
     ContractType(&'a str),
     /// The number of strikes to return above and below the at-the-money price.
     StrikeCount(u8),
-    ///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the 
-    /// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values), 
+    ///Passing a value returns a Strategy Chain. Possible values are SINGLE, ANALYTICAL (allows use of the
+    /// volatility, underlyingPrice, interestRate, and daysToExpiration params to calculate theoretical values),
     /// COVERED, VERTICAL, CALENDAR, STRANGLE, STRADDLE, BUTTERFLY, CONDOR, DIAGONAL, COLLAR, or ROLL. Default is SINGLE.
     Strategy(&'a str),
     /// Strike interval for spread strategy chains (see strategy param).
-    Interval(u8),
+    Interval(f64),
     /// Provide a strike price to return options only at that strike price.
     Strike(f64),
     /// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.
@@ -107,7 +152,7 @@ pub enum OptionChain<'a> {
     ///  ALL: All Strikes
     ///  Default is ALL.
     Range(&'a str),
-    /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration 
+    /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration
     ///  in the strategy. Valid ISO-8601 formats are: yyyy-MM-dd and yyyy-MM-dd'T'HH:mm:ssz.
     FromDate(&'a str),
     /// Only return expirations before this date. For strategies, expiration refers to the nearest term expiration
@@ -129,8 +174,8 @@ pub enum OptionChain<'a> {
     OptionType(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &OptionChain<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &OptionChain<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             OptionChain::Symbol(s) => ("symbol", (*s).to_string()),
             OptionChain::ContractType(i) => ("contractType", (*i).to_string()),
@@ -171,8 +216,8 @@ pub enum Transactions<'a> {
     EndDate(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Transactions<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Transactions<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Transactions::TransactionType(s) => ("type", (*s).to_string()),
             Transactions::Symbol(s) => ("symbol", (*s).to_string()),
@@ -192,20 +237,20 @@ pub enum Instruments<'a> {
     ///
     /// Type of Request
     /// symbol-search: Retrieve instrument data of a specific symbol or cusip
-    /// symbol-regex: Retrieve instrument data for all symbols matching regex. 
+    /// symbol-regex: Retrieve instrument data for all symbols matching regex.
     ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
-    /// desc-search: Retrieve instrument data for instruments whose description 
-    ///      contains the word supplied. Example: symbol=FakeCompany will return 
+    /// desc-search: Retrieve instrument data for instruments whose description
+    ///      contains the word supplied. Example: symbol=FakeCompany will return
     ///      all instruments with FakeCompany in the description.
-    /// desc-regex: Search description with full regex support. 
-    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions 
+    /// desc-regex: Search description with full regex support.
+    ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions
     ///      contain a word beginning with XYZ followed by a character A through C.
     /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
     SearchType(&'a str),
 }
 
-impl<'a> Into<(&'static str, String)> for &Instruments<'a> {
-    fn into(self) -> (&'static str, String) {
+impl<'a> Pair<'a> for &Instruments<'a> {
+    fn pair(self) -> (&'a str, String) {
         match self {
             Instruments::Symbol(s) => ("symbol", (*s).to_string()),
             Instruments::SearchType(s) => ("projection", (*s).to_string()),

@@ -34,7 +34,7 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.getquotes("F,INTC,TRP");
+    let resptxt: String = c.get_quotes("F,INTC,TRP");
 
     // output will be text string in json format
     println!("{:?}", resptxt);
@@ -84,7 +84,7 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 
 ## Future IDEAS
 - [ ] build json schema for order types to help when creating new orders or replacing existing orders
-- [ ] add log crate
+- [X] add log crate
 - [ ] continue to add documentation
 - [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
 - [ ] create feature option from serde_json
@@ -95,21 +95,26 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
 
 - [X] GET /userprincipals
-- [X] GET /accounts/{}
-- [X] GET /marketdata/quotes
+- [ ] GET /userprincipals?parameters*
+- [ ] GET /userprincipals/streamersubscriptionkeys
+- [X] GET /marketdata/quotes?symbol
+- [X] GET /marketdata/{}/hours
+- [X] GET /marketdata/{}/hours?date
 - [X] GET /marketdata/{}/pricehistory
 - [X] GET /marketdata/chains
-- [X] GET /accounts/{}?fields=positions
-- [X] GET /accounts/{}?fields=orders
-- [X] GET /accounts/{}?fields=positions,orders
+- [X] GET /accounts/{}
+- [X] GET /accounts/{}/watchlists
+- [X] GET /accounts/{}?parameters*
 - [X] GET /accounts/{}/orders?parameters*
 - [X] GET /accounts/{}/transactions?parameters*
 - [X] GET /accounts/{}/transactions/{}
 - [X] GET /marketdata/{}/pricehistory?parameters*  
 - [X] GET /marketdata/chains?parameters* 
-- [ ] GET /instruments?parameters*
-- [ ] GET /instruments/{}
+- [X] GET /instruments?parameters*
+- [X] GET /instruments/{}
 - [X] POST /accounts/{}/orders
 - [X] PUT /accounts/{}/orders 
 - [X] DELETE /accounts/{}/orders
 - [X] POST /oauth2/token
+
+parameters* indicates that the fields are specified in the enums located in src/params.rs 
