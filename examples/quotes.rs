@@ -1,12 +1,15 @@
 use std::env;
-use tdameritradeclient::TDAClient;
+use tdameritradeclient::{TDAClient, Endpoint, param};
 
 fn main() {
     env_logger::init();
 
+    // grab authorization token from environmental variable
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
+ 
+    // get quotes endpoint with a variety of symbols supplied as parameters
     title_print("Quotes:");
-    pretty_print(&c.get_quotes("F,SPY,INTC,IWM"));
+    pretty_print(&c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")]));
 }
 
 fn pretty_print(toprint: &serde_json::Value) {

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 /// get primary account number attached to client
 ///
 pub fn get_primary_account_id(client: &TDAClient) -> std::io::Result<String> {
-    let resptxt: serde_json::Value = client.get_user_principals();
+    let resptxt: serde_json::Value = client.get(&request::Endpoint::UserPrincipals, &[param::Empty]);
     match resptxt["primaryAccountId"].as_str() {
         Some(account_id) => Ok(account_id.to_string()),
         None => Err(std::io::Error::new(
@@ -36,7 +36,7 @@ pub fn create_account_model(
     account_id: &str,
 ) -> std::io::Result<SecuritiesAccount> {
     let account_json: serde_json::Value =
-        client.get_account(account_id, &[Account::PositionsAndOrders]);
+        client.get(&request::Endpoint::Account(account_id), &[param::Account::PositionsAndOrders]);
     let account_model = serde_json::from_value(account_json["securitiesAccount"].clone())?;
     Ok(account_model)
 }
@@ -236,9 +236,8 @@ mod tests {
     use std::env;
 
     fn new_client_for_testing() -> TDAClient {
-        let refresh = env::var("TDREFRESHTOKEN").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
-        TDAClient::new_usingrefresh(&refresh, &clientid)
+        let token = env::var("TDAUTHTOKEN").unwrap();
+        TDAClient::new(token)
     }
     //
     //Create a SecuritesAccount struct with known fields for testing

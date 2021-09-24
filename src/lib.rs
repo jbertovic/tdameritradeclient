@@ -8,11 +8,11 @@
 //!
 //! Response output can be kept in text which comes out as JSON text or converted to a `serde_json::Value` object
 //!
-//! # Query parameters through Enum
-//!
-//! Use the relevant associated Enums in param to add any parameters to the get function request on the TDAClient
-//!
-//! # Account module
+//! # Client usage with get() function
+//! 
+//! Use the relevant API endpoint with `request::Endpoint` and query parameters `param`.  When no query parameters are necessary use `param::Empty`
+//! 
+//! # Account module (Experimental)
 //!
 //! Account module contains a `account::SecuritiesAccount` struct to hold all of the balances, positions, and orders of an account.
 //! Convenience functions can be added to work with the account.  Still in development.
@@ -28,7 +28,7 @@
 //!
 //! ```
 //! use std::env;
-//! use tdameritradeclient::TDAClient;
+//! use tdameritradeclient::{TDAClient, Endpoint, param};
 //!
 //! // Will need to set TDAUTHTOKEN as environmental variable containing a valid token
 //!
@@ -39,7 +39,7 @@
 //! let c = TDAClient::new(token);
 //!
 //! // get quotes for 3 symbols and execute
-//! let resptxt: String = c.get_quotes("F,INTC,TRP");
+//! let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,TRP")]);
 //!
 //! // output will be text string in json format
 //! println!("{:?}", resptxt);
@@ -49,9 +49,7 @@
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
 
-mod param;
 mod tdaclient;
-
 ///
 /// Module containing custom struct for getting and holding accoun balances, positions, and orders
 ///
@@ -63,8 +61,13 @@ pub mod account;
 /// for reuse.
 ///
 pub mod auth;
-pub use param::{Account, History, Instruments, OptionChain, Order, Transactions};
+///
+/// holds all the relevant API endpoints
+pub mod request;
+/// holds all the available query parameters used with the endpoints
+pub mod param;
 ///
 /// Move to front of crate
 ///
 pub use tdaclient::TDAClient;
+pub use request::Endpoint;

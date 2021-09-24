@@ -1,9 +1,9 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use crate::auth::{get_token_from_code, get_token_from_refresh};
 use crate::param::{
-    convert_to_pairs, Account, History, Instruments, OptionChain, Order, Transactions,
+    convert_to_pairs, Pair
 };
+use crate::request::Endpoint;
 use attohttpc::{RequestBuilder, Response, Session};
 use log::info;
 use std::time::Duration;
@@ -37,203 +37,26 @@ impl TDAClient {
         }
     }
     ///
-    /// Create new base client that maintains Authorization Header
-    /// Requires valid ***refresh token*** from tdameritrade
-    ///
-    pub fn new_usingrefresh(refresh: &str, clientid: &str) -> TDAClient {
-        info!("New Client initialized - from refresh token");
-        TDAClient::new(get_token_from_refresh(refresh, clientid))
-    }
-    ///
-    /// Create new base client that maintains Authorization Header
-    /// Requires valid auth ***code*** from tdameritrade
-    ///
-    /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
-    ///
-    pub fn new_usingcode(
-        code: &str,
-        clientid: &str,
-        redirecturi: &str,
-        codedecode: bool,
-    ) -> TDAClient {
-        info!("New Client initialized - from authorization code");
-        TDAClient::new(get_token_from_code(code, clientid, redirecturi, codedecode))
-    }
-    ///
     /// change timeout configuration of Session
     ///
     pub fn session_timeout(&mut self, duration: Duration) {
         self.client.read_timeout(duration);
     }
     ///
-    /// get /userprincipals
-    ///
-    pub fn get_user_principals<T>(&self) -> T
-    where
+    /// get endpoint with query parameters
+    /// 
+    /// See `response::Endpoint` for available Endpoints
+    /// See param for matching parameters
+    /// 
+    pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> T 
+        where
         RequestBuilder: Execute<T>,
+        P: IntoIterator,
+        P::Item: Pair<'a>,
     {
-        self.client
-            .get(format!("{}userprincipals", crate::APIWWW))
-            .execute()
-    }
-    ///
-    /// get /marketdata/quotes?symbol=SYM1,SYM2,SYM3....
-    pub fn get_quotes<T>(&self, quotequery: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}marketdata/quotes", crate::APIWWW))
-            .param("symbol", quotequery)
-            .execute()
-    }
-    ///
-    /// get /marketdata/{MARKET}/hours
-    /// retrieve todays market hours for given market
-    pub fn get_todays_market_hours<T>(&self, market: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}marketdata/{}/hours", crate::APIWWW, market))
-            .execute()
-    }
-    ///
-    /// get /marketdata/{MARKET}/hours
-    /// retrieve market hours for given market and date
-    pub fn get_dates_market_hours<T>(&self, market: &str, date: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}marketdata/{}/hours", crate::APIWWW, market))
-            .param("date", date)
-            .execute()
-    }
-    ///
-    /// get /instruments
-    ///
-    /// Search or retrieve instrument data, including fundamental data.
-    ///
-    pub fn get_instruments<T>(&self, params: &[Instruments]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}instruments", crate::APIWWW))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /instruments/cusip
-    ///
-    /// Get an instrument by CUSIP
-    ///
-    pub fn get_instrument<T>(&self, cusip: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}instruments/{}", crate::APIWWW, cusip))
-            .execute()
-    }
-    ///
-    /// get /marketdata/{SYM}/pricehistory
-    /// additional query parameters need to be added from `History` Enum
-    /// retrieved based on EPOCH datetime
-    /// also `History` Enum starttime and endtime is in EPOCH
-    pub fn get_history<T>(&self, symbol: &str, params: &[History]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!(
-                "{}marketdata/{}/pricehistory",
-                crate::APIWWW,
-                symbol
-            ))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /marketdata/chains?symbol=SYM
-    /// additional query parameters need to be added from `OptionChain` Enum
-    pub fn get_option_chain<T>(&self, params: &[OptionChain]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}marketdata/chains", crate::APIWWW))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /accounts
-    /// if there are more than one account linked than it will retrieve an array of accounts
-    pub fn get_accounts<T>(&self) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}accounts", crate::APIWWW))
-            .execute()
-    }
-    ///
-    /// get /accounts/{account}
-    /// grabs one account with `account_id`
-    /// additional query parameters need to be added from `Account` Enum
-    pub fn get_account<T>(&self, account: &str, params: &[Account]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}accounts/{}", crate::APIWWW, account))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /accounts/{account}/orders
-    /// retrieve all working orders
-    pub fn get_orders<T>(&self, account: &str, params: &[Order]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!("{}accounts/{}/orders", crate::APIWWW, account))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /accounts/{account}/transactions
-    /// retrieve a specified transaction by Id
-    pub fn get_transactions<T>(&self, account: &str, params: &[Transactions]) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!(
-                "{}accounts/{}/transactions",
-                crate::APIWWW,
-                account
-            ))
-            .params(convert_to_pairs(params))
-            .execute()
-    }
-    ///
-    /// get /accounts/{account}/transactions/{transactionId}
-    /// retrieve a specified transaction by Id
-    pub fn get_transaction<T>(&self, account: &str, transaction: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .get(format!(
-                "{}accounts/{}/transactions/{}",
-                crate::APIWWW,
-                account,
-                transaction
-            ))
-            .execute()
+        self.client.get(ep.url_endpoint())
+        .params(convert_to_pairs(params))
+        .execute()
     }
     ///
     /// get /accounts/{account}/watchlists
@@ -338,28 +161,3 @@ fn preexecute(req: RequestBuilder) -> Response {
     response
 }
 
-#[cfg(test)]
-mod tdaclient_tests {
-
-    use super::TDAClient;
-    use std::env;
-
-    #[test]
-    #[ignore]
-    fn check_new_usingrefresh_creates_new_client() {
-        let refresh = env::var("TDREFRESHTOKEN").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
-        let c = TDAClient::new_usingrefresh(&refresh, &clientid);
-        println!("{}", c.get_user_principals::<String>());
-    }
-
-    #[test]
-    #[ignore]
-    fn check_if_newusingcode_creates_new_client() {
-        let code = env::var("TDCODE").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
-        let redirecturi = env::var("TDREDIRECT").unwrap();
-        let c = TDAClient::new_usingcode(&code, &clientid, &redirecturi, true);
-        println!("{}", c.get_user_principals::<String>());
-    }
-}

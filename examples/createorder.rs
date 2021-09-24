@@ -1,12 +1,13 @@
 use std::env;
-use tdameritradeclient::TDAClient;
+use tdameritradeclient::{TDAClient, Endpoint, param};
+
 
 fn main() {
     env_logger::init();
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
-    let resptxt: serde_json::Value = c.get_user_principals();
+    let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty]);
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
     let order_def = r#"
@@ -30,9 +31,11 @@ fn main() {
     "#;
 
     let resptxt = c.create_order(&accountid, order_def);
-    println!("Order Created: {}", resptxt); // list working orders
+    // list working orders
+    println!("Order Created: {}", resptxt); 
 
-    let resptxt: serde_json::Value = c.get_orders(&accountid, &[]); // get working orders and find the order above
+    // get working orders and find the order above
+    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]); 
     pretty_print(&resptxt);
 }
 

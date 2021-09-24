@@ -3,6 +3,7 @@
 pub trait Pair<'a> {
     fn pair(self) -> (&'a str, String);
 }
+
 /// function to convert a collection of query parameters in to a vector of pairs
 pub fn convert_to_pairs<'a, T>(queryparams: T) -> Vec<(&'a str, String)>
 where
@@ -14,6 +15,17 @@ where
         params.push(qenum.pair())
     }
     params
+}
+
+/// No Parameters
+/// 
+/// Used as a fill in when there are no query parameters
+pub struct Empty;
+
+impl<'a> Pair<'a> for &Empty {
+    fn pair(self) -> (&'a str, String) {
+        ("", String::new())
+    }
 }
 
 ///
@@ -38,6 +50,22 @@ impl<'a> Pair<'a> for &Account {
         }
     }
 }
+
+/// 
+/// Query Parameters for /v1/marketdata/quotes
+/// 
+pub enum Quotes<'a> {
+    Symbol(&'a str),
+}
+
+impl<'a> Pair<'a> for &Quotes<'a> {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            Quotes::Symbol(s) => ("symbol", (*s).to_string()),
+        }
+    }
+}
+
 
 ///
 /// Query Parameters for /v1/orders/
@@ -254,6 +282,23 @@ impl<'a> Pair<'a> for &Instruments<'a> {
         match self {
             Instruments::Symbol(s) => ("symbol", (*s).to_string()),
             Instruments::SearchType(s) => ("projection", (*s).to_string()),
+        }
+    }
+}
+
+///
+/// Query Parameters for /v1/marketdata/{market}/hours
+/// 
+pub enum MarketHours<'a> {
+    /// Specify date for which market hours information is needed
+    /// Valid ISO-8601 format: 'yyyy-MM-dd'
+    Date(&'a str),
+}
+
+impl<'a> Pair<'a> for &MarketHours<'a> {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            MarketHours::Date(s) => ("date", (*s).to_string()),
         }
     }
 }
