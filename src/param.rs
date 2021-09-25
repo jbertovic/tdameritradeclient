@@ -302,3 +302,28 @@ impl<'a> Pair<'a> for &MarketHours<'a> {
         }
     }
 }
+
+///
+/// Query Parameters for /v1/marketdata/{index}/movers
+/// 
+pub enum Movers {
+    /// Specify direction movers UP
+    DirectionUp,
+    /// Specify direction movers Down
+    DirectionDown,
+    /// Specify change as a percent
+    ChangePercent,
+    /// Specify change as a value
+    ChangeValue,
+}
+
+impl<'a> Pair<'a> for &Movers {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            Movers::DirectionUp => ("direction", String::from("up")),
+            Movers::DirectionDown => ("direction", String::from("down")),
+            Movers::ChangePercent => ("change", String::from("percent")),
+            Movers::ChangeValue => ("change", String::from("value")),
+        }
+    }
+}
