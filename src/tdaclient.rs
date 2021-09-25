@@ -1,8 +1,6 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::must_use_candidate)]
-use crate::param::{
-    convert_to_pairs, Pair
-};
+use crate::param::{convert_to_pairs, Pair};
 use crate::request::Endpoint;
 use attohttpc::{RequestBuilder, Response, Session};
 use log::info;
@@ -58,66 +56,71 @@ impl TDAClient {
         .params(convert_to_pairs(params))
         .execute()
     }
+
     ///
-    /// get /accounts/{account}/watchlists
-    /// retrieves all watchlists for an account
-    pub fn get_watchlists<T>(&self, account: &str) -> T
+    /// post endpoint with json body
+    /// 
+    /// # Errors
+    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// 
+    pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
+        where
+        // RequestBuilder: Execute<T>,
+        RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
+    {    
+        self.client
+            .post(ep.url_endpoint())
+            .header_append("Content-Type", "application/json")
+            .text(body)
+            .execute()
+    }
+    ///
+    /// put endpoint with json body
+    /// 
+    /// # Errors
+    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// 
+    pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
+        where
+        // RequestBuilder: Execute<T>,
+        RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
+    {    
+        self.client
+            .put(ep.url_endpoint())
+            .header_append("Content-Type", "application/json")
+            .text(body)
+            .execute()
+    }
+    ///
+    /// patch endpoint with json body
+    /// 
+    /// # Errors
+    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// 
+    pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
+        where
+        // RequestBuilder: Execute<T>,
+        RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
+    {    
+        self.client
+            .patch(ep.url_endpoint())
+            .header_append("Content-Type", "application/json")
+            .text(body)
+            .execute()
+    }
+
+    ///
+    /// delete endpoint
+    /// 
+    pub fn delete<T>(&self, ep: &Endpoint) -> T
     where
         RequestBuilder: Execute<T>,
     {
         self.client
-            .get(format!("{}accounts/{}/watchlists", crate::APIWWW, account))
+            .delete(ep.url_endpoint())
             .execute()
     }
-    ///
-    /// Post /accounts/{account}/orders with JSON formated body
-    /// Creates a working order
-    /// if JSON body has error it will return json indicating what's wrong
-    /// if nothing is returned than request was good - could add additional error checking for 201 or 200 response
-    pub fn create_order(&self, account: &str, ordertxt: &str) -> String {
-        self.client
-            .post(format!("{}accounts/{}/orders", crate::APIWWW, account))
-            .header_append("Content-Type", "application/json")
-            .text(ordertxt)
-            .send()
-            .expect("Trouble Retrieving Response: ERROR")
-            .text()
-            .unwrap()
-    }
-    ///
-    /// Delete /accounts/{account}/orders/{order}
-    /// Creates a working order
-    pub fn delete_order<T>(&self, account: &str, order: &str) -> T
-    where
-        RequestBuilder: Execute<T>,
-    {
-        self.client
-            .delete(format!(
-                "{}accounts/{}/orders/{}",
-                crate::APIWWW,
-                account,
-                order
-            ))
-            .execute()
-    }
-    ///
-    /// PUT /accounts/{account}/orders/{order} with JSON formated body
-    /// Replaces a working order with new order - allow the API to cancel and then creates new order
-    pub fn replace_order(&self, account: &str, order: &str, ordertxt: &str) -> String {
-        self.client
-            .put(format!(
-                "{}accounts/{}/orders/{}",
-                crate::APIWWW,
-                account,
-                order
-            ))
-            .header_append("Content-Type", "application/json")
-            .text(ordertxt)
-            .send()
-            .expect("Trouble Retrieving Response: ERROR")
-            .text()
-            .unwrap()
-    }
+
 }
 
 /// This isn't called directly as its built into the functions of the `TDAClient`
@@ -138,6 +141,16 @@ impl Execute<String> for RequestBuilder {
             .expect("Response did not return BODY: ERROR")
     }
 }
+
+impl Execute<String> for RequestBuilder<attohttpc::body::Text<&str>> {
+    fn execute(self) -> String {
+        let response = preexecute_wbody(self);
+        response
+            .text()
+            .expect("Response did not return BODY: ERROR")
+    }
+}
+
 
 impl Execute<serde_json::Value> for RequestBuilder {
     fn execute(self) -> serde_json::Value {
@@ -161,3 +174,11 @@ fn preexecute(req: RequestBuilder) -> Response {
     response
 }
 
+/// created to help with logging
+fn preexecute_wbody(req: RequestBuilder<attohttpc::body::Text<&str>>) -> Response {
+    let mut prepared = req.prepare();
+    info!("Request: {}-{} - includes body text", prepared.method(), prepared.url());
+    let response = prepared.send().expect("Trouble Retrieving Response: ERROR");
+    info!("Response: Status:{}", response.status());
+    response
+}

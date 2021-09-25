@@ -1,7 +1,4 @@
-pub enum _RequestType {
-    Get,
-}
-
+/// specifies Endpoints for TD Ameritrade's API
 pub enum Endpoint<'a> {
     ///
     /// /userprincipals
@@ -20,10 +17,33 @@ pub enum Endpoint<'a> {
     /// 
     Account(&'a str),
     ///
+    /// /accounts/{ACCOUNTID}/orders/{ORDERID}
+    /// get order details for specified account id for specific order id
+    /// delete to cancel order
+    /// put to replace order; need to include body that will replace original order
+    /// First parameter is ACCOUNTID and second parameter is ORDERID
+    /// 
+    Order((&'a str, &'a str)),
+    ///
     /// /accounts/{ACCOUNTID}/orders
     /// get order details for specified account
+    /// post body with order details to submit order
     /// 
     Orders(&'a str),
+    ///
+    /// /accounts/{ACCOUNTID}/savedorders/{SAVEDORDERID}
+    /// get order details for specified account id for specific order id
+    /// delete to cancel order
+    /// put to replace order; need to include body that will replace original order
+    /// First parameter is ACCOUNTID and second parameter is SAVEDORDERID
+    /// 
+    SavedOrder((&'a str, &'a str)),
+    ///
+    /// /accounts/{ACCOUNTID}/savedorders
+    /// get order details for specified account
+    /// post body with order details to submit order
+    /// 
+    SavedOrders(&'a str),
     ///
     /// /marketdata/quotes
     /// get quotes for a list of symbols. example: "SPY,IWM,QQQ"
@@ -47,6 +67,7 @@ pub enum Endpoint<'a> {
     Instrument(&'a str),
     ///
     /// /marketdata/{SYMBOL}/pricehistory
+    /// search for instruments
     /// additional query parameters need to be added from `param::History` Enum
     /// 
     History(&'a str),
@@ -57,25 +78,51 @@ pub enum Endpoint<'a> {
     OptionChain,
     ///
     /// /accounts/{ACCOUNTID}/transactions
-    /// retrieve transactions in a specified Account
+    /// get transactions in a specified Account
     /// additional query parameters can be added from `param::Transactions` Enum
     /// 
     Transactions(&'a str),
     ///
-    /// /accounts/{account}/transactions/{transactionId}
-    /// retrieve in a specified Account a specified transaction by Id 
+    /// /accounts/{ACCOUNTID}/transactions/{TRANSACTIONID}
+    /// get in a specified Account a specified transaction by Id 
+    /// First parameter is ACCOUNTID and second parameter is TRANSACTIONID
     /// 
     Transaction((&'a str, &'a str)),
+    ///
+    /// /accounts/{ACCOUNTID}/watchlists
+    /// get all watchlists for specified account
+    /// post to create watchlist
+    /// 
+    Watchlists(&'a str),
+    ///
+    /// /accounts/{ACCOUNTID}/watchlists/{WATCHLISTID}
+    /// get a specific watchlid for a specified account
+    /// put to replace watchlist
+    /// patch to update watchlist
+    /// delete to remove watchlist
+    /// 
+    Watchlist((&'a str, &'a str)),
+    ///
+    /// **Has not been tested**
+    /// /marketdata/{INDEX}/movers
+    /// get mover information by index symbol, direction type and change
+    /// INDEX: $SPX.X, $COMPX, $DJI
+    /// 
+    Movers(&'a str),
 
 }
 
 impl<'a> Endpoint<'a> {
+    /// defines the URL for the specified Endpoint
     pub fn url_endpoint(&self) -> String {
         match self {
             Endpoint::UserPrincipals => format!("{}userprincipals", crate::APIWWW),
             Endpoint::Accounts => format!("{}accounts", crate::APIWWW),
             Endpoint::Account(account) => format!("{}accounts/{}", crate::APIWWW, account),
+            Endpoint::Order((account, order)) => format!("{}accounts/{}/orders/{}", crate::APIWWW, account, order),
             Endpoint::Orders(account) => format!("{}accounts/{}/orders", crate::APIWWW, account),
+            Endpoint::SavedOrder((account, savedorder)) => format!("{}accounts/{}/savedorders/{}", crate::APIWWW, account, savedorder),
+            Endpoint::SavedOrders(account) => format!("{}accounts/{}/savedorders", crate::APIWWW, account),
             Endpoint::Quotes => format!("{}marketdata/quotes", crate::APIWWW),
             Endpoint::MarketHours(market) => format!("{}marketdata/{}/hours", crate::APIWWW, market),
             Endpoint::Instruments => format!("{}instruments", crate::APIWWW),
@@ -84,6 +131,9 @@ impl<'a> Endpoint<'a> {
             Endpoint::OptionChain => format!("{}marketdata/chains", crate::APIWWW),
             Endpoint::Transactions(account) => format!("{}accounts/{}/transactions", crate::APIWWW, account),
             Endpoint::Transaction((account, transaction)) => format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, transaction),
+            Endpoint::Watchlists(account) => format!("{}accounts/{}/transactions", crate::APIWWW, account),
+            Endpoint::Watchlist((account, watchlist)) => format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, watchlist),
+            Endpoint::Movers(index) => format!("{}marketdata/{}/movers", crate::APIWWW, index),
         }
     }
 }

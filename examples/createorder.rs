@@ -14,7 +14,7 @@ fn main() {
     {
         "orderType": "LIMIT",
         "session": "NORMAL",
-        "price": "30.01",
+        "price": "30.02",
         "duration": "DAY",
         "orderStrategyType": "SINGLE",
         "orderLegCollection": [
@@ -30,9 +30,11 @@ fn main() {
       }
     "#;
 
-    let resptxt = c.create_order(&accountid, order_def);
-    // list working orders
-    println!("Order Created: {}", resptxt); 
+    // use post method to pass body of order definition/instructions
+    let resptxt = c.post(&Endpoint::Orders(accountid), &order_def);
+
+    // outcome of order submit
+    println!("Order Created: '{}'", resptxt); 
 
     // get working orders and find the order above
     let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]); 

@@ -2,6 +2,9 @@ use std::env;
 use tdameritradeclient::{TDAClient, Endpoint, param};
 
 fn main() {
+
+    // Delete order by ORDERID
+
     env_logger::init();
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
@@ -12,7 +15,7 @@ fn main() {
     let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty]);
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    let _: String = c.delete_order(&accountid, &orderid);
+    let _: String = c.delete(&Endpoint::Order((&accountid, &orderid)));
 
     let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]); // get working orders
     println!("orders remaining: ");

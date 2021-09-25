@@ -2,6 +2,8 @@
 // These are more like examples
 // REQUIRES an active TD ameritrade account and valid token
 
+// TODO: tests to add: watchlist endpoints
+
 use std::env;
 use tdameritradeclient::{TDAClient, Endpoint, param};
 
