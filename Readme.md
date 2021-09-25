@@ -1,5 +1,8 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
+# Version 0.4 Changes
+
+I changed my approach to this wrapper around TD Ameritrade's API.  Previous versions used multiple functions on the client to specify each endpoint.  This version has now a major change in that it specifies the endpoints in the request module as an Endpoint enum.  So now both the parameters for query parameters and specifying the endpoints are kept in enums.  I have updated the examples to show how to use them.  Feedback is welcomed.   
 
 # tdameritradeclient
 
@@ -21,7 +24,7 @@ For the examples and tests to work you will need to set environmental variables 
 
 ```
 use std::env;
-use tdameritradeclient::TDAClient;
+use tdameritradeclient::{TDAClient, Endpoint, param};
 
 // Will need to set TDAUTHTOKEN as environmental variable containing a valid token
 
@@ -34,7 +37,7 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.get_quotes("F,INTC,TRP");
+    let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")]);
 
     // output will be text string in json format
     println!("{:?}", resptxt);
@@ -44,7 +47,7 @@ fn main() {
 
 ## Setup
 
-You will need to determine a way to supply a method of authorization to the client.  
+You will need to determine a way to supply a method of authorization to the client.  The client is simple and will only take a valid token to perform the requests.  The client will not automatically manage the token refresh.  See `auth` module below.
 
 You can implement the client in one of 3 ways:
 1) Supply valid ***token*** that will be used in the request as `Bearer <token>`
@@ -55,7 +58,7 @@ See [developer.tdameritrade.com](http://developer.tdameritrade.com) on how to ma
 
 ## Authorization module
 
-I've included some utility tools under `auth` module to help deal with managing tokens using the above 3 options.  See documentation for extra information.
+I've included utility tools under `auth` module to help deal with managing tokens using the above 3 options.  See documentation for extra information.
 
 Example using `refresh_token` to renew `token`
 
@@ -83,38 +86,8 @@ clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 
 
 ## Future IDEAS
-- [ ] build json schema for order types to help when creating new orders or replacing existing orders
-- [X] add log crate
+- [ ] create model structs for all json output 
 - [ ] continue to add documentation
-- [ ] add better error checking on `Execute<T>` Trait and creating/deleting/changing orders
+- [ ] add better error checking on `Execute<T>` Trait 
 - [ ] create feature option from serde_json
-- [ ] build structs that match json return structures
-
-
-## Endpoints added
-see [https://developer.tdameritrade.com/apis](http://developer.tdameritrade.com/apis)
-
-- [X] GET /userprincipals
-- [ ] GET /userprincipals?parameters*
-- [ ] GET /userprincipals/streamersubscriptionkeys
-- [X] GET /marketdata/quotes?symbol
-- [X] GET /marketdata/{}/hours
-- [X] GET /marketdata/{}/hours?date
-- [X] GET /marketdata/{}/pricehistory
-- [X] GET /marketdata/chains
-- [X] GET /accounts/{}
-- [X] GET /accounts/{}/watchlists
-- [X] GET /accounts/{}?parameters*
-- [X] GET /accounts/{}/orders?parameters*
-- [X] GET /accounts/{}/transactions?parameters*
-- [X] GET /accounts/{}/transactions/{}
-- [X] GET /marketdata/{}/pricehistory?parameters*  
-- [X] GET /marketdata/chains?parameters* 
-- [X] GET /instruments?parameters*
-- [X] GET /instruments/{}
-- [X] POST /accounts/{}/orders
-- [X] PUT /accounts/{}/orders 
-- [X] DELETE /accounts/{}/orders
-- [X] POST /oauth2/token
-
-parameters* indicates that the fields are specified in the enums located in src/params.rs 
+- [ ] create schema structs in defining orders
