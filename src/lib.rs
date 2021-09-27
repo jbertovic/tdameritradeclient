@@ -8,14 +8,19 @@
 //!
 //! Response output can be kept in text which comes out as JSON text or converted to a `serde_json::Value` object
 //!
-//! # Client usage with get() function
+//! # Client request functions
 //! 
-//! Use the relevant API endpoint with `request::Endpoint` and query parameters `param`.  When no query parameters are necessary use `param::Empty`
+//! Use the relevant API endpoint with `request::Endpoint` and query parameters `param`.  When no query parameters are necessary use `param::Empty`.
 //! 
-//! # Account module (Experimental)
+//! See `TDAClient` for each of the request functions: `get`, `post`, `put`, `delete`.
+//! 
+//! # Model module
 //!
-//! Account module contains a `account::SecuritiesAccount` struct to hold all of the balances, positions, and orders of an account.
-//! Convenience functions can be added to work with the account.  Still in development.
+//! Model module contains response types that can be parsed from the JSON responses.  This is a work in progress and still in development. 
+//! 
+//! I tried using TD Ameritrade Schema's that were located on their developer site, however, they don't always match or there is additional data
+//!  available.  Therefore, I'm creating these response type's manually - experimenting a bit.  Would be much more useful if there was a way to
+//!  code generate the types that match each response.  Its your option if you want to use them, or stick with json or define your own response types.
 //!
 //! # Auth module
 //!
@@ -51,10 +56,6 @@ static APIKEY: &str = "@AMER.OAUTHAP";
 
 mod tdaclient;
 ///
-/// Module containing custom struct for getting and holding accoun balances, positions, and orders
-///
-pub mod account;
-///
 /// utility module to help with authorization token, refresh token and grant code
 ///
 /// You can use the public functions or the `TDauth` struct.  `TDauth` allows you to store the information
@@ -71,3 +72,7 @@ pub mod param;
 ///
 pub use tdaclient::TDAClient;
 pub use request::Endpoint;
+
+/// models that define structs to capture json response from API
+/// 
+pub mod model;

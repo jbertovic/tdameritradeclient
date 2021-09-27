@@ -2,7 +2,9 @@
 
 # Version 0.4 Changes
 
-I changed my approach to this wrapper around TD Ameritrade's API.  Previous versions used multiple functions on the client to specify each endpoint.  This version has now a major change in that it specifies the endpoints in the request module as an Endpoint enum.  So now both the parameters for query parameters and specifying the endpoints are kept in enums.  I have updated the examples to show how to use them.  Feedback is welcomed.   
+I changed my approach to this wrapper around TD Ameritrade's API.  Previous versions used multiple functions on the client to specify each endpoint.  This version has a major change in that it specifies the endpoints in the request module as an Endpoint enum.  So now both the parameters for query parameters and specifying the endpoints are kept in enums.  I have updated the examples to show how to use them.  Feedback is welcomed.   
+
+I added a model module to contain response types that can be parsed from the json output.  I tried using TD Ameritrade Schema's that were located on their developer site, however, they don't always match or there is additional data available.  Therefore, I'm creating these response type's manually - experimenting a bit.  Would be much more useful if there was a way to code generate the types that match each response.  Its your option if you want to use them, or stick with json or define your own response types.
 
 # tdameritradeclient
 

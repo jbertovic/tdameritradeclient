@@ -23,6 +23,7 @@ pub struct TDAClient {
 impl TDAClient {
     ///
     /// Create new base client that maintains Authorization Header
+    /// 
     /// Requires valid ***token*** from tdameritrade
     ///
     pub fn new(token: String) -> TDAClient {
@@ -44,6 +45,7 @@ impl TDAClient {
     /// get endpoint with query parameters
     /// 
     /// See `response::Endpoint` for available Endpoints
+    /// 
     /// See param for matching parameters
     /// 
     pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> T 
