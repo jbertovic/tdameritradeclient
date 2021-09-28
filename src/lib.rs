@@ -72,7 +72,8 @@ pub mod param;
 ///
 pub use tdaclient::TDAClient;
 pub use request::Endpoint;
-
-/// models that define structs to capture json response from API
+/// models that define types to parse json response or value responses from API
 /// 
+/// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation
+///
 pub mod model;

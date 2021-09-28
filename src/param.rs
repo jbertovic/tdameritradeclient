@@ -55,6 +55,7 @@ impl<'a> Pair<'a> for &Account {
 /// Query Parameters for /marketdata/quotes
 /// 
 pub enum Quotes<'a> {
+    /// Indicate one symbol or multiple symbols with `,` as delimiter
     Symbol(&'a str),
 }
 
@@ -322,7 +323,7 @@ impl<'a> Pair<'a> for &MarketHours<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/{index}/movers
+/// Query Parameters for /marketdata/{index}/movers
 /// 
 pub enum Movers {
     /// Specify direction movers UP

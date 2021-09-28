@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 ///
 /// Holds Type for UserPrincipals response
-/// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation
 ///
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

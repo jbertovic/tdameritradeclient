@@ -13,6 +13,7 @@ use std::time::Duration;
 /// Two options for output:
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
+/// 3) use `serde_json::Value` output to parse into a response `model` type 
 ///
 #[derive(Debug, Default)]
 pub struct TDAClient {

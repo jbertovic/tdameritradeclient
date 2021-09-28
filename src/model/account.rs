@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// Holds account information that contains account information, balances, positions and orders
 /// as retrieved from get Accounts
-/// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation
 ///
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
