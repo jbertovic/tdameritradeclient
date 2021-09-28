@@ -16,7 +16,7 @@ use std::time::Duration;
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
 ///
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TDAClient {
     auth_token: String,
     client: Session,
