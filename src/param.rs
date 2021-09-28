@@ -3,6 +3,7 @@
 pub trait Pair<'a> {
     fn pair(self) -> (&'a str, String);
 }
+
 /// function to convert a collection of query parameters in to a vector of pairs
 pub fn convert_to_pairs<'a, T>(queryparams: T) -> Vec<(&'a str, String)>
 where
@@ -16,8 +17,19 @@ where
     params
 }
 
+/// No Parameters
+/// 
+/// Used as a fill in when there are no query parameters
+pub struct Empty;
+
+impl<'a> Pair<'a> for &Empty {
+    fn pair(self) -> (&'a str, String) {
+        ("", String::new())
+    }
+}
+
 ///
-/// Query Parameters for /v1/accounts/
+/// Query Parameters for /accounts/
 ///
 /// Balances displayed by default, additional fields can be added here by adding
 /// positions or orders
@@ -39,8 +51,25 @@ impl<'a> Pair<'a> for &Account {
     }
 }
 
+/// 
+/// Query Parameters for /marketdata/quotes
+/// 
+pub enum Quotes<'a> {
+    /// Indicate one symbol or multiple symbols with `,` as delimiter
+    Symbol(&'a str),
+}
+
+impl<'a> Pair<'a> for &Quotes<'a> {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            Quotes::Symbol(s) => ("symbol", (*s).to_string()),
+        }
+    }
+}
+
+
 ///
-/// Query Parameters for /v1/orders/
+/// Query Parameters for /orders/
 ///
 #[derive(Debug)]
 pub enum Order<'a> {
@@ -48,9 +77,11 @@ pub enum Order<'a> {
     MaxResults(u8),
     /// Specifies that no orders entered before this time should be returned.
     /// Must be 60 days from today's date
+    /// 
     /// format yyyy-mm-dd
     FromEnteredTime(&'a str),
     /// Specifies that no orders entered after this time should be returned.
+    /// 
     /// format yyyy-mm-dd
     ToEnteredTime(&'a str),
     /// specifies type of orders to be returned: WORKING, FILLED, EXPIRED, etc...
@@ -69,7 +100,7 @@ impl<'a> Pair<'a> for &Order<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/{symbol}/pricehistory
+/// Query Parameters for /marketdata/{symbol}/pricehistory
 ///
 #[derive(Debug)]
 pub enum History<'a> {
@@ -77,23 +108,35 @@ pub enum History<'a> {
     /// ytd (year to date). Default is day.
     PeriodType(&'a str),
     /// Number of periods to show. Valid by `PeriodType` (* is default)
+    /// 
     /// day: 1, 2, 3, 4, 5, 10*
+    /// 
     /// month: 1*, 2, 3, 6
+    /// 
     /// year: 1*, 2, 3, 5, 10, 15, 20
+    /// 
     /// ytd: 1*
     Period(u8),
     /// the type of frequency with which a new candle is formed.
     /// Valid frequencyTypes by periodType (defaults marked with an asterisk):
+    /// 
     /// day: minute*
+    /// 
     /// month: daily, weekly*
+    /// 
     /// year: daily, weekly, monthly*
+    /// 
     /// ytd: daily, weekly*
     FrequencyType(&'a str),
     /// the number of the frequencyType to be included in each candle.
     /// Valid frequencies by frequencyType (defaults marked with an asterisk):
+    /// 
     /// minute: 1*, 5, 10, 15, 30
+    /// 
     /// daily: 1*
+    /// 
     /// weekly: 1*
+    /// 
     /// monthly: 1*
     Frequency(u8),
     /// Start date as milliseconds since epoch. If startDate and endDate
@@ -122,7 +165,7 @@ impl<'a> Pair<'a> for &History<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/chains
+/// Query Parameters for /marketdata/chains
 ///
 #[derive(Debug)]
 pub enum OptionChain<'a> {
@@ -203,7 +246,7 @@ impl<'a> Pair<'a> for &OptionChain<'a> {
 pub enum Transactions<'a> {
     ///
     /// type = ALL, TRADE, BUY_ONLY, SELL_ONLY, CASH_IN_OR_CASH_OUT, CHECKING, DIVIDEND, INTEREST
-    ///        OTHER, ADVISOR_FEES
+    /// OTHER, ADVISOR_FEES
     /// default = ALL
     TransactionType(&'a str),
     /// Specify symbol, otherwise all symbols
@@ -228,7 +271,7 @@ impl<'a> Pair<'a> for &Transactions<'a> {
 }
 
 ///
-/// Query Parameters for /v1/instruments
+/// Query Parameters for /instruments
 ///
 #[derive(Debug)]
 pub enum Instruments<'a> {
@@ -237,14 +280,18 @@ pub enum Instruments<'a> {
     ///
     /// Type of Request
     /// symbol-search: Retrieve instrument data of a specific symbol or cusip
+    /// 
     /// symbol-regex: Retrieve instrument data for all symbols matching regex.
     ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
+    /// 
     /// desc-search: Retrieve instrument data for instruments whose description
     ///      contains the word supplied. Example: symbol=FakeCompany will return
     ///      all instruments with FakeCompany in the description.
+    /// 
     /// desc-regex: Search description with full regex support.
     ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions
     ///      contain a word beginning with XYZ followed by a character A through C.
+    /// 
     /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
     SearchType(&'a str),
 }
@@ -254,6 +301,48 @@ impl<'a> Pair<'a> for &Instruments<'a> {
         match self {
             Instruments::Symbol(s) => ("symbol", (*s).to_string()),
             Instruments::SearchType(s) => ("projection", (*s).to_string()),
+        }
+    }
+}
+
+///
+/// Query Parameters for /marketdata/{market}/hours
+/// 
+pub enum MarketHours<'a> {
+    /// Specify date for which market hours information is needed
+    /// Valid ISO-8601 format: 'yyyy-MM-dd'
+    Date(&'a str),
+}
+
+impl<'a> Pair<'a> for &MarketHours<'a> {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            MarketHours::Date(s) => ("date", (*s).to_string()),
+        }
+    }
+}
+
+///
+/// Query Parameters for /marketdata/{index}/movers
+/// 
+pub enum Movers {
+    /// Specify direction movers UP
+    DirectionUp,
+    /// Specify direction movers Down
+    DirectionDown,
+    /// Specify change as a percent
+    ChangePercent,
+    /// Specify change as a value
+    ChangeValue,
+}
+
+impl<'a> Pair<'a> for &Movers {
+    fn pair(self) -> (&'a str, String) {
+        match self {
+            Movers::DirectionUp => ("direction", String::from("up")),
+            Movers::DirectionDown => ("direction", String::from("down")),
+            Movers::ChangePercent => ("change", String::from("percent")),
+            Movers::ChangeValue => ("change", String::from("value")),
         }
     }
 }
