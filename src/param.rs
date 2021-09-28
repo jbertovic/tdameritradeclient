@@ -29,7 +29,7 @@ impl<'a> Pair<'a> for &Empty {
 }
 
 ///
-/// Query Parameters for /v1/accounts/
+/// Query Parameters for /accounts/
 ///
 /// Balances displayed by default, additional fields can be added here by adding
 /// positions or orders
@@ -52,7 +52,7 @@ impl<'a> Pair<'a> for &Account {
 }
 
 /// 
-/// Query Parameters for /v1/marketdata/quotes
+/// Query Parameters for /marketdata/quotes
 /// 
 pub enum Quotes<'a> {
     Symbol(&'a str),
@@ -68,7 +68,7 @@ impl<'a> Pair<'a> for &Quotes<'a> {
 
 
 ///
-/// Query Parameters for /v1/orders/
+/// Query Parameters for /orders/
 ///
 #[derive(Debug)]
 pub enum Order<'a> {
@@ -99,7 +99,7 @@ impl<'a> Pair<'a> for &Order<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/{symbol}/pricehistory
+/// Query Parameters for /marketdata/{symbol}/pricehistory
 ///
 #[derive(Debug)]
 pub enum History<'a> {
@@ -164,7 +164,7 @@ impl<'a> Pair<'a> for &History<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/chains
+/// Query Parameters for /marketdata/chains
 ///
 #[derive(Debug)]
 pub enum OptionChain<'a> {
@@ -270,7 +270,7 @@ impl<'a> Pair<'a> for &Transactions<'a> {
 }
 
 ///
-/// Query Parameters for /v1/instruments
+/// Query Parameters for /instruments
 ///
 #[derive(Debug)]
 pub enum Instruments<'a> {
@@ -305,7 +305,7 @@ impl<'a> Pair<'a> for &Instruments<'a> {
 }
 
 ///
-/// Query Parameters for /v1/marketdata/{market}/hours
+/// Query Parameters for /marketdata/{market}/hours
 /// 
 pub enum MarketHours<'a> {
     /// Specify date for which market hours information is needed

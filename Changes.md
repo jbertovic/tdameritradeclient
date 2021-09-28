@@ -1,3 +1,14 @@
+# v0.4.0
+ - Major change in approach of making requests.  Requests are now made from an enum of endpoints instead of individual unique functions on client for each endpoint.
+ - added generic requests on client; `get`, `post`, `put`, `patch` and `delete`
+ - removed endpoint funtions from `TDClient` which will prevent backward compatibility to version 0.3
+ - caputured endpoints in `request` module
+ - updated documentation, examples, and tests with new approach
+ - added model types for `SecuritiesAccount` and `UserPrincipals` response
+
+# v0.3.1
+- added `derive(Default)` on `TDClient`
+
 # v0.3.0
 - add log crate and inserted a few log outputs for ERROR and INFO
 

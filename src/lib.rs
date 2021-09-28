@@ -12,7 +12,7 @@
 //! 
 //! Use the relevant API endpoint with `request::Endpoint` and query parameters `param`.  When no query parameters are necessary use `param::Empty`.
 //! 
-//! See `TDAClient` for each of the request functions: `get`, `post`, `put`, `delete`.
+//! See `TDAClient` for each of the request functions: `get`, `post`, `put`, `patch`, and `delete`.
 //! 
 //! # Model module
 //!
