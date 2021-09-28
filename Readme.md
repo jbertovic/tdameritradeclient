@@ -8,7 +8,7 @@ I added a model module to contain response types that can be parsed from the jso
 
 # tdameritradeclient
 
-[Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/)
+[Documentation](https://jbertovic.github.io/tdameritradeclient/doc/tdameritradeclient/index.html)
 
 ## Description
 
