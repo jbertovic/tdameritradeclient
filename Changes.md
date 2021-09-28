@@ -1,3 +1,6 @@
+# v0.3.1
+- added derive(Default) on TDClient
+
 # v0.3.0
 - add log crate and inserted a few log outputs for ERROR and INFO
 
