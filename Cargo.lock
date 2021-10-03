@@ -519,7 +519,7 @@ dependencies = [
 
 [[package]]
 name = "tdameritradeclient"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "attohttpc",
  "env_logger",
