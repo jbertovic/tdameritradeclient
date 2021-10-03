@@ -3,3 +3,4 @@ config.txt
 updateenv.sh
 /.vscode
 launch.json
+Cargo.lock
