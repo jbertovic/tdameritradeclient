@@ -1,4 +1,6 @@
 /// specifies Endpoints for TD Ameritrade's API
+/// 
+#[derive(Debug)]
 pub enum Endpoint<'a> {
     ///
     /// /userprincipals

@@ -20,6 +20,7 @@ where
 /// No Parameters
 /// 
 /// Used as a fill in when there are no query parameters
+#[derive(Debug)]
 pub struct Empty;
 
 impl<'a> Pair<'a> for &Empty {
@@ -325,6 +326,7 @@ impl<'a> Pair<'a> for &MarketHours<'a> {
 ///
 /// Query Parameters for /marketdata/{index}/movers
 /// 
+#[derive(Debug)]
 pub enum Movers {
     /// Specify direction movers UP
     DirectionUp,
