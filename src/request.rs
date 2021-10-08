@@ -168,8 +168,8 @@ impl<'a> Endpoint<'a> {
             Endpoint::OptionChain => format!("{}marketdata/chains", crate::APIWWW),
             Endpoint::Transactions(account) => format!("{}accounts/{}/transactions", crate::APIWWW, account),
             Endpoint::Transaction((account, transaction)) => format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, transaction),
-            Endpoint::Watchlists(account) => format!("{}accounts/{}/transactions", crate::APIWWW, account),
-            Endpoint::Watchlist((account, watchlist)) => format!("{}accounts/{}/transactions/{}", crate::APIWWW, account, watchlist),
+            Endpoint::Watchlists(account) => format!("{}accounts/{}/watchlists", crate::APIWWW, account),
+            Endpoint::Watchlist((account, watchlist)) => format!("{}accounts/{}/watchlists/{}", crate::APIWWW, account, watchlist),
             Endpoint::Movers(index) => format!("{}marketdata/{}/movers", crate::APIWWW, index),
         }
     }
