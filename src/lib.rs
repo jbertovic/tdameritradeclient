@@ -9,15 +9,15 @@
 //! Response output can be kept in text which comes out as JSON text or converted to a `serde_json::Value` object
 //!
 //! # Client request functions
-//! 
+//!
 //! Use the relevant API endpoint with `request::Endpoint` and query parameters `param`.  When no query parameters are necessary use `param::Empty`.
-//! 
+//!
 //! See `TDAClient` for each of the request functions: `get`, `post`, `put`, `patch`, and `delete`.
-//! 
+//!
 //! # Model module
 //!
-//! Model module contains response types that can be parsed from the JSON responses.  This is a work in progress and still in development. 
-//! 
+//! Model module contains response types that can be parsed from the JSON responses.  This is a work in progress and still in development.
+//!
 //! I tried using TD Ameritrade Schema's that were located on their developer site, however, they don't always match or there is additional data
 //!  available.  Therefore, I'm creating these response type's manually - experimenting a bit.  Would be much more useful if there was a way to
 //!  code generate the types that match each response.  Its your option if you want to use them, or stick with json or define your own response types.
@@ -54,7 +54,6 @@
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
 
-mod tdaclient;
 ///
 /// utility module to help with authorization token, refresh token and grant code
 ///
@@ -62,18 +61,17 @@ mod tdaclient;
 /// for reuse.
 ///
 pub mod auth;
-///
-/// holds all the relevant API endpoints
-pub mod request;
 /// holds all the available query parameters used with the endpoints
 pub mod param;
-///
+/// holds all the relevant API endpoints
+pub mod request;
 /// Move to front of crate
-///
-pub use tdaclient::TDAClient;
 pub use request::Endpoint;
+mod tdaclient;
+/// client that manages session and interaction with TDAmeritrade API
+pub use tdaclient::TDAClient;
 /// models that define types to parse json response or value responses from API
-/// 
+///
 /// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation
 ///
 pub mod model;

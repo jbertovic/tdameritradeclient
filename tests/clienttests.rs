@@ -5,7 +5,7 @@
 // TODO: tests to add: watchlist endpoints
 
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn initialize_client() -> TDAClient {
     TDAClient::new(env::var("TDAUTHTOKEN").unwrap())
@@ -30,21 +30,24 @@ fn able_to_retrieve_user_data() {
 
 #[test]
 fn able_to_retrieve_quotes() {
-    let resptxt: String = initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
+    let resptxt: String =
+        initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"assetType\""), true);
 }
 
 #[test]
 fn able_to_retrieve_tojson() {
-    let resptxt: serde_json::Value = initialize_client().get(&Endpoint::UserPrincipals, &[param::Empty]);
+    let resptxt: serde_json::Value =
+        initialize_client().get(&Endpoint::UserPrincipals, &[param::Empty]);
     println!("{:?}", resptxt);
     assert!(resptxt["userId"].is_string());
 }
 
 #[test]
 fn able_to_retrieve_history() {
-    let resptxt: String = initialize_client().get(&Endpoint::History("SPY"),
+    let resptxt: String = initialize_client().get(
+        &Endpoint::History("SPY"),
         &[
             param::History::Period(1),
             param::History::PeriodType("month"),
@@ -58,11 +61,14 @@ fn able_to_retrieve_history() {
 
 #[test]
 fn able_to_retrieve_optionchain() {
-    let resptxt: String = initialize_client().get(&Endpoint::OptionChain, &[
-        param::OptionChain::Symbol("SPY"),
-        param::OptionChain::StrikeCount(3),
-        param::OptionChain::ContractType("CALL"),
-    ]);
+    let resptxt: String = initialize_client().get(
+        &Endpoint::OptionChain,
+        &[
+            param::OptionChain::Symbol("SPY"),
+            param::OptionChain::StrikeCount(3),
+            param::OptionChain::ContractType("CALL"),
+        ],
+    );
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"SUCCESS\""), true);
 }
@@ -109,10 +115,13 @@ fn able_to_retrieve_instrument_cusip() {
 #[test]
 fn able_to_retrieve_instrument_search() {
     let c = initialize_client();
-    let resptxt: String = c.get(&Endpoint::Instruments, &[
-        param::Instruments::Symbol("INTC"),
-        param::Instruments::SearchType("fundamental"),
-    ]);
+    let resptxt: String = c.get(
+        &Endpoint::Instruments,
+        &[
+            param::Instruments::Symbol("INTC"),
+            param::Instruments::SearchType("fundamental"),
+        ],
+    );
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"cusip\""), true);
 }

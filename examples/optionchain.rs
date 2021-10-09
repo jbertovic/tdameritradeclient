@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn main() {
     env_logger::init();
@@ -7,11 +7,14 @@ fn main() {
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
     // TODO: add symbol in params
     title_print("Option Chain:");
-    pretty_print(&c.get(&Endpoint::OptionChain, &[
-        param::OptionChain::Symbol("SPY"),
-        param::OptionChain::StrikeCount(3),
-        param::OptionChain::ContractType("CALL"),
-    ]));
+    pretty_print(&c.get(
+        &Endpoint::OptionChain,
+        &[
+            param::OptionChain::Symbol("SPY"),
+            param::OptionChain::StrikeCount(3),
+            param::OptionChain::ContractType("CALL"),
+        ],
+    ));
 }
 
 fn pretty_print(toprint: &serde_json::Value) {

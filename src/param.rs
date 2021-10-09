@@ -18,7 +18,7 @@ where
 }
 
 /// No Parameters
-/// 
+///
 /// Used as a fill in when there are no query parameters
 #[derive(Debug)]
 pub struct Empty;
@@ -52,9 +52,9 @@ impl<'a> Pair<'a> for &Account {
     }
 }
 
-/// 
+///
 /// Query Parameters for /marketdata/quotes
-/// 
+///
 pub enum Quotes<'a> {
     /// Indicate one symbol or multiple symbols with `,` as delimiter
     Symbol(&'a str),
@@ -68,7 +68,6 @@ impl<'a> Pair<'a> for &Quotes<'a> {
     }
 }
 
-
 ///
 /// Query Parameters for /orders/
 ///
@@ -78,11 +77,11 @@ pub enum Order<'a> {
     MaxResults(u8),
     /// Specifies that no orders entered before this time should be returned.
     /// Must be 60 days from today's date
-    /// 
+    ///
     /// format yyyy-mm-dd
     FromEnteredTime(&'a str),
     /// Specifies that no orders entered after this time should be returned.
-    /// 
+    ///
     /// format yyyy-mm-dd
     ToEnteredTime(&'a str),
     /// specifies type of orders to be returned: WORKING, FILLED, EXPIRED, etc...
@@ -109,35 +108,35 @@ pub enum History<'a> {
     /// ytd (year to date). Default is day.
     PeriodType(&'a str),
     /// Number of periods to show. Valid by `PeriodType` (* is default)
-    /// 
+    ///
     /// day: 1, 2, 3, 4, 5, 10*
-    /// 
+    ///
     /// month: 1*, 2, 3, 6
-    /// 
+    ///
     /// year: 1*, 2, 3, 5, 10, 15, 20
-    /// 
+    ///
     /// ytd: 1*
     Period(u8),
     /// the type of frequency with which a new candle is formed.
     /// Valid frequencyTypes by periodType (defaults marked with an asterisk):
-    /// 
+    ///
     /// day: minute*
-    /// 
+    ///
     /// month: daily, weekly*
-    /// 
+    ///
     /// year: daily, weekly, monthly*
-    /// 
+    ///
     /// ytd: daily, weekly*
     FrequencyType(&'a str),
     /// the number of the frequencyType to be included in each candle.
     /// Valid frequencies by frequencyType (defaults marked with an asterisk):
-    /// 
+    ///
     /// minute: 1*, 5, 10, 15, 30
-    /// 
+    ///
     /// daily: 1*
-    /// 
+    ///
     /// weekly: 1*
-    /// 
+    ///
     /// monthly: 1*
     Frequency(u8),
     /// Start date as milliseconds since epoch. If startDate and endDate
@@ -187,13 +186,13 @@ pub enum OptionChain<'a> {
     /// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.
     IncludeQuotes(bool),
     /// Returns options for the given range. Possible values are:
-    ///  ITM: In-the-money
-    ///  NTM: Near-the-money
-    ///  OTM: Out-of-the-money
-    ///  SAK: Strikes Above Market
-    ///  SBK: Strikes Below Market
-    ///  SNK: Strikes Near Market
-    ///  ALL: All Strikes
+    ///  ITM: In-the-money, 
+    ///  NTM: Near-the-money, 
+    ///  OTM: Out-of-the-money, 
+    ///  SAK: Strikes Above Market, 
+    ///  SBK: Strikes Below Market, 
+    ///  SNK: Strikes Near Market, 
+    ///  ALL: All Strikes, 
     ///  Default is ALL.
     Range(&'a str),
     /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration
@@ -281,18 +280,18 @@ pub enum Instruments<'a> {
     ///
     /// Type of Request
     /// symbol-search: Retrieve instrument data of a specific symbol or cusip
-    /// 
+    ///
     /// symbol-regex: Retrieve instrument data for all symbols matching regex.
     ///      Example: symbol=XYZ.* will return all symbols beginning with XYZ
-    /// 
+    ///
     /// desc-search: Retrieve instrument data for instruments whose description
     ///      contains the word supplied. Example: symbol=FakeCompany will return
     ///      all instruments with FakeCompany in the description.
-    /// 
+    ///
     /// desc-regex: Search description with full regex support.
     ///      Example: symbol=XYZ.[A-C] returns all instruments whose descriptions
     ///      contain a word beginning with XYZ followed by a character A through C.
-    /// 
+    ///
     /// fundamental: Returns fundamental data for a single instrument specified by exact symbol.
     SearchType(&'a str),
 }
@@ -308,7 +307,7 @@ impl<'a> Pair<'a> for &Instruments<'a> {
 
 ///
 /// Query Parameters for /marketdata/{market}/hours
-/// 
+///
 pub enum MarketHours<'a> {
     /// Specify date for which market hours information is needed
     /// Valid ISO-8601 format: 'yyyy-MM-dd'
@@ -325,7 +324,7 @@ impl<'a> Pair<'a> for &MarketHours<'a> {
 
 ///
 /// Query Parameters for /marketdata/{index}/movers
-/// 
+///
 #[derive(Debug)]
 pub enum Movers {
     /// Specify direction movers UP

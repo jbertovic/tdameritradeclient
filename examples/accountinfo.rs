@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn main() {
     env_logger::init();
@@ -19,7 +19,7 @@ fn main() {
     title_print("position info:");
     pretty_print(&c.get(&Endpoint::Account(accountid), &[param::Account::Positions]));
 
-    // get account details on any orders 
+    // get account details on any orders
     title_print("orders:");
     pretty_print(&c.get(&Endpoint::Orders(accountid), &[param::Empty]));
 }

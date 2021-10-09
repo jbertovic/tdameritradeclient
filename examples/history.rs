@@ -1,11 +1,12 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn main() {
     env_logger::init();
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
     title_print("History:");
-    pretty_print(&c.get(&Endpoint::History("SPY"),
+    pretty_print(&c.get(
+        &Endpoint::History("SPY"),
         &[
             param::History::Period(1),
             param::History::PeriodType("month"),

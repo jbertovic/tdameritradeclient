@@ -13,7 +13,7 @@ use std::time::Duration;
 /// Two options for output:
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
-/// 3) use `serde_json::Value` output to parse into a response `model` type 
+/// 3) use `serde_json::Value` output to parse into a response `model` type
 ///
 #[derive(Debug, Default)]
 pub struct TDAClient {
@@ -24,7 +24,7 @@ pub struct TDAClient {
 impl TDAClient {
     ///
     /// Create new base client that maintains Authorization Header
-    /// 
+    ///
     /// Requires valid ***token*** from tdameritrade
     ///
     pub fn new(token: String) -> TDAClient {
@@ -44,33 +44,34 @@ impl TDAClient {
     }
     ///
     /// get endpoint with query parameters
-    /// 
+    ///
     /// See `response::Endpoint` for available Endpoints
-    /// 
+    ///
     /// See param for matching parameters
-    /// 
-    pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> T 
-        where
+    ///
+    pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> T
+    where
         RequestBuilder: Execute<T>,
         P: IntoIterator,
         P::Item: Pair<'a>,
     {
-        self.client.get(ep.url_endpoint())
-        .params(convert_to_pairs(params))
-        .execute()
+        self.client
+            .get(ep.url_endpoint())
+            .params(convert_to_pairs(params))
+            .execute()
     }
 
     ///
     /// post endpoint with json body
-    /// 
+    ///
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
-    /// 
-    pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
-        where
+    ///
+    pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
-    {    
+    {
         self.client
             .post(ep.url_endpoint())
             .header_append("Content-Type", "application/json")
@@ -79,15 +80,15 @@ impl TDAClient {
     }
     ///
     /// put endpoint with json body
-    /// 
+    ///
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
-    /// 
-    pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
-        where
+    ///
+    pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
-    {    
+    {
         self.client
             .put(ep.url_endpoint())
             .header_append("Content-Type", "application/json")
@@ -96,15 +97,15 @@ impl TDAClient {
     }
     ///
     /// patch endpoint with json body
-    /// 
+    ///
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
-    /// 
-    pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T 
-        where
+    ///
+    pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
-    {    
+    {
         self.client
             .patch(ep.url_endpoint())
             .header_append("Content-Type", "application/json")
@@ -114,16 +115,13 @@ impl TDAClient {
 
     ///
     /// delete endpoint
-    /// 
+    ///
     pub fn delete<T>(&self, ep: &Endpoint) -> T
     where
         RequestBuilder: Execute<T>,
     {
-        self.client
-            .delete(ep.url_endpoint())
-            .execute()
+        self.client.delete(ep.url_endpoint()).execute()
     }
-
 }
 
 /// This isn't called directly as its built into the functions of the `TDAClient`
@@ -154,7 +152,6 @@ impl Execute<String> for RequestBuilder<attohttpc::body::Text<&str>> {
     }
 }
 
-
 impl Execute<serde_json::Value> for RequestBuilder {
     fn execute(self) -> serde_json::Value {
         let response = preexecute(self);
@@ -180,7 +177,11 @@ fn preexecute(req: RequestBuilder) -> Response {
 /// created to help with logging
 fn preexecute_wbody(req: RequestBuilder<attohttpc::body::Text<&str>>) -> Response {
     let mut prepared = req.prepare();
-    info!("Request: {}-{} - includes body text", prepared.method(), prepared.url());
+    info!(
+        "Request: {}-{} - includes body text",
+        prepared.method(),
+        prepared.url()
+    );
     let response = prepared.send().expect("Trouble Retrieving Response: ERROR");
     info!("Response: Status:{}", response.status());
     response
