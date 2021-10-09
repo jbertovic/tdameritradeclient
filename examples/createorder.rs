@@ -1,6 +1,5 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
-
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn main() {
     env_logger::init();
@@ -34,10 +33,10 @@ fn main() {
     let resptxt = c.post(&Endpoint::Orders(accountid), &order_def);
 
     // outcome of order submit
-    println!("Order Created: '{}'", resptxt); 
+    println!("Order Created: '{}'", resptxt);
 
     // get working orders and find the order above
-    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]); 
+    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]);
     pretty_print(&resptxt);
 }
 

@@ -1,8 +1,7 @@
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn main() {
-
     // Delete order by ORDERID
 
     env_logger::init();
