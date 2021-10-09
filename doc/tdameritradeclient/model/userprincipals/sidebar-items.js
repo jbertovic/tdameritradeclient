@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Account",""],["Authorizations",""],["Key",""],["Preferences",""],["Quotes",""],["StreamerInfo",""],["StreamerSubscriptionKeys",""],["UserPrincipals","Holds Type for UserPrincipals response"]]});
