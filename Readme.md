@@ -1,11 +1,11 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
-# Version 0.4.3 Changes
+## Note Version 0.4.3 Changes
 - Added a new client (`TDAClientAuth`) that manages ungoing token requirements.
 - `TDAClientAuth` is just a wrapper around `TDAClient` but includes token renewals as needed
 - `auth::TDauth` was updated to include expire times of tokens
 
-# Version 0.4 Changes
+## Note Version 0.4 Changes
 
 I changed my approach to this wrapper around TD Ameritrade's API.  Previous versions used multiple functions on the client to specify each endpoint.  This version has a major change in that it specifies the endpoints in the request module as an Endpoint enum.  So now both the parameters for query parameters and specifying the endpoints are kept in enums.  I have updated the examples to show how to use them.  This change will break backward compatibility to previous versions.  Feedback is welcomed.   
 
