@@ -134,16 +134,17 @@ impl TDauth {
         let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
         dbg!(&responsejson);
 
-        let epoch = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
+        let epoch = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
 
         self.token = responsejson["access_token"]
             .as_str()
             .expect(T_ERR)
             .to_owned();
-        self.token_expire_epoch = responsejson["expires_in"]
-            .as_u64()
-            .expect(T_ERR)
-            .to_owned() + epoch;
+        self.token_expire_epoch =
+            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
         if refreshupdate {
             self.refresh = responsejson["refresh_token"]
                 .as_str()
@@ -152,7 +153,8 @@ impl TDauth {
             self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
                 .as_u64()
                 .expect(T_ERR)
-                .to_owned() + epoch;
+                .to_owned()
+                + epoch;
         }
         response
     }
@@ -199,16 +201,17 @@ impl TDauth {
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
 
-            let epoch = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
+        let epoch = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
 
         self.token = responsejson["access_token"]
             .as_str()
             .expect(T_ERR)
             .to_owned();
-        self.token_expire_epoch = responsejson["expires_in"]
-            .as_u64()
-            .expect(T_ERR)
-            .to_owned() + epoch;
+        self.token_expire_epoch =
+            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
         self.refresh = responsejson["refresh_token"]
             .as_str()
             .expect(T_ERR)
@@ -216,16 +219,27 @@ impl TDauth {
         self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
             .as_u64()
             .expect(T_ERR)
-            .to_owned() + epoch;
+            .to_owned()
+            + epoch;
         response
     }
 
     pub fn is_token_valid(&self, buffer: u64) -> bool {
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + buffer < self.token_expire_epoch
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + buffer
+            < self.token_expire_epoch
     }
 
     pub fn is_refresh_valid(&self, buffer: u64) -> bool {
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + buffer < self.refresh_expire_epoch
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + buffer
+            < self.refresh_expire_epoch
     }
 
     pub fn get_tokens(&self) -> (&str, &str) {
