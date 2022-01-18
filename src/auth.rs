@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
 static R_ERR: &str = "Error: Trouble making request and parsing response";
 ///
@@ -63,6 +65,8 @@ pub struct TDauth {
     refresh: String,
     client_id: String,
     redirect_uri: Option<String>,
+    token_expire_epoch: u64,
+    refresh_expire_epoch: u64,
 }
 
 impl TDauth {
@@ -75,6 +79,8 @@ impl TDauth {
             refresh: refresh.to_owned(),
             client_id: format!("{}{}", clientid, crate::APIKEY),
             redirect_uri: None,
+            token_expire_epoch: 0,
+            refresh_expire_epoch: 0,
         };
         newauth.resolve_token_from_refresh(refreshupdate);
         newauth
@@ -95,6 +101,8 @@ impl TDauth {
             refresh: String::new(),
             client_id: format!("{}{}", clientid, crate::APIKEY),
             redirect_uri: Some(redirecturi.to_owned()),
+            token_expire_epoch: 0,
+            refresh_expire_epoch: 0,
         };
         newauth.resolve_token_fromcode(code, codedecode);
         newauth
@@ -124,15 +132,29 @@ impl TDauth {
             .expect(R_ERR);
 
         let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
+        dbg!(&responsejson);
+
+        let epoch = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
         self.token = responsejson["access_token"]
             .as_str()
             .expect(T_ERR)
             .to_owned();
+        self.token_expire_epoch =
+            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
         if refreshupdate {
             self.refresh = responsejson["refresh_token"]
                 .as_str()
                 .expect(T_ERR)
                 .to_owned();
+            self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
+                .as_u64()
+                .expect(T_ERR)
+                .to_owned()
+                + epoch;
         }
         response
     }
@@ -178,19 +200,59 @@ impl TDauth {
 
         let responsejson: serde_json::Value =
             serde_json::from_str(&response).expect("Error: No access token retrieved");
+
+        let epoch = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
         self.token = responsejson["access_token"]
             .as_str()
             .expect(T_ERR)
             .to_owned();
+        self.token_expire_epoch =
+            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
         self.refresh = responsejson["refresh_token"]
             .as_str()
             .expect(T_ERR)
             .to_owned();
+        self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
+            .as_u64()
+            .expect(T_ERR)
+            .to_owned()
+            + epoch;
         response
+    }
+
+    pub fn is_token_valid(&self, buffer: u64) -> bool {
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + buffer
+            < self.token_expire_epoch
+    }
+
+    pub fn is_refresh_valid(&self, buffer: u64) -> bool {
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + buffer
+            < self.refresh_expire_epoch
     }
 
     pub fn get_tokens(&self) -> (&str, &str) {
         (&self.token, &self.refresh)
+    }
+
+    pub fn get_auth_token(&self) -> &str {
+        &self.token
+    }
+
+    pub fn reset_expire(&mut self) {
+        self.token_expire_epoch = 0;
+        self.refresh_expire_epoch = 0;
     }
 }
 
@@ -223,8 +285,9 @@ mod auth_tests {
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
-        let newtdauth = TDauth::new_from_refresh(&refresh, &clientid, false);
+        let newtdauth = TDauth::new_from_refresh(&refresh, &clientid, true);
         let (t, r) = newtdauth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);
+        println!("{:?}", newtdauth);
     }
 }

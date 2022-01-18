@@ -1,6 +1,11 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
-# Version 0.4 Changes
+## Note Version 0.4.3 Changes
+- Added a new client (`TDAClientAuth`) that manages ungoing token requirements.
+- `TDAClientAuth` is just a wrapper around `TDAClient` but includes token renewals as needed
+- `auth::TDauth` was updated to include expire times of tokens
+
+## Note Version 0.4 Changes
 
 I changed my approach to this wrapper around TD Ameritrade's API.  Previous versions used multiple functions on the client to specify each endpoint.  This version has a major change in that it specifies the endpoints in the request module as an Endpoint enum.  So now both the parameters for query parameters and specifying the endpoints are kept in enums.  I have updated the examples to show how to use them.  This change will break backward compatibility to previous versions.  Feedback is welcomed.   
 
@@ -58,6 +63,8 @@ You can implement the client in one of 3 ways:
 
 See [developer.tdameritrade.com](http://developer.tdameritrade.com) on how to manually create either of the 3 auth codes listed above or use the below `auth` module to help.
 
+NEW in v0.4.3 - You have the option of using `TDAClientAuth` which would require a refresh_token and client_id.  It will check the validity of the tokens and update if required prior to each request.
+
 ## Authorization module
 
 I've included utility tools under `auth` module to help deal with managing tokens using the above 3 options.  See documentation for extra information.
@@ -86,10 +93,7 @@ refresh: "REFRESH_REMOVED_SOME_FOR_EXAMPLE_FOR_SECURITYkLJXsKiUm8e0hPfV28bF0tm/Z
 clientid: "MYCLIENTIDASREGISTERED@AMER.OAUTHAP", redirecturi: None }
 ```
 
-
-## Future IDEAS
-- [ ] create model structs for all json output 
-- [ ] continue to add documentation
-- [ ] add better error checking on `Execute<T>` Trait 
-- [ ] create feature option from serde_json
-- [ ] create schema structs in defining orders
+## Future Plans
+I am investigating transitioning the client to async or at least having the option of async functions.  For this, the 
+http request client would need to change.  When downloading lots of history, an async function would allow the requests 
+to be run in parallel instead of series, saving considerable time.

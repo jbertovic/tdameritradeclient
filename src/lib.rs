@@ -25,7 +25,18 @@
 //! # Auth module
 //!
 //! Auth module can be used separately to renew tokens or to construct a weblink to grab an authroization code.
-//! See instructions in module.
+//! See instructions in module.  Also works with the managed client `TDAClientAuth`.
+//!
+//! # Basic Client
+//!
+//! Using `tdameritradeclient::TDAClient` will require a valid token.  Token management will need to be managed
+//! by the user with tools in the `auth` module.
+//!
+//! # Managed Client
+//!
+//! Using `tdameritradeclient::TDAClientAuth` will require a valid refresh token and client id.  Token management
+//! can be managed by this client.  `TDAClientAuth` is a wrapper around `TDAClient` but includes authorization
+//! information.  You can access an updated client and make all the same requests as `TDAClient`.
 //!
 //! # Example
 //!
@@ -53,6 +64,8 @@
 
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
+const TOKENTIMEBUFFER: u64 = 5 * 60; // 5 Minutes
+const REFRESHTIMEBUFFER: u64 = 30 * 24 * 60; // 30 days
 
 ///
 /// utility module to help with authorization token, refresh token and grant code
@@ -67,9 +80,15 @@ pub mod param;
 pub mod request;
 /// Move to front of crate
 pub use request::Endpoint;
+
 mod tdaclient;
 /// client that manages session and interaction with TDAmeritrade API
 pub use tdaclient::TDAClient;
+
+mod authmanagedclient;
+/// client that manages authorization, sessions and interaction with TDAmeritrade API
+pub use authmanagedclient::TDAClientAuth;
+
 /// models that define types to parse json response or value responses from API
 ///
 /// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation

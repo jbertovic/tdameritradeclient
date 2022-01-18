@@ -1,3 +1,15 @@
+# v0.4.3
+- Added a new client (`TDAClientAuth`) that manages ungoing token requirements.
+- `TDAClientAuth` is just a wrapper around `TDAClient` but includes token renewals as needed
+- `auth::TDauth` was updated to include expire times of tokens
+
+# v0.4.2
+- updated `Endpoint::Watchlist` and `Endpoint::Watchlists` - incorrect in previous version.
+- cargo fmt and cargo clippy
+
+# v0.4.1
+- incremented version numbers on `attohttpc` and `serde`
+
 # v0.4.0
  - Major change in approach of making requests.  Requests are now made from an enum of endpoints instead of individual unique functions on client for each endpoint.
  - added generic requests on client; `get`, `post`, `put`, `patch` and `delete`

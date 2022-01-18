@@ -186,13 +186,13 @@ pub enum OptionChain<'a> {
     /// Include quotes for options in the option chain. Can be TRUE or FALSE. Default is FALSE.
     IncludeQuotes(bool),
     /// Returns options for the given range. Possible values are:
-    ///  ITM: In-the-money, 
-    ///  NTM: Near-the-money, 
-    ///  OTM: Out-of-the-money, 
-    ///  SAK: Strikes Above Market, 
-    ///  SBK: Strikes Below Market, 
-    ///  SNK: Strikes Near Market, 
-    ///  ALL: All Strikes, 
+    ///  ITM: In-the-money,
+    ///  NTM: Near-the-money,
+    ///  OTM: Out-of-the-money,
+    ///  SAK: Strikes Above Market,
+    ///  SBK: Strikes Below Market,
+    ///  SNK: Strikes Near Market,
+    ///  ALL: All Strikes,
     ///  Default is ALL.
     Range(&'a str),
     /// Only return expirations after this date. For strategies, expiration refers to the nearest term expiration
