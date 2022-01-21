@@ -132,7 +132,6 @@ impl TDauth {
             .expect(R_ERR);
 
         let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
-        dbg!(&responsejson);
 
         let epoch = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
