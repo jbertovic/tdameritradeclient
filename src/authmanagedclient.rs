@@ -10,7 +10,7 @@ use log::info;
 ///
 /// Initiate with a valid refresh token and client id
 ///
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TDAClientAuth {
     client: TDAClient,
     auth: TDauth,
