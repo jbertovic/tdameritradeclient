@@ -31,17 +31,33 @@ impl TDAClientAuth {
     /// retrieve client with updated token to use
     pub fn client(&mut self) -> &TDAClient {
         // check validity of token
-        if !self.auth.is_token_valid(TOKENTIMEBUFFER) {
-            // if token needs updating check if refresh needs to be updated too
-            let refresh_update = !self.auth.is_refresh_valid(REFRESHTIMEBUFFER);
-            self.auth.resolve_token_from_refresh(refresh_update);
-
+        if !self.check_token_validity() {
             // update client with new token
             self.client = TDAClient::new(self.auth.get_auth_token().to_owned());
         }
         &self.client
     }
+
+    pub fn active_token(&mut self) -> &str {
+        self.check_token_validity();
+        self.auth.get_auth_token()
+    }
+
+    fn check_token_validity(&mut self) -> bool {
+        // check validity of token
+        if !self.auth.is_token_valid(TOKENTIMEBUFFER) {
+            // if token needs updating check if refresh needs to be updated too
+            let refresh_update = !self.auth.is_refresh_valid(REFRESHTIMEBUFFER);
+            self.auth.resolve_token_from_refresh(refresh_update);
+            false
+        } else {
+            true
+        }
+    }
+
 }
+
+
 
 #[cfg(test)]
 mod managed_client_tests {
