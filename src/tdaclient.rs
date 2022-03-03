@@ -51,7 +51,7 @@ impl TDAClient {
     ///
     /// get endpoint with query parameters
     ///
-    /// See `response::Endpoint` for available Endpoints
+    /// See `Endpoint` for available Endpoints
     ///
     /// See param for matching parameters
     ///
