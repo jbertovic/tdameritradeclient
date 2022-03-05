@@ -3,6 +3,8 @@
 ## Note Version 0.4.4 Changes
 - Added error checking on TDauth module. Used when retrieving tokens.
 - Gave TDAClientAuth acces to TDauth struct
+- Managed TDAClientAuth has the ability to deal with no token returned due to some error in web retrieval or authorization
+- Integrated TDauth module better with TDAClientAuth
 
 ## Note Version 0.4 Changes
 
