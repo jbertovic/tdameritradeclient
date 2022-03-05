@@ -1,9 +1,8 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
-## Note Version 0.4.3 Changes
-- Added a new client (`TDAClientAuth`) that manages ungoing token requirements.
-- `TDAClientAuth` is just a wrapper around `TDAClient` but includes token renewals as needed
-- `auth::TDauth` was updated to include expire times of tokens
+## Note Version 0.4.4 Changes
+- Added error checking on TDauth module. Used when retrieving tokens.
+- Gave TDAClientAuth acces to TDauth struct
 
 ## Note Version 0.4 Changes
 
