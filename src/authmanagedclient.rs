@@ -43,8 +43,10 @@ impl TDAClientAuth {
     pub fn client(&mut self) -> Option<&TDAClient> {
         // check validity of token
         if !self.check_token_validity() {
-            // update client with new token
-            self.client = TDAClient::new(self.auth.get_auth_token().to_owned());
+            if !self.auth.get_auth_token().is_empty() {
+            // update client with new token if token exists otherwise leave existing client
+                self.client = TDAClient::new(self.auth.get_auth_token().to_owned());
+            }
         }
         if self.auth.get_auth_token().is_empty() {
             return None
