@@ -1,6 +1,8 @@
 use std::time::SystemTime;
+use serde::Serialize;
 use crate::model::token::{TokenResponse, ErrorResponse};
 use log::info;
+
 
 ///
 /// Convenience function
@@ -65,7 +67,7 @@ pub fn get_code_weblink(clientid: &str, redirecturi: &str) -> String {
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
 ///
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct TDauth {
     token: String,
     refresh: String,
