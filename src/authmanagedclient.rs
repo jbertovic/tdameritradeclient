@@ -17,7 +17,7 @@ pub struct TDAClientAuth {
 }
 
 impl TDAClientAuth {
-    /// create a new managed client with refresh token and client id that will check and refresh tokens 
+    /// create a new managed client with refresh token and client id that will check and refresh tokens
     /// as needed before every use.
     pub fn new(refresh_token: String, client_id: String) -> Self {
         info!("New Client (Auth Managed) initialized - from refresh token");
@@ -28,7 +28,7 @@ impl TDAClientAuth {
         }
     }
 
-    /// create a new managed client from a TDauth configured struct that will check and refresh tokens 
+    /// create a new managed client from a TDauth configured struct that will check and refresh tokens
     /// as needed before every use.
     pub fn from_tdauth(auth: TDauth) -> Self {
         info!("New Client (Auth Managed) initialized - from TDauth struct");
@@ -42,14 +42,12 @@ impl TDAClientAuth {
     /// return None if no token exists
     pub fn client(&mut self) -> Option<&TDAClient> {
         // check validity of token
-        if !self.check_token_validity() {
-            if !self.auth.get_auth_token().is_empty() {
+        if !self.check_token_validity() && !self.auth.get_auth_token().is_empty() {
             // update client with new token if token exists otherwise leave existing client
-                self.client = TDAClient::new(self.auth.get_auth_token().to_owned());
-            }
+            self.client = TDAClient::new(self.auth.get_auth_token().to_owned());
         }
         if self.auth.get_auth_token().is_empty() {
-            return None
+            None
         } else {
             Some(&self.client)
         }
@@ -58,7 +56,7 @@ impl TDAClientAuth {
     pub fn active_token(&mut self) -> Option<&str> {
         self.check_token_validity();
         if self.auth.get_auth_token().is_empty() {
-            return None
+            None
         } else {
             Some(self.auth.get_auth_token())
         }
@@ -79,10 +77,7 @@ impl TDAClientAuth {
     pub fn get_auth(&self) -> &TDauth {
         &self.auth
     }
-
 }
-
-
 
 #[cfg(test)]
 mod managed_client_tests {
@@ -99,7 +94,8 @@ mod managed_client_tests {
         let mut managed_client = TDAClientAuth::new(refresh, clientid);
 
         let resptxt: String = managed_client
-            .client().unwrap()
+            .client()
+            .unwrap()
             .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
         assert_eq!(resptxt.contains("\"assetType\""), true);
 
@@ -114,7 +110,8 @@ mod managed_client_tests {
 
         // check that both tokens are valid after another request
         let resptxt: String = managed_client
-            .client().unwrap()
+            .client()
+            .unwrap()
             .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
         assert_eq!(resptxt.contains("\"assetType\""), true);
 

@@ -22,8 +22,8 @@ pub struct TDAClient {
 }
 
 impl Clone for TDAClient {
-    fn clone(&self) -> Self { 
-        TDAClient::new(self.auth_token.clone()) 
+    fn clone(&self) -> Self {
+        TDAClient::new(self.auth_token.clone())
     }
 }
 

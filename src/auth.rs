@@ -1,12 +1,11 @@
-use std::time::SystemTime;
-use serde::Serialize;
-use crate::model::token::{TokenResponse, ErrorResponse};
+use crate::model::token::{ErrorResponse, TokenResponse};
 use log::info;
-
+use serde::Serialize;
+use std::time::SystemTime;
 
 ///
 /// Convenience function
-/// 
+///
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
 pub fn get_token_from_refresh(refresh: &str, clientid: &str) -> String {
@@ -16,9 +15,9 @@ pub fn get_token_from_refresh(refresh: &str, clientid: &str) -> String {
     newauth.log_change("access token created from refresh");
     newauth.token
 }
-/// 
+///
 /// Convenience function
-/// 
+///
 /// used to get a valid `refresh` from `refresh_token` and `clientid`
 ///
 pub fn get_refresh_from_refresh(refresh: &str, clientid: &str) -> String {
@@ -115,7 +114,6 @@ impl TDauth {
     /// returns full response and updates `TDauth` struct
     ///
     pub fn resolve_token_from_refresh(&mut self, refresh_update: bool) {
-
         let refresh = self.refresh.clone();
         let client_id = self.client_id.clone();
 
@@ -168,7 +166,6 @@ impl TDauth {
         ];
 
         self.auth_request(body, true);
-
     }
 
     fn auth_request(&mut self, body: Vec<(&str, &str)>, refresh_update: bool) {
@@ -206,8 +203,7 @@ impl TDauth {
             .as_secs();
 
         self.token = token_response.access_token;
-        self.token_expire_epoch =
-            token_response.expires_in + epoch;
+        self.token_expire_epoch = token_response.expires_in + epoch;
         if refresh_update {
             self.refresh = token_response.refresh_token;
             self.refresh_expire_epoch = token_response.refresh_token_expires_in + epoch;
@@ -261,7 +257,6 @@ impl TDauth {
 
     fn set_redirect_uri(&mut self, redirect_uri: &str) {
         self.redirect_uri = Some(redirect_uri.to_owned());
-
     }
 
     pub fn log_change(&self, desc: &str) {
@@ -270,17 +265,14 @@ impl TDauth {
         } else {
             info!("{}", desc);
         }
-
     }
 }
 
 fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
-    Ok(
-        attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
+    Ok(attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
         .form(&body)?
         .send()?
-        .text()?
-    )
+        .text()?)
 }
 
 #[cfg(test)]
