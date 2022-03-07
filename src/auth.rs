@@ -277,6 +277,10 @@ impl TDauth {
             info!("{}", desc);
         }
     }
+
+    pub fn web_link_authorization(&self) -> String {
+        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())    
+    }
 }
 
 fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
