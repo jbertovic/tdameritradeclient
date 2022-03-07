@@ -32,7 +32,7 @@ pub fn get_refresh_from_refresh(refresh: &str, clientid: &str) -> String {
 ///
 /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
 ///
-pub fn get_token_from_code(
+pub fn get_refresh_from_code(
     code: &str,
     clientid: &str,
     redirecturi: &str,
@@ -41,7 +41,7 @@ pub fn get_token_from_code(
     // create new TDauth struct using refresh / clientid
     // return token
     let newauth = TDauth::new_from_code(code, clientid, redirecturi, codedecode);
-    newauth.token
+    newauth.refresh
 }
 ///
 /// used to get code manually from tdameritrade website with redirect URI as localhost
@@ -126,7 +126,7 @@ impl TDauth {
     ///
     pub fn resolve_token_from_refresh(&mut self, refresh_update: bool) {
         let refresh = self.refresh.clone();
-        let client_id = self.client_id.clone();
+        let client_id = format!("{}{}", self.client_id.clone(), crate::APIKEY);
 
         //body parameters
         let mut body = vec![
@@ -165,7 +165,7 @@ impl TDauth {
         };
 
         let redirect_uri = self.redirect_uri.as_ref().unwrap().clone();
-        let client_id = self.client_id.clone();
+        let client_id = format!("{}{}", self.client_id.clone(), crate::APIKEY);
 
         //body parameters
         let body = vec![
@@ -262,8 +262,8 @@ impl TDauth {
         self.refresh = refresh.to_owned();
     }
 
-    fn set_client_id(&mut self, clientid: String) {
-        self.client_id = format!("{}{}", clientid, crate::APIKEY);
+    fn set_client_id(&mut self, client_id: String) {
+        self.client_id = client_id;
     }
 
     fn set_redirect_uri(&mut self, redirect_uri: String) {
@@ -315,7 +315,7 @@ mod auth_tests {
     }
 
     #[test]
-    #[ignore]
+//    #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
