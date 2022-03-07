@@ -78,14 +78,25 @@ pub struct TDauth {
 }
 
 impl TDauth {
+
+    /// create new `TDauth` with configuration only
+    /// 
+    pub fn new(refresh: String, client_id: String, redirect_uri: String) -> Self {
+        let mut newauth = TDauth::default();
+        newauth.set_refresh(refresh);
+        newauth.set_client_id(client_id);
+        newauth.set_redirect_uri(redirect_uri);
+        newauth
+    }
+
     /// create new `TDauth` with `refresh_token` and `clientid`
     /// if successful `TDauth` will carry new valid `token`
     /// if refreshupdate is true than `refresh_token` will also be updated
-    pub fn new_from_refresh(refresh: &str, clientid: &str, refreshupdate: bool) -> TDauth {
+    pub fn new_from_refresh(refresh: &str, client_id: &str, refresh_update: bool) -> Self {
         let mut newauth = TDauth::default();
-        newauth.set_refresh(refresh);
-        newauth.set_client_id(clientid);
-        newauth.resolve_token_from_refresh(refreshupdate);
+        newauth.set_refresh(refresh.to_string());
+        newauth.set_client_id(client_id.to_string());
+        newauth.resolve_token_from_refresh(refresh_update);
         newauth.log_change("TDauth tokens created from refresh grant");
         newauth
     }
@@ -96,14 +107,14 @@ impl TDauth {
     ///
     pub fn new_from_code(
         code: &str,
-        clientid: &str,
-        redirecturi: &str,
-        codedecode: bool,
-    ) -> TDauth {
+        client_id: &str,
+        redirect_uri: &str,
+        code_decode: bool,
+    ) -> Self {
         let mut newauth = TDauth::default();
-        newauth.set_client_id(clientid);
-        newauth.set_redirect_uri(redirecturi);
-        newauth.resolve_token_fromcode(code, codedecode);
+        newauth.set_client_id(client_id.to_string());
+        newauth.set_redirect_uri(redirect_uri.to_string());
+        newauth.resolve_token_fromcode(code, code_decode);
         newauth.log_change("TDauth tokens created from code grant");
         newauth
     }
@@ -247,15 +258,15 @@ impl TDauth {
         self.reset_expire();
     }
 
-    fn set_refresh(&mut self, refresh: &str) {
+    fn set_refresh(&mut self, refresh: String) {
         self.refresh = refresh.to_owned();
     }
 
-    fn set_client_id(&mut self, clientid: &str) {
+    fn set_client_id(&mut self, clientid: String) {
         self.client_id = format!("{}{}", clientid, crate::APIKEY);
     }
 
-    fn set_redirect_uri(&mut self, redirect_uri: &str) {
+    fn set_redirect_uri(&mut self, redirect_uri: String) {
         self.redirect_uri = Some(redirect_uri.to_owned());
     }
 
