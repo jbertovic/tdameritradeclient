@@ -219,6 +219,11 @@ impl TDauth {
             self.refresh = token_response.refresh_token;
             self.refresh_expire_epoch = token_response.refresh_token_expires_in + epoch;
         }
+
+        // reset error code if successful
+        if self.token_expire_epoch > 0 {
+            self.error = String::new()
+        }
     }
 
     pub fn is_token_valid(&self, buffer: u64) -> bool {
@@ -315,7 +320,7 @@ mod auth_tests {
     }
 
     #[test]
-//    #[ignore]
+   #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
@@ -324,4 +329,17 @@ mod auth_tests {
         println!("token: {} \nrefresh: {} \n", t, r);
         println!("{:?}", newtdauth);
     }
+
+    #[test]
+    // #[ignore]
+     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
+        let mut auth = TDauth::default();
+        auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
+        auth.set_refresh(env::var("TDREFRESHTOKEN").unwrap());
+        auth.resolve_token_from_refresh(false);
+        let (t, r) = auth.get_tokens();
+        println!("token: {} \nrefresh: {} \n", t, r);
+        println!("{:?}", auth);
+     }
+ 
 }
