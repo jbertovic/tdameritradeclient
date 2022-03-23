@@ -331,7 +331,7 @@ mod auth_tests {
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
      fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
         let mut auth = TDauth::default();
         auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
