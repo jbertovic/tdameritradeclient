@@ -5,6 +5,7 @@
 - Gave TDAClientAuth acces to TDauth struct
 - Managed TDAClientAuth has the ability to deal with no token returned due to some error in web retrieval or authorization
 - Integrated TDauth module better with TDAClientAuth
+- Added model::pricehistory and tests
 
 ## Note Version 0.4 Changes
 
