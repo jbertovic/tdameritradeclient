@@ -4,10 +4,12 @@
 
 // TODO: tests to add: watchlist endpoints
 
+use std::env;
+use std::collections::HashMap;
+use tdameritradeclient::model::quote::Quote;
 use tdameritradeclient::model::pricehistory::History;
 use tdameritradeclient::model::account::AccountRoot;
 use tdameritradeclient::model::userprincipals::UserPrincipals;
-use std::env;
 use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn initialize_client() -> TDAClient {
@@ -39,9 +41,16 @@ fn able_to_retrieve_userprincipals_into_model() {
 #[test]
 fn able_to_retrieve_quotes() {
     let resptxt: String =
-        initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
+        initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,VFIAX,SPY,$SPX.X")]);
+    
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"assetType\""), true);
+}
+
+#[test]
+fn able_to_retrieve_quotes_into_model() {
+    let quote_symbols="F,VFIAX,SPY,$SPX.X";
+    assert!(serde_json::from_value::<HashMap<String, Quote>>(initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol(quote_symbols)])).is_ok());
 }
 
 #[test]

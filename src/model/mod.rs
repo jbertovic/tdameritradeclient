@@ -6,4 +6,5 @@ pub mod token;
 pub mod userprincipals;
 /// type to represent price history from /marketdata/SYM/pricehistory
 pub mod pricehistory;
-//pub mod quote;
+/// type to represent quotes from /marketdata/quotes?SYM1,SYM2,etc
+pub mod quote;
