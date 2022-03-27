@@ -167,7 +167,7 @@ pub struct QFund {
     #[serde(rename = "52WkLow")]
     pub n52wk_low: f64,
     #[serde(rename = "nAV")]
-    pub n_av: f64,
+    pub nav: f64,
     pub pe_ratio: f64,
     pub div_amount: f64,
     pub div_yield: f64,
@@ -185,6 +185,37 @@ pub struct QGeneral {
     pub symbol: String,
     #[serde(flatten)]
     extra: HashMap<String, Value>,
+}
+
+
+impl Quote {
+    pub fn symbol(&self) -> &str {
+        match self {
+            Quote::Equity(quote) => &quote.symbol,
+            Quote::Option(quote) => &quote.symbol,
+            Quote::Fund(quote) => &quote.symbol,
+            Quote::Index(quote) => &quote.symbol,
+            Quote::General(quote) => &quote.symbol,
+        }
+    }
+    pub fn mark_price(&self) -> f64 {
+        match self {
+            Quote::Equity(quote) => quote.mark,
+            Quote::Option(quote) => quote.mark,
+            Quote::Fund(quote) => quote.nav,
+            Quote::Index(quote) => quote.last_price,
+            _ => 0.0,
+        }
+    }
+    pub fn close_price(&self) -> f64 {
+        match self {
+            Quote::Equity(quote) => quote.close_price,
+            Quote::Option(quote) => quote.close_price,
+            Quote::Fund(quote) => quote.close_price,
+            Quote::Index(quote) => quote.close_price,
+            _ => 0.0,
+        }
+    }
 }
 
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=cf9cda3d15e7bb0cc905047e11d42c78
