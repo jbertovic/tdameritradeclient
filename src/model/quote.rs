@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 /// Deserialized through a HashMap<String, Quote>
 /// 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"), untagged)]
+#[serde(rename_all = "camelCase", untagged)]
 pub enum Quote {
     Equity(QEquity),
     Index(QIndex),
@@ -17,7 +17,7 @@ pub enum Quote {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct QEquity {
     pub asset_type: String,    
     pub symbol: String,
@@ -67,7 +67,7 @@ pub struct QEquity {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct QIndex {
     pub asset_type: String,    
     pub symbol: String,
@@ -94,7 +94,7 @@ pub struct QIndex {
 }   
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct QOption {
     pub asset_type: String,    
     pub symbol: String,
@@ -149,7 +149,7 @@ pub struct QOption {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct QFund {
     pub asset_type: String,    
     pub symbol: String,
@@ -179,7 +179,7 @@ pub struct QFund {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct QGeneral {
     pub asset_type: String,    
     pub symbol: String,
@@ -217,5 +217,3 @@ impl Quote {
         }
     }
 }
-
-// https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=cf9cda3d15e7bb0cc905047e11d42c78
