@@ -9,6 +9,8 @@ pub struct AccountRoot {
     pub securities_account: SecuritiesAccount,
 }
 
+// TODO: Add the opportunity for either cash_account or margin_account. Currently only uses margin_account
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecuritiesAccount {
@@ -60,6 +62,7 @@ pub struct Instrument {
 #[serde(rename_all = "camelCase")]
 pub struct InitialBalances {
     pub accrued_interest: f64,
+    #[serde(default)]
     pub available_funds_non_marginable_trade: f64,
     pub bond_value: f64,
     pub buying_power: f64,
@@ -69,27 +72,37 @@ pub struct InitialBalances {
     pub day_trading_buying_power: f64,
     pub day_trading_buying_power_call: f64,
     pub day_trading_equity_call: f64,
+    #[serde(default)]
     pub equity: f64,
+    #[serde(default)]
     pub equity_percentage: f64,
     pub liquidation_value: f64,
+    #[serde(default)]
     pub long_margin_value: f64,
     pub long_option_market_value: f64,
     pub long_stock_value: f64,
+    #[serde(default)]
     pub maintenance_call: f64,
+    #[serde(default)]
     pub maintenance_requirement: f64,
+    #[serde(default)]
     pub margin: f64,
+    #[serde(default)]
     pub margin_equity: f64,
     pub money_market_fund: f64,
     pub mutual_fund_value: f64,
     #[serde(rename = "regTCall")]
     pub reg_tcall: f64,
+    #[serde(default)]
     pub short_margin_value: f64,
     pub short_option_market_value: f64,
     pub short_stock_value: f64,
     pub total_cash: f64,
     pub is_in_call: bool,
     pub pending_deposits: f64,
+    #[serde(default)]
     pub margin_balance: f64,
+    #[serde(default)]
     pub short_balance: f64,
     pub account_value: f64,
 }
@@ -112,15 +125,22 @@ pub struct CurrentBalances {
     pub buying_power: f64,
     pub buying_power_non_marginable_trade: f64,
     pub day_trading_buying_power: f64,
+    #[serde(default)]
     pub equity: f64,
+    #[serde(default)]
     pub equity_percentage: f64,
+    #[serde(default)]
     pub long_margin_value: f64,
+    #[serde(default)]
     pub maintenance_call: f64,
+    #[serde(default)]
     pub maintenance_requirement: f64,
+    #[serde(default)]
     pub margin_balance: f64,
     #[serde(rename = "regTCall")]
     pub reg_tcall: f64,
     pub short_balance: f64,
+    #[serde(default)]
     pub short_margin_value: f64,
     pub short_option_market_value: f64,
     pub sma: f64,
@@ -136,6 +156,7 @@ pub struct ProjectedBalances {
     pub buying_power: f64,
     pub day_trading_buying_power: f64,
     pub day_trading_buying_power_call: f64,
+    #[serde(default)]
     pub maintenance_call: f64,
     #[serde(rename = "regTCall")]
     pub reg_tcall: f64,
