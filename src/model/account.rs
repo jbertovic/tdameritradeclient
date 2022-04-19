@@ -10,6 +10,7 @@ pub struct AccountRoot {
 }
 
 // TODO: Add the opportunity for either cash_account or margin_account. Currently only uses margin_account
+// Need to test cash account to see if it works
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

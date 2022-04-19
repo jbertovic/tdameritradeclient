@@ -53,6 +53,7 @@ impl TDAClientAuth {
         }
     }
 
+    /// get current authorization token for TD API
     pub fn active_token(&mut self) -> Option<&str> {
         self.check_token_validity();
         if self.auth.get_auth_token().is_empty() {
@@ -74,6 +75,15 @@ impl TDAClientAuth {
         }
     }
 
+    /// check that an active refresh token exists so client tokens can be updated as needed
+    /// 
+    /// if this is false then `TDauth` will have to be resolved by getting a refresh token
+    /// probably using `tdauth_code_grant`
+    pub fn refresh_auth_active(&self) -> bool {
+        self.auth.is_refresh_valid(REFRESHTIMEBUFFER)
+    }
+
+    /// get authorization tokens for TD API
     pub fn get_auth(&self) -> &TDauth {
         &self.auth
     }
