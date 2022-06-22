@@ -1,7 +1,10 @@
+use crate::model::token::{ErrorResponse, TokenResponse};
+use log::info;
+use serde::Serialize;
 use std::time::SystemTime;
 
-static T_ERR: &str = "Error: Response returned no access token.  Check input parameters";
-static R_ERR: &str = "Error: Trouble making request and parsing response";
+///
+/// Convenience function
 ///
 /// used to get a valid `token` from `refresh_token` and `clientid`
 ///
@@ -9,8 +12,11 @@ pub fn get_token_from_refresh(refresh: &str, clientid: &str) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
     let newauth = TDauth::new_from_refresh(refresh, clientid, false);
+    newauth.log_change("access token created from refresh");
     newauth.token
 }
+///
+/// Convenience function
 ///
 /// used to get a valid `refresh` from `refresh_token` and `clientid`
 ///
@@ -18,6 +24,7 @@ pub fn get_refresh_from_refresh(refresh: &str, clientid: &str) -> String {
     // create new TDauth struct using refresh / clientid
     // return token
     let newauth = TDauth::new_from_refresh(refresh, clientid, true);
+    newauth.log_change("refresh token created from refresh");
     newauth.refresh
 }
 ///
@@ -25,7 +32,7 @@ pub fn get_refresh_from_refresh(refresh: &str, clientid: &str) -> String {
 ///
 /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
 ///
-pub fn get_token_from_code(
+pub fn get_refresh_from_code(
     code: &str,
     clientid: &str,
     redirecturi: &str,
@@ -34,7 +41,7 @@ pub fn get_token_from_code(
     // create new TDauth struct using refresh / clientid
     // return token
     let newauth = TDauth::new_from_code(code, clientid, redirecturi, codedecode);
-    newauth.token
+    newauth.refresh
 }
 ///
 /// used to get code manually from tdameritrade website with redirect URI as localhost
@@ -59,7 +66,7 @@ pub fn get_code_weblink(clientid: &str, redirecturi: &str) -> String {
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
 ///
-#[derive(Debug)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct TDauth {
     token: String,
     refresh: String,
@@ -67,22 +74,30 @@ pub struct TDauth {
     redirect_uri: Option<String>,
     token_expire_epoch: u64,
     refresh_expire_epoch: u64,
+    error: String,
 }
 
 impl TDauth {
+
+    /// create new `TDauth` with configuration only
+    /// 
+    pub fn new(refresh: String, client_id: String, redirect_uri: String) -> Self {
+        let mut newauth = TDauth::default();
+        newauth.set_refresh(refresh);
+        newauth.set_client_id(client_id);
+        newauth.set_redirect_uri(redirect_uri);
+        newauth
+    }
+
     /// create new `TDauth` with `refresh_token` and `clientid`
     /// if successful `TDauth` will carry new valid `token`
     /// if refreshupdate is true than `refresh_token` will also be updated
-    pub fn new_from_refresh(refresh: &str, clientid: &str, refreshupdate: bool) -> TDauth {
-        let mut newauth = TDauth {
-            token: String::new(),
-            refresh: refresh.to_owned(),
-            client_id: format!("{}{}", clientid, crate::APIKEY),
-            redirect_uri: None,
-            token_expire_epoch: 0,
-            refresh_expire_epoch: 0,
-        };
-        newauth.resolve_token_from_refresh(refreshupdate);
+    pub fn new_from_refresh(refresh: &str, client_id: &str, refresh_update: bool) -> Self {
+        let mut newauth = TDauth::default();
+        newauth.set_refresh(refresh.to_string());
+        newauth.set_client_id(client_id.to_string());
+        newauth.resolve_token_from_refresh(refresh_update);
+        newauth.log_change("TDauth tokens created from refresh grant");
         newauth
     }
     /// create new `TDauth` with `code`, `redirecturi` and `clientid`
@@ -92,19 +107,15 @@ impl TDauth {
     ///
     pub fn new_from_code(
         code: &str,
-        clientid: &str,
-        redirecturi: &str,
-        codedecode: bool,
-    ) -> TDauth {
-        let mut newauth = TDauth {
-            token: String::new(),
-            refresh: String::new(),
-            client_id: format!("{}{}", clientid, crate::APIKEY),
-            redirect_uri: Some(redirecturi.to_owned()),
-            token_expire_epoch: 0,
-            refresh_expire_epoch: 0,
-        };
-        newauth.resolve_token_fromcode(code, codedecode);
+        client_id: &str,
+        redirect_uri: &str,
+        code_decode: bool,
+    ) -> Self {
+        let mut newauth = TDauth::default();
+        newauth.set_client_id(client_id.to_string());
+        newauth.set_redirect_uri(redirect_uri.to_string());
+        newauth.resolve_token_fromcode(code, code_decode);
+        newauth.log_change("TDauth tokens created from code grant");
         newauth
     }
     /// get /oauth2/token
@@ -113,51 +124,23 @@ impl TDauth {
     ///
     /// returns full response and updates `TDauth` struct
     ///
-    pub fn resolve_token_from_refresh(&mut self, refreshupdate: bool) -> String {
+    pub fn resolve_token_from_refresh(&mut self, refresh_update: bool) {
+        let refresh = self.refresh.clone();
+        let client_id = format!("{}{}", self.client_id.clone(), crate::APIKEY);
+
         //body parameters
-        let mut p = vec![
+        let mut body = vec![
             ("grant_type", "refresh_token"),
-            ("refresh_token", &self.refresh),
-            ("client_id", &self.client_id),
+            ("refresh_token", &refresh),
+            ("client_id", &client_id),
         ];
-        if refreshupdate {
-            p.push(("access_type", "offline"));
+        if refresh_update {
+            body.push(("access_type", "offline"));
         }
-        let response = attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
-            .form(&p)
-            .unwrap()
-            .send()
-            .expect(R_ERR)
-            .text()
-            .expect(R_ERR);
 
-        let responsejson: serde_json::Value = serde_json::from_str(&response).expect(T_ERR);
-        dbg!(&responsejson);
-
-        let epoch = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-
-        self.token = responsejson["access_token"]
-            .as_str()
-            .expect(T_ERR)
-            .to_owned();
-        self.token_expire_epoch =
-            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
-        if refreshupdate {
-            self.refresh = responsejson["refresh_token"]
-                .as_str()
-                .expect(T_ERR)
-                .to_owned();
-            self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
-                .as_u64()
-                .expect(T_ERR)
-                .to_owned()
-                + epoch;
-        }
-        response
+        self.auth_request(body, refresh_update);
     }
+
     /// get /oauth2/token
     /// token endpoint returns an access token along with an optional refresh token
     /// using `authorization_code` grant type and retrieves new `refresh_token` (response returned) while storing valid token inside client
@@ -169,7 +152,7 @@ impl TDauth {
     ///
     /// you can use decode=true if you did **NOT** decode it **only useful if you are using the browser to get code from query string**
     ///
-    pub fn resolve_token_fromcode(&mut self, code: &str, codedecode: bool) -> String {
+    pub fn resolve_token_fromcode(&mut self, code: &str, codedecode: bool) {
         // is code already decoded or not? - ask did it come from a query parameter (codedecode=true) or some other way (codedecode=false)
         let decoded_code = if codedecode {
             let (_, decoded) = url::form_urlencoded::parse(format!("code={}", code).as_bytes())
@@ -181,47 +164,66 @@ impl TDauth {
             code.to_owned()
         };
 
+        let redirect_uri = self.redirect_uri.as_ref().unwrap().clone();
+        let client_id = format!("{}{}", self.client_id.clone(), crate::APIKEY);
+
         //body parameters
-        let p = vec![
+        let body = vec![
             ("grant_type", "authorization_code"),
             ("access_type", "offline"),
             ("code", &decoded_code),
-            ("client_id", &self.client_id),
-            ("redirect_uri", self.redirect_uri.as_ref().unwrap()),
+            ("client_id", &client_id),
+            ("redirect_uri", &redirect_uri),
         ];
 
-        let response = attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
-            .form(&p)
-            .unwrap()
-            .send()
-            .expect(R_ERR)
-            .text()
-            .expect(R_ERR);
+        self.auth_request(body, true);
+    }
 
-        let responsejson: serde_json::Value =
-            serde_json::from_str(&response).expect("Error: No access token retrieved");
+    fn auth_request(&mut self, body: Vec<(&str, &str)>, refresh_update: bool) {
+        // any web issues
+        let response = match request_auth(body) {
+            Ok(r) => r,
+            Err(e) => {
+                self.error = e.to_string();
+                self.reset_tokens();
+                return;
+            }
+        };
+
+        // any authorization issues
+        if response.contains("\"error\" :") {
+            let error_response: ErrorResponse = serde_json::from_str(&response).unwrap();
+            self.error = format!("Error response from server: {}", error_response.error);
+            self.reset_tokens();
+            return;
+        }
+
+        // any parsing issues
+        let token_response: TokenResponse = match serde_json::from_str(&response) {
+            Ok(t) => t,
+            Err(e) => {
+                self.error = e.to_string();
+                self.reset_tokens();
+                return;
+            }
+        };
 
         let epoch = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
             .as_secs();
 
-        self.token = responsejson["access_token"]
-            .as_str()
-            .expect(T_ERR)
-            .to_owned();
-        self.token_expire_epoch =
-            responsejson["expires_in"].as_u64().expect(T_ERR).to_owned() + epoch;
-        self.refresh = responsejson["refresh_token"]
-            .as_str()
-            .expect(T_ERR)
-            .to_owned();
-        self.refresh_expire_epoch = responsejson["refresh_token_expires_in"]
-            .as_u64()
-            .expect(T_ERR)
-            .to_owned()
-            + epoch;
-        response
+        self.token = token_response.access_token;
+        self.token_expire_epoch = token_response.expires_in + epoch;
+        if refresh_update {
+            self.refresh = token_response.refresh_token;
+            self.refresh_expire_epoch = token_response.refresh_token_expires_in + epoch;
+        }
+
+        // reset error code if successful
+        if self.token_expire_epoch > 0 {
+            self.error = String::new()
+        }
     }
 
     pub fn is_token_valid(&self, buffer: u64) -> bool {
@@ -254,6 +256,43 @@ impl TDauth {
         self.token_expire_epoch = 0;
         self.refresh_expire_epoch = 0;
     }
+
+    fn reset_tokens(&mut self) {
+        self.token = String::new();
+        self.refresh = String::new();
+        self.reset_expire();
+    }
+
+    fn set_refresh(&mut self, refresh: String) {
+        self.refresh = refresh.to_owned();
+    }
+
+    fn set_client_id(&mut self, client_id: String) {
+        self.client_id = client_id;
+    }
+
+    fn set_redirect_uri(&mut self, redirect_uri: String) {
+        self.redirect_uri = Some(redirect_uri.to_owned());
+    }
+
+    pub fn log_change(&self, desc: &str) {
+        if !self.error.is_empty() {
+            info!("{}-Error: {}", desc, &self.error);
+        } else {
+            info!("{}", desc);
+        }
+    }
+
+    pub fn web_link_authorization(&self) -> String {
+        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())    
+    }
+}
+
+fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
+    Ok(attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
+        .form(&body)?
+        .send()?
+        .text()?)
 }
 
 #[cfg(test)]
@@ -281,7 +320,7 @@ mod auth_tests {
     }
 
     #[test]
-    #[ignore]
+   #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
@@ -290,4 +329,17 @@ mod auth_tests {
         println!("token: {} \nrefresh: {} \n", t, r);
         println!("{:?}", newtdauth);
     }
+
+    #[test]
+    #[ignore]
+     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
+        let mut auth = TDauth::default();
+        auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
+        auth.set_refresh(env::var("TDREFRESHTOKEN").unwrap());
+        auth.resolve_token_from_refresh(false);
+        let (t, r) = auth.get_tokens();
+        println!("token: {} \nrefresh: {} \n", t, r);
+        println!("{:?}", auth);
+     }
+ 
 }

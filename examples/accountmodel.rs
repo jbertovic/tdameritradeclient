@@ -26,7 +26,7 @@ fn main() {
             .unwrap();
 
     // pull out positions
-    let positions = account_root.securities_account.positions;
+    let positions = account_root.securities_account.positions.unwrap();
 
     // iterate through positions
     for p in positions {

@@ -64,8 +64,8 @@
 
 static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
-const TOKENTIMEBUFFER: u64 = 5 * 60; // 5 Minutes
-const REFRESHTIMEBUFFER: u64 = 30 * 24 * 60; // 30 days
+const TOKENTIMEBUFFER: u64 = 25 * 60; // 25 Minutes instead of 30 min
+const REFRESHTIMEBUFFER: u64 = 60 * 24 * 60; // 60 days instead of 90 days
 
 ///
 /// utility module to help with authorization token, refresh token and grant code

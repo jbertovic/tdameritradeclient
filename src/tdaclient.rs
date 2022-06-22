@@ -21,6 +21,12 @@ pub struct TDAClient {
     client: Session,
 }
 
+impl Clone for TDAClient {
+    fn clone(&self) -> Self {
+        TDAClient::new(self.auth_token.clone())
+    }
+}
+
 impl TDAClient {
     ///
     /// Create new base client that maintains Authorization Header
@@ -45,7 +51,7 @@ impl TDAClient {
     ///
     /// get endpoint with query parameters
     ///
-    /// See `response::Endpoint` for available Endpoints
+    /// See `Endpoint` for available Endpoints
     ///
     /// See param for matching parameters
     ///

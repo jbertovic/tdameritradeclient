@@ -5,6 +5,11 @@
 // TODO: tests to add: watchlist endpoints
 
 use std::env;
+use std::collections::HashMap;
+use tdameritradeclient::model::quote::Quote;
+use tdameritradeclient::model::pricehistory::History;
+use tdameritradeclient::model::account::AccountRoot;
+use tdameritradeclient::model::userprincipals::UserPrincipals;
 use tdameritradeclient::{param, Endpoint, TDAClient};
 
 fn initialize_client() -> TDAClient {
@@ -22,18 +27,30 @@ fn initialize_client_accountid() -> (TDAClient, String) {
 }
 
 #[test]
-fn able_to_retrieve_user_data() {
+fn able_to_retrieve_userprincipals() {
     let resptxt: String = initialize_client().get(&Endpoint::UserPrincipals, &[param::Empty]);
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"userId\""), true);
 }
 
 #[test]
+fn able_to_retrieve_userprincipals_into_model() {
+    assert!(serde_json::from_value::<UserPrincipals>(initialize_client().get(&Endpoint::UserPrincipals, &[param::Empty])).is_ok());
+}
+
+#[test]
 fn able_to_retrieve_quotes() {
     let resptxt: String =
-        initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
+        initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,VFIAX,SPY,$SPX.X")]);
+    
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"assetType\""), true);
+}
+
+#[test]
+fn able_to_retrieve_quotes_into_model() {
+    let quote_symbols="F,VFIAX,SPY,$SPX.X";
+    assert!(serde_json::from_value::<HashMap<String, Quote>>(initialize_client().get(&Endpoint::Quotes, &[param::Quotes::Symbol(quote_symbols)])).is_ok());
 }
 
 #[test]
@@ -57,6 +74,19 @@ fn able_to_retrieve_history() {
     );
     println!("RESULT{:?}", resptxt);
     assert_eq!(resptxt.contains("\"candles\""), true);
+}
+
+#[test]
+fn able_to_retrieve_pricehistory_into_model() {
+    assert!(serde_json::from_value::<History>(initialize_client()
+        .get(&Endpoint::History("SPY"), 
+            &[
+                param::History::Period(1),
+                param::History::PeriodType("month"),
+                param::History::Frequency(1),
+                param::History::FrequencyType("daily"),
+            ],
+        )).is_ok());
 }
 
 #[test]
@@ -87,6 +117,15 @@ fn able_to_retrieve_one_account() {
     println!("{:?}", resptxt);
     assert_eq!(resptxt.contains("\"securitiesAccount\""), true);
 }
+
+#[test]
+fn able_to_retrieve_account_into_model() {
+    let (c, accountid) = initialize_client_accountid();
+    assert!(serde_json::from_value::<AccountRoot>(c.get(&Endpoint::Account(&accountid), &[param::Empty])).is_ok());
+    assert!(serde_json::from_value::<AccountRoot>(c.get(&Endpoint::Account(&accountid), &[param::Account::Positions])).is_ok());
+    assert!(serde_json::from_value::<AccountRoot>(c.get(&Endpoint::Account(&accountid), &[param::Account::Orders])).is_ok());
+}
+
 
 #[test]
 fn able_to_retrieve_account_positions() {
