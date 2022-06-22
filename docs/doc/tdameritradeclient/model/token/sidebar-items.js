@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ErrorResponse",""],["TokenResponse","Holds Type Authorization response"]]});
