@@ -1,3 +1,11 @@
+# v0.4.4
+- Added visibility to `auth::TDauth` from `TDAClientAuth`.  Easier to manage when running library from a server
+- Added error checking in `auth::TDauth` 
+- Able to now initialize `TDAClientAuth` with `auth::TDauth`
+- Refactoring in both `auth::TDauth` and `TDAClientAuth`, including a couple of bug fixes
+- Added new models: PriceHistory, Quotes and modified Account model
+- Doc corrections
+
 # v0.4.3
 - Added a new client (`TDAClientAuth`) that manages ungoing token requirements.
 - `TDAClientAuth` is just a wrapper around `TDAClient` but includes token renewals as needed
