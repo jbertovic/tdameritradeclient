@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Quote","Quote"]],"struct":[["QEquity",""],["QFund",""],["QGeneral",""],["QIndex",""],["QOption",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Quote","Quote"]],"struct":[["QEquity",""],["QFund",""],["QGeneral",""],["QIndex",""],["QOption",""]]};

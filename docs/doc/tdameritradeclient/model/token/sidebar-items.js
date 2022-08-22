@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ErrorResponse",""],["TokenResponse","Holds Type Authorization response"]]});
+window.SIDEBAR_ITEMS = {"struct":[["ErrorResponse",""],["TokenResponse","Holds Type Authorization response"]]};

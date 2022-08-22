@@ -4,7 +4,7 @@ use serde::Deserialize;
 /// OptionChain Model
 #[derive(Default, Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-    pub struct OptionChain {
+pub struct OptionChain {
     pub symbol: String,
     pub status: String,
 //    pub underlying: String - ignore for now

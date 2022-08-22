@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Account",""],["Authorizations",""],["Key",""],["Preferences",""],["Quotes",""],["StreamerInfo",""],["StreamerSubscriptionKeys",""],["UserPrincipals","Holds Type for UserPrincipals response"]]});
+window.SIDEBAR_ITEMS = {"struct":[["Account",""],["Authorizations",""],["Key",""],["Preferences",""],["Quotes",""],["StreamerInfo",""],["StreamerSubscriptionKeys",""],["UserPrincipals","Holds Type for UserPrincipals response"]]};

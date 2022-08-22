@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Endpoint","specifies Endpoints for TD Ameritrade’s API"]]});
+window.SIDEBAR_ITEMS = {"enum":[["Endpoint","specifies Endpoints for TD Ameritrade’s API"]]};
