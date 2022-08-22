@@ -8,3 +8,5 @@ pub mod userprincipals;
 pub mod pricehistory;
 /// type to represent quotes from /marketdata/quotes?SYM1,SYM2,etc
 pub mod quote;
+/// type to represent optionchains from /marketdata/chains
+pub mod optionchain;
