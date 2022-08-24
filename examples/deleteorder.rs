@@ -1,7 +1,7 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient};
+use tdameritradeclient::{param, Endpoint, TDAClient, error::TDAClientError};
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
     // Delete order by ORDERID
 
     env_logger::init();
@@ -11,14 +11,16 @@ fn main() {
 
     println!("orderid to delete: {}", orderid);
 
-    let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty]);
+    let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty])?;
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
-    let _: String = c.delete(&Endpoint::Order((&accountid, &orderid)));
+    let _: String = c.delete(&Endpoint::Order((&accountid, &orderid)))?;
 
-    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]); // get working orders
+    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty])?; // get working orders
     println!("orders remaining: ");
     prettyprint(&resptxt);
+
+    Ok(())
 }
 
 fn prettyprint(toprint: &serde_json::Value) {

@@ -5,6 +5,8 @@ use crate::request::Endpoint;
 use attohttpc::{RequestBuilder, Response, Session};
 use log::info;
 use std::time::Duration;
+use crate::Result;
+
 ///
 /// Main client to access TD Ameritrade endpoints
 ///
@@ -14,6 +16,11 @@ use std::time::Duration;
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
 /// 3) use `serde_json::Value` output to parse into a response `model` type
+/// 
+/// # Error
+/// 
+/// Any errors with request to API will be returned as `tdameritradeclient::Error::TDAClientError`
+/// These errors will be issue with the connection or trouble parsing the output if using serde_json
 ///
 #[derive(Debug, Default)]
 pub struct TDAClient {
@@ -55,7 +62,7 @@ impl TDAClient {
     ///
     /// See param for matching parameters
     ///
-    pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> T
+    pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> Result<T>
     where
         RequestBuilder: Execute<T>,
         P: IntoIterator,
@@ -73,7 +80,7 @@ impl TDAClient {
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
     ///
-    pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
@@ -90,7 +97,7 @@ impl TDAClient {
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
     ///
-    pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
@@ -107,7 +114,7 @@ impl TDAClient {
     /// # Errors
     /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
     ///
-    pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> T
+    pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
         // RequestBuilder: Execute<T>,
         RequestBuilder<attohttpc::body::Text<&'a str>>: Execute<T>,
@@ -122,7 +129,7 @@ impl TDAClient {
     ///
     /// delete endpoint
     ///
-    pub fn delete<T>(&self, ep: &Endpoint) -> T
+    pub fn delete<T>(&self, ep: &Endpoint) -> Result<T>
     where
         RequestBuilder: Execute<T>,
     {
@@ -137,37 +144,27 @@ impl TDAClient {
 /// 2) `serde_json::Value` - as a JSON object format
 ///
 pub trait Execute<T> {
-    fn execute(self) -> T;
+    fn execute(self) -> Result<T>;
 }
 
 impl Execute<String> for RequestBuilder {
-    fn execute(self) -> String {
+    fn execute(self) -> Result<String> {
         let response = preexecute(self);
-        response
-            .text()
-            .expect("Response did not return BODY: ERROR")
+        Ok(response.text()?)
     }
 }
 
 impl Execute<String> for RequestBuilder<attohttpc::body::Text<&str>> {
-    fn execute(self) -> String {
+    fn execute(self) -> Result<String> {
         let response = preexecute_wbody(self);
-        response
-            .text()
-            .expect("Response did not return BODY: ERROR")
+        Ok(response.text()?)
     }
 }
 
 impl Execute<serde_json::Value> for RequestBuilder {
-    fn execute(self) -> serde_json::Value {
+    fn execute(self) -> Result<serde_json::Value> {
         let response = preexecute(self);
-        serde_json::from_str(
-            response
-                .text()
-                .expect("Response did not return JSON: ERROR")
-                .as_str(),
-        )
-        .expect("SERDE: Trouble parsing json text: ERROR")
+        Ok(serde_json::from_str(response.text()?.as_str())?)
     }
 }
 

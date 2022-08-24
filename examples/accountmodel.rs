@@ -1,9 +1,10 @@
 use std::env;
+use tdameritradeclient::error::TDAClientError;
 use tdameritradeclient::model::account::AccountRoot;
 use tdameritradeclient::model::userprincipals::UserPrincipals;
 use tdameritradeclient::{param, Endpoint, TDAClient};
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
     env_logger::init();
 
     // grab authorization token from an environmental variable
@@ -13,7 +14,7 @@ fn main() {
     title_print("UserPrincipals Model:");
 
     let userprincipals: UserPrincipals =
-        serde_json::from_value(c.get(&Endpoint::UserPrincipals, &[param::Empty])).unwrap();
+        serde_json::from_value(c.get(&Endpoint::UserPrincipals, &[param::Empty])?).unwrap();
     println!("{:?}\n", &userprincipals);
 
     // pull out primary account id
@@ -22,7 +23,7 @@ fn main() {
     // get account details on positions
     title_print("Account Position:");
     let account_root: AccountRoot =
-        serde_json::from_value(c.get(&Endpoint::Account(accountid), &[param::Account::Positions]))
+        serde_json::from_value(c.get(&Endpoint::Account(accountid), &[param::Account::Positions])?)
             .unwrap();
 
     // pull out positions
@@ -37,6 +38,8 @@ fn main() {
             p.market_value
         );
     }
+
+    Ok(())
 }
 
 fn title_print(heading: &str) {

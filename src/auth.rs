@@ -66,6 +66,8 @@ pub fn get_code_weblink(clientid: &str, redirecturi: &str) -> String {
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
 ///
+/// # Errors
+/// Any Web issues will reset token and send default TDAUTH struct which will be empty
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct TDauth {
     token: String,
