@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient, error::TDAClientError};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
 fn main() -> Result<(), TDAClientError> {
     // Delete order by ORDERID

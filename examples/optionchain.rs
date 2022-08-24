@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient, error::TDAClientError};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
 fn main() -> Result<(), TDAClientError> {
     env_logger::init();
@@ -13,8 +13,8 @@ fn main() -> Result<(), TDAClientError> {
             param::OptionChain::Symbol("SPY"),
             param::OptionChain::StrikeCount(3),
             param::OptionChain::ContractType("CALL"),
-        ])?
-    );
+        ],
+    )?);
 
     Ok(())
 }

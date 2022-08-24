@@ -80,9 +80,8 @@ pub struct TDauth {
 }
 
 impl TDauth {
-
     /// create new `TDauth` with configuration only
-    /// 
+    ///
     pub fn new(refresh: String, client_id: String, redirect_uri: String) -> Self {
         let mut newauth = TDauth::default();
         newauth.set_refresh(refresh);
@@ -181,7 +180,7 @@ impl TDauth {
         self.auth_request(body, true);
     }
 
-    // if error in request just reset tokens 
+    // if error in request just reset tokens
     fn auth_request(&mut self, body: Vec<(&str, &str)>, refresh_update: bool) {
         // any web issues
         let response = match request_auth(body) {
@@ -287,7 +286,7 @@ impl TDauth {
     }
 
     pub fn web_link_authorization(&self) -> String {
-        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())    
+        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())
     }
 }
 
@@ -323,7 +322,7 @@ mod auth_tests {
     }
 
     #[test]
-   #[ignore]
+    #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
@@ -335,7 +334,7 @@ mod auth_tests {
 
     #[test]
     #[ignore]
-     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
+    fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
         let mut auth = TDauth::default();
         auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
         auth.set_refresh(env::var("TDREFRESHTOKEN").unwrap());
@@ -343,6 +342,5 @@ mod auth_tests {
         let (t, r) = auth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);
         println!("{:?}", auth);
-     }
- 
+    }
 }

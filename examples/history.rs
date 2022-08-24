@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient, error::TDAClientError};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
 fn main() -> Result<(), TDAClientError> {
     env_logger::init();
@@ -12,8 +12,8 @@ fn main() -> Result<(), TDAClientError> {
             param::History::PeriodType("month"),
             param::History::Frequency(1),
             param::History::FrequencyType("daily"),
-        ])?
-    );
+        ],
+    )?);
 
     Ok(())
 }

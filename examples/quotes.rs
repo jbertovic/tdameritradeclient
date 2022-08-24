@@ -1,5 +1,5 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient, error::TDAClientError};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
 fn main() -> Result<(), TDAClientError> {
     env_logger::init();
@@ -12,8 +12,7 @@ fn main() -> Result<(), TDAClientError> {
     pretty_print(&c.get(
         &Endpoint::Quotes,
         &[param::Quotes::Symbol("F,SPY,INTC,IWM")],
-        )?
-    );
+    )?);
 
     Ok(())
 }

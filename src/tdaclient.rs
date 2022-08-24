@@ -2,10 +2,10 @@
 #![allow(clippy::must_use_candidate)]
 use crate::param::{convert_to_pairs, Pair};
 use crate::request::Endpoint;
+use crate::Result;
 use attohttpc::{RequestBuilder, Response, Session};
 use log::info;
 use std::time::Duration;
-use crate::Result;
 
 ///
 /// Main client to access TD Ameritrade endpoints
@@ -16,9 +16,9 @@ use crate::Result;
 /// 1) text which in this case is JSON from TDA API
 /// 2) convert to `serde_json::Value`
 /// 3) use `serde_json::Value` output to parse into a response `model` type
-/// 
+///
 /// # Error
-/// 
+///
 /// Any errors with request to API will be returned as `tdameritradeclient::Error::TDAClientError`
 /// These errors will be issue with the connection or trouble parsing the output if using `serde_json`
 ///
