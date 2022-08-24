@@ -181,6 +181,7 @@ impl TDauth {
         self.auth_request(body, true);
     }
 
+    // if error in request just reset tokens 
     fn auth_request(&mut self, body: Vec<(&str, &str)>, refresh_update: bool) {
         // any web issues
         let response = match request_auth(body) {
@@ -266,7 +267,7 @@ impl TDauth {
     }
 
     fn set_refresh(&mut self, refresh: String) {
-        self.refresh = refresh.to_owned();
+        self.refresh = refresh;
     }
 
     fn set_client_id(&mut self, client_id: String) {
@@ -274,7 +275,7 @@ impl TDauth {
     }
 
     fn set_redirect_uri(&mut self, redirect_uri: String) {
-        self.redirect_uri = Some(redirect_uri.to_owned());
+        self.redirect_uri = Some(redirect_uri);
     }
 
     pub fn log_change(&self, desc: &str) {
@@ -291,10 +292,10 @@ impl TDauth {
 }
 
 fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
-    Ok(attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
+    attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
         .form(&body)?
         .send()?
-        .text()?)
+        .text()
 }
 
 #[cfg(test)]

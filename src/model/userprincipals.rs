@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Holds Type for UserPrincipals response
 ///
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPrincipals {
     #[serde(skip)]
@@ -24,7 +24,7 @@ pub struct UserPrincipals {
     pub accounts: Vec<Account>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamerInfo {
     pub streamer_binary_url: String,
@@ -37,7 +37,7 @@ pub struct StreamerInfo {
     pub app_id: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Quotes {
     pub is_nyse_delayed: bool,
@@ -49,19 +49,19 @@ pub struct Quotes {
     pub is_forex_delayed: bool,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamerSubscriptionKeys {
     pub keys: Vec<Key>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Key {
     pub key: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Account {
     pub account_id: String,
@@ -79,7 +79,7 @@ pub struct Account {
     pub authorizations: Authorizations,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences {
     pub express_trading: bool,
@@ -98,7 +98,7 @@ pub struct Preferences {
     pub auth_token_timeout: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Authorizations {
     pub apex: bool,

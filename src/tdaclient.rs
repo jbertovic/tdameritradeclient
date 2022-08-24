@@ -20,7 +20,7 @@ use crate::Result;
 /// # Error
 /// 
 /// Any errors with request to API will be returned as `tdameritradeclient::Error::TDAClientError`
-/// These errors will be issue with the connection or trouble parsing the output if using serde_json
+/// These errors will be issue with the connection or trouble parsing the output if using `serde_json`
 ///
 #[derive(Debug, Default)]
 pub struct TDAClient {
@@ -62,6 +62,8 @@ impl TDAClient {
     ///
     /// See param for matching parameters
     ///
+    /// # Errors
+    /// Will return either a web connection issue or a parse error
     pub fn get<'a, P, T>(&self, ep: &Endpoint, params: P) -> Result<T>
     where
         RequestBuilder: Execute<T>,
@@ -78,7 +80,7 @@ impl TDAClient {
     /// post endpoint with json body
     ///
     /// # Errors
-    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// Will return either a web connection issue or a parse error
     ///
     pub fn post<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
@@ -95,7 +97,7 @@ impl TDAClient {
     /// put endpoint with json body
     ///
     /// # Errors
-    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// Will return either a web connection issue or a parse error
     ///
     pub fn put<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
@@ -112,7 +114,7 @@ impl TDAClient {
     /// patch endpoint with json body
     ///
     /// # Errors
-    /// if nothing was returned than request was good, otherwise a json string will be returned indicating error
+    /// Will return either a web connection issue or a parse error
     ///
     pub fn patch<'a, T>(&self, ep: &Endpoint, body: &'a str) -> Result<T>
     where
@@ -128,6 +130,9 @@ impl TDAClient {
 
     ///
     /// delete endpoint
+    ///
+    /// # Errors
+    /// Will return either a web connection issue or a parse error
     ///
     pub fn delete<T>(&self, ep: &Endpoint) -> Result<T>
     where
