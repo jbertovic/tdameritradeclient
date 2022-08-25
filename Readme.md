@@ -39,11 +39,11 @@ For the examples and tests to work you will need to set environmental variables 
 
 ```
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{TDAClient, Endpoint, param, error::TDAClient};
 
 // Will need to set TDAUTHTOKEN as environmental variable containing a valid token
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
 
     //set token from environment variables
     let token = env::var("TDAUTHTOKEN").unwrap();
@@ -52,10 +52,12 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")]);
+    let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")])?;
 
     // output will be text string in json format
     println!("{:?}", resptxt);
+
+    Ok(())
 }
 ```
 
