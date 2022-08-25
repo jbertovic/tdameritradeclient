@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+use super::ok_or_default;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 /// OptionChain Model
 #[derive(Default, Debug, Clone, Deserialize)]
@@ -7,21 +8,21 @@ use serde::Deserialize;
 pub struct OptionChain {
     pub symbol: String,
     pub status: String,
-//    pub underlying: String - ignore for now
+    //    pub underlying: String - ignore for now
     pub strategy: String,
     pub interval: f64,
     pub is_delayed: bool,
     pub is_index: bool,
     pub interest_rate: f64,
-    #[serde(default)]
+    #[serde(deserialize_with = "ok_or_default")]
     pub underlying_price: f64,
     pub volatility: f64,
-//    pub days_to_expiration: i64 - not sure what this is at top level
+    //    pub days_to_expiration: i64 - not sure what this is at top level
     pub number_of_contracts: i64,
     // format is HashMap< expiredate, HashMap< strike, [optionquote] > >
-    #[serde(default)]
+    #[serde(deserialize_with = "ok_or_default")]
     pub put_exp_date_map: HashMap<String, HashMap<String, Vec<OptionQuote>>>,
-    #[serde(default)]
+    #[serde(deserialize_with = "ok_or_default")]
     pub call_exp_date_map: HashMap<String, HashMap<String, Vec<OptionQuote>>>,
 }
 
@@ -45,21 +46,29 @@ pub struct OptionQuote {
     pub open_price: f64,
     pub close_price: f64,
     pub total_volume: i64,
-//    pub trade_date: Value,
+    //    pub trade_date: Value,
     pub trade_time_in_long: i64,
     pub quote_time_in_long: i64,
     pub net_change: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub volatility: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub delta: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub gamma: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub theta: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub vega: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub rho: f64,
     pub open_interest: i64,
     pub time_value: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub theoretical_option_value: f64,
+    #[serde(deserialize_with = "ok_or_default")]
     pub theoretical_volatility: f64,
-//    pub option_deliverables_list: Value,
+    //    pub option_deliverables_list: Value,
     pub strike_price: f64,
     pub expiration_date: i64,
     pub days_to_expiration: i64,
@@ -68,7 +77,7 @@ pub struct OptionQuote {
     pub multiplier: f64,
     pub settlement_type: String,
     pub deliverable_note: String,
-//    pub is_index_option: Value,
+    //    pub is_index_option: Value,
     pub percent_change: f64,
     pub mark_change: f64,
     pub mark_percent_change: f64,

@@ -66,6 +66,8 @@ pub fn get_code_weblink(clientid: &str, redirecturi: &str) -> String {
 /// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)
 /// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.
 ///
+/// # Errors
+/// Any Web issues will reset token and send default TDAUTH struct which will be empty
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct TDauth {
     token: String,
@@ -78,9 +80,8 @@ pub struct TDauth {
 }
 
 impl TDauth {
-
     /// create new `TDauth` with configuration only
-    /// 
+    ///
     pub fn new(refresh: String, client_id: String, redirect_uri: String) -> Self {
         let mut newauth = TDauth::default();
         newauth.set_refresh(refresh);
@@ -179,6 +180,7 @@ impl TDauth {
         self.auth_request(body, true);
     }
 
+    // if error in request just reset tokens
     fn auth_request(&mut self, body: Vec<(&str, &str)>, refresh_update: bool) {
         // any web issues
         let response = match request_auth(body) {
@@ -264,7 +266,7 @@ impl TDauth {
     }
 
     fn set_refresh(&mut self, refresh: String) {
-        self.refresh = refresh.to_owned();
+        self.refresh = refresh;
     }
 
     fn set_client_id(&mut self, client_id: String) {
@@ -272,7 +274,7 @@ impl TDauth {
     }
 
     fn set_redirect_uri(&mut self, redirect_uri: String) {
-        self.redirect_uri = Some(redirect_uri.to_owned());
+        self.redirect_uri = Some(redirect_uri);
     }
 
     pub fn log_change(&self, desc: &str) {
@@ -284,15 +286,15 @@ impl TDauth {
     }
 
     pub fn web_link_authorization(&self) -> String {
-        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())    
+        get_code_weblink(&self.client_id, self.redirect_uri.as_ref().unwrap())
     }
 }
 
 fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
-    Ok(attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
+    attohttpc::post(format!("{}oauth2/token", crate::APIWWW))
         .form(&body)?
         .send()?
-        .text()?)
+        .text()
 }
 
 #[cfg(test)]
@@ -320,7 +322,7 @@ mod auth_tests {
     }
 
     #[test]
-   #[ignore]
+    #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
@@ -332,7 +334,7 @@ mod auth_tests {
 
     #[test]
     #[ignore]
-     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
+    fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
         let mut auth = TDauth::default();
         auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
         auth.set_refresh(env::var("TDREFRESHTOKEN").unwrap());
@@ -340,6 +342,5 @@ mod auth_tests {
         let (t, r) = auth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);
         println!("{:?}", auth);
-     }
- 
+    }
 }

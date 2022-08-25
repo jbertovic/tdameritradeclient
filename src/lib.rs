@@ -55,7 +55,7 @@
 //! let c = TDAClient::new(token);
 //!
 //! // get quotes for 3 symbols and execute
-//! let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,TRP")]);
+//! let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,TRP")]).unwrap();
 //!
 //! // output will be text string in json format
 //! println!("{:?}", resptxt);
@@ -66,6 +66,7 @@ static APIWWW: &str = "https://api.tdameritrade.com/v1/";
 static APIKEY: &str = "@AMER.OAUTHAP";
 const TOKENTIMEBUFFER: u64 = 25 * 60; // 25 Minutes instead of 30 min
 const REFRESHTIMEBUFFER: u64 = 60 * 24 * 60; // 60 days instead of 90 days
+type Result<T> = std::result::Result<T, error::TDAClientError>;
 
 ///
 /// utility module to help with authorization token, refresh token and grant code
@@ -94,3 +95,6 @@ pub use authmanagedclient::TDAClientAuth;
 /// Used: `https://transform.tools/json-to-rust-serde` to help with struct generation
 ///
 pub mod model;
+
+/// Rolled up Errors for TDAClient
+pub mod error;

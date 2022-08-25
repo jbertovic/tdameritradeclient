@@ -76,7 +76,7 @@ impl TDAClientAuth {
     }
 
     /// check that an active refresh token exists so client tokens can be updated as needed
-    /// 
+    ///
     /// if this is false then `TDauth` will have to be resolved by getting a refresh token
     /// probably using `tdauth_code_grant`
     pub fn refresh_auth_active(&self) -> bool {
@@ -106,7 +106,8 @@ mod managed_client_tests {
         let resptxt: String = managed_client
             .client()
             .unwrap()
-            .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
+            .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")])
+            .unwrap();
         assert_eq!(resptxt.contains("\"assetType\""), true);
 
         let (t1, r1, t2, r2): (String, String, String, String);
@@ -122,7 +123,8 @@ mod managed_client_tests {
         let resptxt: String = managed_client
             .client()
             .unwrap()
-            .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")]);
+            .get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,INTC,SPY")])
+            .unwrap();
         assert_eq!(resptxt.contains("\"assetType\""), true);
 
         {

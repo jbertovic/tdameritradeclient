@@ -198,13 +198,17 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(<span class="ident">clippy::all</span>, <span class="ident">clippy::pedantic</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::must_use_candidate</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::param</span>::{<span class="ident">convert_to_pairs</span>, <span class="ident">Pair</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::request::Endpoint</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Result</span>;
 <span class="kw">use</span> <span class="ident">attohttpc</span>::{<span class="ident">RequestBuilder</span>, <span class="ident">Response</span>, <span class="ident">Session</span>};
 <span class="kw">use</span> <span class="ident">log::info</span>;
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+
 <span class="doccomment">///</span>
 <span class="doccomment">/// Main client to access TD Ameritrade endpoints</span>
 <span class="doccomment">///</span>
@@ -214,6 +218,11 @@
 <span class="doccomment">/// 1) text which in this case is JSON from TDA API</span>
 <span class="doccomment">/// 2) convert to `serde_json::Value`</span>
 <span class="doccomment">/// 3) use `serde_json::Value` output to parse into a response `model` type</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Error</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Any errors with request to API will be returned as `tdameritradeclient::Error::TDAClientError`</span>
+<span class="doccomment">/// These errors will be issue with the connection or trouble parsing the output if using `serde_json`</span>
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TDAClient</span> {
@@ -255,7 +264,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See param for matching parameters</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">T</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">/// Will return either a web connection issue or a parse error</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">P</span>: <span class="ident">IntoIterator</span>,
@@ -271,9 +282,9 @@
     <span class="doccomment">/// post endpoint with json body</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">/// if nothing was returned than request was good, otherwise a json string will be returned indicating error</span>
+    <span class="doccomment">/// Will return either a web connection issue or a parse error</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">post</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">T</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">post</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="comment">// RequestBuilder: Execute&lt;T&gt;,</span>
         <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="ident">attohttpc::body::Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -288,9 +299,9 @@
     <span class="doccomment">/// put endpoint with json body</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">/// if nothing was returned than request was good, otherwise a json string will be returned indicating error</span>
+    <span class="doccomment">/// Will return either a web connection issue or a parse error</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">T</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="comment">// RequestBuilder: Execute&lt;T&gt;,</span>
         <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="ident">attohttpc::body::Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -305,9 +316,9 @@
     <span class="doccomment">/// patch endpoint with json body</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">/// if nothing was returned than request was good, otherwise a json string will be returned indicating error</span>
+    <span class="doccomment">/// Will return either a web connection issue or a parse error</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">patch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">T</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">patch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="comment">// RequestBuilder: Execute&lt;T&gt;,</span>
         <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="ident">attohttpc::body::Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -322,7 +333,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// delete endpoint</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>) -&gt; <span class="ident">T</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">/// Will return either a web connection issue or a parse error</span>
+    <span class="doccomment">///</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ep</span>: <span class="kw-2">&amp;</span><span class="ident">Endpoint</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">RequestBuilder</span>: <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
@@ -337,37 +351,27 @@
 <span class="doccomment">/// 2) `serde_json::Value` - as a JSON object format</span>
 <span class="doccomment">///</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
+    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">preexecute</span>(<span class="self">self</span>);
-        <span class="ident">response</span>
-            .<span class="ident">text</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Response did not return BODY: ERROR&quot;</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">response</span>.<span class="ident">text</span>()<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="ident">attohttpc::body::Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">preexecute_wbody</span>(<span class="self">self</span>);
-        <span class="ident">response</span>
-            .<span class="ident">text</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Response did not return BODY: ERROR&quot;</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">response</span>.<span class="ident">text</span>()<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Execute</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="ident">serde_json::Value</span> {
+    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">preexecute</span>(<span class="self">self</span>);
-        <span class="ident">serde_json::from_str</span>(
-            <span class="ident">response</span>
-                .<span class="ident">text</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Response did not return JSON: ERROR&quot;</span>)
-                .<span class="ident">as_str</span>(),
-        )
-        .<span class="ident">expect</span>(<span class="string">&quot;SERDE: Trouble parsing json text: ERROR&quot;</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">serde_json::from_str</span>(<span class="ident">response</span>.<span class="ident">text</span>()<span class="question-mark">?</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>)
     }
 }
 

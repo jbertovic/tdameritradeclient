@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 /// Holds account information that contains account information, balances, positions and orders
 /// as retrieved from get Accounts
 ///
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountRoot {
     pub securities_account: SecuritiesAccount,
@@ -12,7 +12,7 @@ pub struct AccountRoot {
 // TODO: Add the opportunity for either cash_account or margin_account. Currently only uses margin_account
 // Need to test cash account to see if it works
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SecuritiesAccount {
     #[serde(rename = "type")]
@@ -28,7 +28,7 @@ pub struct SecuritiesAccount {
     pub projected_balances: ProjectedBalances,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Position {
     pub short_quantity: f64,
@@ -46,7 +46,7 @@ pub struct Position {
     pub previous_session_short_quantity: Option<f64>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Instrument {
     pub asset_type: String,
@@ -59,7 +59,7 @@ pub struct Instrument {
     pub type_field: Option<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InitialBalances {
     pub accrued_interest: f64,
@@ -108,7 +108,7 @@ pub struct InitialBalances {
     pub account_value: f64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CurrentBalances {
     pub accrued_interest: f64,
@@ -149,7 +149,7 @@ pub struct CurrentBalances {
     pub bond_value: f64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProjectedBalances {
     pub available_funds: f64,
@@ -165,7 +165,7 @@ pub struct ProjectedBalances {
     pub stock_buying_power: f64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderStrategy {
     pub session: String,
@@ -189,7 +189,7 @@ pub struct OrderStrategy {
     pub account_id: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderLegCollection {
     pub order_leg_type: String,

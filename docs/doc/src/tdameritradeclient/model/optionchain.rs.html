@@ -84,8 +84,18 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ok_or_default</span>;
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// OptionChain Model</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>)]</span>
@@ -93,21 +103,21 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptionChain</span> {
     <span class="kw">pub</span> <span class="ident">symbol</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">String</span>,
-<span class="comment">//    pub underlying: String - ignore for now</span>
+    <span class="comment">//    pub underlying: String - ignore for now</span>
     <span class="kw">pub</span> <span class="ident">strategy</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">interval</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">is_delayed</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">is_index</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">interest_rate</span>: <span class="ident">f64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">underlying_price</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">volatility</span>: <span class="ident">f64</span>,
-<span class="comment">//    pub days_to_expiration: i64 - not sure what this is at top level</span>
+    <span class="comment">//    pub days_to_expiration: i64 - not sure what this is at top level</span>
     <span class="kw">pub</span> <span class="ident">number_of_contracts</span>: <span class="ident">i64</span>,
     <span class="comment">// format is HashMap&lt; expiredate, HashMap&lt; strike, [optionquote] &gt; &gt;</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">put_exp_date_map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OptionQuote</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">call_exp_date_map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OptionQuote</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -131,21 +141,29 @@
     <span class="kw">pub</span> <span class="ident">open_price</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">close_price</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">total_volume</span>: <span class="ident">i64</span>,
-<span class="comment">//    pub trade_date: Value,</span>
+    <span class="comment">//    pub trade_date: Value,</span>
     <span class="kw">pub</span> <span class="ident">trade_time_in_long</span>: <span class="ident">i64</span>,
     <span class="kw">pub</span> <span class="ident">quote_time_in_long</span>: <span class="ident">i64</span>,
     <span class="kw">pub</span> <span class="ident">net_change</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">volatility</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">delta</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">gamma</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">theta</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">vega</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">rho</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">open_interest</span>: <span class="ident">i64</span>,
     <span class="kw">pub</span> <span class="ident">time_value</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">theoretical_option_value</span>: <span class="ident">f64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ok_or_default&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">theoretical_volatility</span>: <span class="ident">f64</span>,
-<span class="comment">//    pub option_deliverables_list: Value,</span>
+    <span class="comment">//    pub option_deliverables_list: Value,</span>
     <span class="kw">pub</span> <span class="ident">strike_price</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">expiration_date</span>: <span class="ident">i64</span>,
     <span class="kw">pub</span> <span class="ident">days_to_expiration</span>: <span class="ident">i64</span>,
@@ -154,7 +172,7 @@
     <span class="kw">pub</span> <span class="ident">multiplier</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">settlement_type</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">deliverable_note</span>: <span class="ident">String</span>,
-<span class="comment">//    pub is_index_option: Value,</span>
+    <span class="comment">//    pub is_index_option: Value,</span>
     <span class="kw">pub</span> <span class="ident">percent_change</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">mark_change</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">mark_percent_change</span>: <span class="ident">f64</span>,

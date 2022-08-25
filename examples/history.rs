@@ -1,7 +1,7 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
     env_logger::init();
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
     title_print("History:");
@@ -13,7 +13,9 @@ fn main() {
             param::History::Frequency(1),
             param::History::FrequencyType("daily"),
         ],
-    ));
+    )?);
+
+    Ok(())
 }
 
 fn pretty_print(toprint: &serde_json::Value) {

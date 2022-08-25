@@ -1,5 +1,12 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
+## Note Version 0.4.5 Changes
+- (BREAKING CHANGE) all reqests (get, post, put, patch and delete) will now return `Result<T, TDAClientError>` instead of just `T`
+- Added library errors `crate::error`
+- Removed all expect and unwrap on requests from `TDAClient`
+- updated option chain model
+- cleaned up code with `cargo clippy` and `cargo fmt`
+
 ## Note Version 0.4.4 Changes
 - Added error checking on TDauth module. Used when retrieving tokens.
 - Gave TDAClientAuth acces to TDauth struct
@@ -33,11 +40,11 @@ For the examples and tests to work you will need to set environmental variables 
 
 ```
 use std::env;
-use tdameritradeclient::{TDAClient, Endpoint, param};
+use tdameritradeclient::{TDAClient, Endpoint, param, error::TDAClient};
 
 // Will need to set TDAUTHTOKEN as environmental variable containing a valid token
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
 
     //set token from environment variables
     let token = env::var("TDAUTHTOKEN").unwrap();
@@ -46,10 +53,12 @@ fn main() {
     let c = TDAClient::new(token);
 
     // get quotes for 3 symbols and execute
-    let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")]);
+    let resptxt: String = c.get(&Endpoint::Quotes, &[param::Quotes::Symbol("F,SPY,INTC,IWM")])?;
 
     // output will be text string in json format
     println!("{:?}", resptxt);
+
+    Ok(())
 }
 ```
 

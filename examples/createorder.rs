@@ -1,12 +1,12 @@
 use std::env;
-use tdameritradeclient::{param, Endpoint, TDAClient};
+use tdameritradeclient::{error::TDAClientError, param, Endpoint, TDAClient};
 
-fn main() {
+fn main() -> Result<(), TDAClientError> {
     env_logger::init();
 
     let c = TDAClient::new(env::var("TDAUTHTOKEN").unwrap());
 
-    let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty]);
+    let resptxt: serde_json::Value = c.get(&Endpoint::UserPrincipals, &[param::Empty])?;
     let accountid = resptxt["primaryAccountId"].as_str().unwrap();
 
     let order_def = r#"
@@ -30,14 +30,16 @@ fn main() {
     "#;
 
     // use post method to pass body of order definition/instructions
-    let resptxt = c.post(&Endpoint::Orders(accountid), &order_def);
+    let resptxt = c.post(&Endpoint::Orders(accountid), &order_def)?;
 
     // outcome of order submit
     println!("Order Created: '{}'", resptxt);
 
     // get working orders and find the order above
-    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty]);
+    let resptxt: serde_json::Value = c.get(&Endpoint::Orders(accountid), &[param::Empty])?;
     pretty_print(&resptxt);
+
+    Ok(())
 }
 
 fn pretty_print(toprint: &serde_json::Value) {

@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-use serde_json::Value;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
 ///
 /// Quote
 ///
 /// Deserialized through a HashMap<String, Quote>
-/// 
+///
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum Quote {
@@ -19,7 +19,7 @@ pub enum Quote {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QEquity {
-    pub asset_type: String,    
+    pub asset_type: String,
     pub symbol: String,
     pub description: String,
     pub bid_price: f64,
@@ -69,7 +69,7 @@ pub struct QEquity {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QIndex {
-    pub asset_type: String,    
+    pub asset_type: String,
     pub symbol: String,
     pub description: String,
     pub last_price: f64,
@@ -91,12 +91,12 @@ pub struct QIndex {
     pub net_percent_change_in_double: f64,
     #[serde(flatten)]
     extra: HashMap<String, Value>,
-}   
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QOption {
-    pub asset_type: String,    
+    pub asset_type: String,
     pub symbol: String,
     pub description: String,
     pub bid_price: f64,
@@ -151,7 +151,7 @@ pub struct QOption {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QFund {
-    pub asset_type: String,    
+    pub asset_type: String,
     pub symbol: String,
     pub description: String,
     pub close_price: f64,
@@ -181,12 +181,11 @@ pub struct QFund {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct QGeneral {
-    pub asset_type: String,    
+    pub asset_type: String,
     pub symbol: String,
     #[serde(flatten)]
     extra: HashMap<String, Value>,
 }
-
 
 impl Quote {
     pub fn symbol(&self) -> &str {
