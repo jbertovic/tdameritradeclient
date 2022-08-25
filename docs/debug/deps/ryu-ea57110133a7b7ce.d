@@ -1,0 +1,16 @@
+/home/jas/rust/tdameritradeclient/docs/debug/deps/ryu-ea57110133a7b7ce.rmeta: /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/lib.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/buffer/mod.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/common.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_full_table.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_intrinsics.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/digit_table.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s_intrinsics.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mod.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/exponent.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mantissa.rs
+
+/home/jas/rust/tdameritradeclient/docs/debug/deps/ryu-ea57110133a7b7ce.d: /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/lib.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/buffer/mod.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/common.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_full_table.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_intrinsics.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/digit_table.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s_intrinsics.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mod.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/exponent.rs /home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mantissa.rs
+
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/lib.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/buffer/mod.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/common.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_full_table.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/d2s_intrinsics.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/digit_table.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/f2s_intrinsics.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mod.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/exponent.rs:
+/home/jas/.cargo/registry/src/github.com-1ecc6299db9ec823/ryu-1.0.11/src/pretty/mantissa.rs:

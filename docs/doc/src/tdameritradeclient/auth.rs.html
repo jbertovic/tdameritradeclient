@@ -349,6 +349,7 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
+<span id="346">346</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::token</span>::{<span class="ident">ErrorResponse</span>, <span class="ident">TokenResponse</span>};
 <span class="kw">use</span> <span class="ident">log::info</span>;
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
@@ -417,6 +418,8 @@
 <span class="doccomment">/// 2) `new_fromcode` will allow you to update tokens from the code retrieved in 1)</span>
 <span class="doccomment">/// 3) `new_fromrefresh` will allow you to update tokens from the `refresh_token`.  The `refresh_token` will stay active for 90 days so you can save for reuse.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">/// Any Web issues will reset token and send default TDAUTH struct which will be empty</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TDauth</span> {
     <span class="ident">token</span>: <span class="ident">String</span>,
@@ -429,9 +432,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TDauth</span> {
-
     <span class="doccomment">/// create new `TDauth` with configuration only</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">refresh</span>: <span class="ident">String</span>, <span class="ident">client_id</span>: <span class="ident">String</span>, <span class="ident">redirect_uri</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newauth</span> <span class="op">=</span> <span class="ident">TDauth::default</span>();
         <span class="ident">newauth</span>.<span class="ident">set_refresh</span>(<span class="ident">refresh</span>);
@@ -530,6 +532,7 @@
         <span class="self">self</span>.<span class="ident">auth_request</span>(<span class="ident">body</span>, <span class="bool-val">true</span>);
     }
 
+    <span class="comment">// if error in request just reset tokens</span>
     <span class="kw">fn</span> <span class="ident">auth_request</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span>, <span class="ident">refresh_update</span>: <span class="ident">bool</span>) {
         <span class="comment">// any web issues</span>
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">request_auth</span>(<span class="ident">body</span>) {
@@ -615,7 +618,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">set_refresh</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">refresh</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">refresh</span> <span class="op">=</span> <span class="ident">refresh</span>.<span class="ident">to_owned</span>();
+        <span class="self">self</span>.<span class="ident">refresh</span> <span class="op">=</span> <span class="ident">refresh</span>;
     }
 
     <span class="kw">fn</span> <span class="ident">set_client_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">client_id</span>: <span class="ident">String</span>) {
@@ -623,7 +626,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">set_redirect_uri</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">redirect_uri</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">redirect_uri</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">redirect_uri</span>.<span class="ident">to_owned</span>());
+        <span class="self">self</span>.<span class="ident">redirect_uri</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">redirect_uri</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">desc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
@@ -635,15 +638,15 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">web_link_authorization</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">get_code_weblink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_id</span>, <span class="self">self</span>.<span class="ident">redirect_uri</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())    
+        <span class="ident">get_code_weblink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_id</span>, <span class="self">self</span>.<span class="ident">redirect_uri</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
     }
 }
 
 <span class="kw">fn</span> <span class="ident">request_auth</span>(<span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">attohttpc::Error</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">attohttpc::post</span>(<span class="macro">format!</span>(<span class="string">&quot;{}oauth2/token&quot;</span>, <span class="ident"><span class="kw">crate</span>::APIWWW</span>))
+    <span class="ident">attohttpc::post</span>(<span class="macro">format!</span>(<span class="string">&quot;{}oauth2/token&quot;</span>, <span class="ident"><span class="kw">crate</span>::APIWWW</span>))
         .<span class="ident">form</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>)<span class="question-mark">?</span>
         .<span class="ident">send</span>()<span class="question-mark">?</span>
-        .<span class="ident">text</span>()<span class="question-mark">?</span>)
+        .<span class="ident">text</span>()
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -671,7 +674,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-   <span class="attribute">#[<span class="ident">ignore</span>]</span>
+    <span class="attribute">#[<span class="ident">ignore</span>]</span>
     <span class="kw">fn</span> <span class="ident">check_new_fromrefresh_constructs_tdauth</span>() {
         <span class="kw">let</span> <span class="ident">refresh</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;TDREFRESHTOKEN&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">clientid</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;TDCLIENTKEY&quot;</span>).<span class="ident">unwrap</span>();
@@ -683,7 +686,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">ignore</span>]</span>
-     <span class="kw">fn</span> <span class="ident">check_existing_tdauth_fromrefresh_constructs_tdauth</span>() {
+    <span class="kw">fn</span> <span class="ident">check_existing_tdauth_fromrefresh_constructs_tdauth</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">TDauth::default</span>();
         <span class="ident">auth</span>.<span class="ident">set_client_id</span>(<span class="ident">env::var</span>(<span class="string">&quot;TDCLIENTKEY&quot;</span>).<span class="ident">unwrap</span>());
         <span class="ident">auth</span>.<span class="ident">set_refresh</span>(<span class="ident">env::var</span>(<span class="string">&quot;TDREFRESHTOKEN&quot;</span>).<span class="ident">unwrap</span>());
@@ -691,8 +694,7 @@
         <span class="kw">let</span> (<span class="ident">t</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">get_tokens</span>();
         <span class="macro">println!</span>(<span class="string">&quot;token: {} \nrefresh: {} \n&quot;</span>, <span class="ident">t</span>, <span class="ident">r</span>);
         <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">auth</span>);
-     }
- 
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tdameritradeclient" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
