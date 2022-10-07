@@ -57,6 +57,9 @@ pub struct Instrument {
     pub underlying_symbol: Option<String>,
     #[serde(rename = "type")]
     pub type_field: Option<String>,
+    pub maturity_date: Option<String>,
+    pub variable_rate: Option<f64>,
+    pub factor: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
