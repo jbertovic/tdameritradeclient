@@ -7,8 +7,7 @@ use log::info;
 /// Wrapper around `TDAClient` that handles managing the authorization token
 ///
 /// A valid refresh token and client id needs to be supplied
-///
-/// Initiate with a valid refresh token and client id
+/// or a TDAuth struct
 ///
 #[derive(Debug, Clone)]
 pub struct TDAClientAuth {
