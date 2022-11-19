@@ -4,7 +4,7 @@ use crate::param::{convert_to_pairs, Pair};
 use crate::request::Endpoint;
 use crate::Result;
 use attohttpc::{RequestBuilder, Response, Session};
-use log::info;
+use log::trace;
 use std::time::Duration;
 
 ///
@@ -42,7 +42,7 @@ impl TDAClient {
     ///
     pub fn new(token: String) -> TDAClient {
         let mut client = Session::new();
-        info!("New Client initialized - from token");
+        trace!("New Client initialized - from token");
         client.header("AUTHORIZATION", format!("Bearer {}", &token));
         TDAClient {
             auth_token: token,
@@ -176,21 +176,21 @@ impl Execute<serde_json::Value> for RequestBuilder {
 /// created to help with logging
 fn preexecute(req: RequestBuilder) -> Response {
     let mut prepared = req.prepare();
-    info!("Request: {}-{}", prepared.method(), prepared.url());
+    trace!("Request: {}-{}", prepared.method(), prepared.url());
     let response = prepared.send().expect("Trouble Retrieving Response: ERROR");
-    info!("Response: Status:{}", response.status());
+    trace!("Response: Status:{}", response.status());
     response
 }
 
 /// created to help with logging
 fn preexecute_wbody(req: RequestBuilder<attohttpc::body::Text<&str>>) -> Response {
     let mut prepared = req.prepare();
-    info!(
+    trace!(
         "Request: {}-{} - includes body text",
         prepared.method(),
         prepared.url()
     );
     let response = prepared.send().expect("Trouble Retrieving Response: ERROR");
-    info!("Response: Status:{}", response.status());
+    trace!("Response: Status:{}", response.status());
     response
 }

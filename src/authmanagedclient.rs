@@ -2,7 +2,7 @@ use crate::auth::TDauth;
 use crate::TDAClient;
 use crate::REFRESHTIMEBUFFER;
 use crate::TOKENTIMEBUFFER;
-use log::info;
+use log::trace;
 
 /// Wrapper around `TDAClient` that handles managing the authorization token
 ///
@@ -19,7 +19,7 @@ impl TDAClientAuth {
     /// create a new managed client with refresh token and client id that will check and refresh tokens
     /// as needed before every use.
     pub fn new(refresh_token: String, client_id: String) -> Self {
-        info!("New Client (Auth Managed) initialized - from refresh token");
+        trace!("New Client (Auth Managed) initialized - from refresh token");
         let auth = TDauth::new_from_refresh(&refresh_token, &client_id, true);
         TDAClientAuth {
             client: TDAClient::new(auth.get_auth_token().to_owned()),
@@ -30,7 +30,7 @@ impl TDAClientAuth {
     /// create a new managed client from a TDauth configured struct that will check and refresh tokens
     /// as needed before every use.
     pub fn from_tdauth(auth: TDauth) -> Self {
-        info!("New Client (Auth Managed) initialized - from TDauth struct");
+        trace!("New Client (Auth Managed) initialized - from TDauth struct");
         TDAClientAuth {
             client: TDAClient::new(auth.get_auth_token().to_owned()),
             auth,

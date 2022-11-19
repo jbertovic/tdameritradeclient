@@ -1,5 +1,5 @@
 use crate::model::token::{ErrorResponse, TokenResponse};
-use log::info;
+use log::{trace, warn};
 use serde::Serialize;
 use std::time::SystemTime;
 
@@ -279,9 +279,9 @@ impl TDauth {
 
     pub fn log_change(&self, desc: &str) {
         if !self.error.is_empty() {
-            info!("{}-Error: {}", desc, &self.error);
+            warn!("{}-Error: {}", desc, &self.error);
         } else {
-            info!("{}", desc);
+            trace!("{}", desc);
         }
     }
 
