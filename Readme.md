@@ -1,18 +1,16 @@
 **Disclaimer:** I'm not endorsing and am not affiliated with TD Ameritrade. Be careful using the API and understand that actual orders can be created through this library.  Read and understand the TD Ameritrade's api terms of service and documentation before using.
 
+## Note Version 0.4.6 Changes
+- Added features to help use tests when Env Variables are set; TDAUTHTOKEN, TDREFRESHTOKEN, TDCLIENTKEY
+- Added model::instrument::fundamental model for instrument endpoint
+- 
+
 ## Note Version 0.4.5 Changes
 - (BREAKING CHANGE) all reqests (get, post, put, patch and delete) will now return `Result<T, TDAClientError>` instead of just `T`
 - Added library errors `crate::error`
 - Removed all expect and unwrap on requests from `TDAClient`
 - updated option chain model
 - cleaned up code with `cargo clippy` and `cargo fmt`
-
-## Note Version 0.4.4 Changes
-- Added error checking on TDauth module. Used when retrieving tokens.
-- Gave TDAClientAuth acces to TDauth struct
-- Managed TDAClientAuth has the ability to deal with no token returned due to some error in web retrieval or authorization
-- Integrated TDauth module better with TDAClientAuth
-- Added model::pricehistory, quotes, optionchain and modified account model
 
 ## Note Version 0.4 Changes
 

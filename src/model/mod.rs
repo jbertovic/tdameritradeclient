@@ -13,6 +13,9 @@ pub mod quote;
 pub mod token;
 /// type to respresent responses from /userprincipals/ endpoint
 pub mod userprincipals;
+/// type to respresent responses from /instruments
+pub mod instrument;
+
 
 fn ok_or_default<'a, T, D>(deserializer: D) -> Result<T, D::Error>
 where

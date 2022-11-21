@@ -88,6 +88,7 @@ impl TDAClientAuth {
     }
 }
 
+#[cfg(feature = "set-tdauthrefresh")]
 #[cfg(test)]
 mod managed_client_tests {
 

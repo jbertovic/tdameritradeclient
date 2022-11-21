@@ -297,6 +297,7 @@ fn request_auth(body: Vec<(&str, &str)>) -> Result<String, attohttpc::Error> {
         .text()
 }
 
+#[cfg(feature = "set-tdauthrefresh")]
 #[cfg(test)]
 mod auth_tests {
 
@@ -304,7 +305,6 @@ mod auth_tests {
     use std::env;
 
     #[test]
-    #[ignore]
     fn check_code_weblink_auth_works() {
         let clientid = env::var("TDCLIENTKEY").unwrap();
         let redirecturi = env::var("TDREDIRECT").unwrap();
@@ -322,7 +322,6 @@ mod auth_tests {
     }
 
     #[test]
-    #[ignore]
     fn check_new_fromrefresh_constructs_tdauth() {
         let refresh = env::var("TDREFRESHTOKEN").unwrap();
         let clientid = env::var("TDCLIENTKEY").unwrap();
@@ -333,7 +332,6 @@ mod auth_tests {
     }
 
     #[test]
-    #[ignore]
     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
         let mut auth = TDauth::default();
         auth.set_client_id(env::var("TDCLIENTKEY").unwrap());

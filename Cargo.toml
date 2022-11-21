@@ -15,3 +15,12 @@ log = "0.4"
 
 [dev-dependencies]
 env_logger = "0.9"
+
+[features]
+live-test = ["set-tdauthtoken", "set-tdauthrefresh"]
+# run tests as cargo test --features=dev -- --nocapture
+# allows TDAUTHTOKEN to be set through env variable to run tests
+set-tdauthtoken = []
+# use tdauth env variables, TDREFRESHTOKEN, TDCLIENTID need to be set
+# use development links for API access
+set-tdauthrefresh = []
