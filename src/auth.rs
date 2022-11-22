@@ -305,9 +305,10 @@ mod auth_tests {
     use std::env;
 
     #[test]
+    #[ignore]
     fn check_code_weblink_auth_works() {
-        let clientid = env::var("TDCLIENTKEY").unwrap();
-        let redirecturi = env::var("TDREDIRECT").unwrap();
+        let clientid = env::var("TDCLIENTKEY").expect("Missing env TDCLIENTKEY");
+        let redirecturi = env::var("TDREDIRECT").expect("Missing env TDREDIRECT");
         println!("{}", crate::auth::get_code_weblink(&clientid, &redirecturi));
     }
 
@@ -315,16 +316,16 @@ mod auth_tests {
     #[ignore]
     fn check_new_fromcode_constructs_tdauth() {
         let code = env::var("TDCODE").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
-        let redirecturi = env::var("TDREDIRECT").unwrap();
+        let clientid = env::var("TDCLIENTKEY").expect("Missing env TDCLIENTKEY");
+        let redirecturi = env::var("TDREDIRECT").expect("Missing env TDREDIRECT");
         let newtdauth = TDauth::new_from_code(&code, &clientid, &redirecturi, true);
         println!("{:?}", newtdauth);
     }
 
     #[test]
     fn check_new_fromrefresh_constructs_tdauth() {
-        let refresh = env::var("TDREFRESHTOKEN").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
+        let refresh = env::var("TDREFRESHTOKEN").expect("Missing env TDREFRESHTOKEN");
+        let clientid = env::var("TDCLIENTKEY").expect("Missing env TDCLIENTKEY");
         let newtdauth = TDauth::new_from_refresh(&refresh, &clientid, true);
         let (t, r) = newtdauth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);
@@ -334,8 +335,8 @@ mod auth_tests {
     #[test]
     fn check_existing_tdauth_fromrefresh_constructs_tdauth() {
         let mut auth = TDauth::default();
-        auth.set_client_id(env::var("TDCLIENTKEY").unwrap());
-        auth.set_refresh(env::var("TDREFRESHTOKEN").unwrap());
+        auth.set_client_id(env::var("TDCLIENTKEY").expect("Missing env TDCLIENTKEY"));
+        auth.set_refresh(env::var("TDREFRESHTOKEN").expect("Missing env TDREFRESHTOKEN"));
         auth.resolve_token_from_refresh(false);
         let (t, r) = auth.get_tokens();
         println!("token: {} \nrefresh: {} \n", t, r);

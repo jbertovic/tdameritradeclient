@@ -99,8 +99,8 @@ mod managed_client_tests {
     #[test]
     #[ignore]
     fn check_managed_client() {
-        let refresh = env::var("TDREFRESHTOKEN").unwrap();
-        let clientid = env::var("TDCLIENTKEY").unwrap();
+        let refresh = env::var("TDREFRESHTOKEN").expect("Missing env TDREFRESHTOKEN");
+        let clientid = env::var("TDCLIENTKEY").expect("Missing env TDCLIENTKEY");
         let mut managed_client = TDAClientAuth::new(refresh, clientid);
 
         let resptxt: String = managed_client

@@ -3,6 +3,8 @@ use serde_json::Value;
 
 /// type to respresent responses from /accounts/ endpoint
 pub mod account;
+/// type to respresent responses from /instruments
+pub mod instrument;
 /// type to represent optionchains from /marketdata/chains
 pub mod optionchain;
 /// type to represent price history from /marketdata/SYM/pricehistory
@@ -13,9 +15,6 @@ pub mod quote;
 pub mod token;
 /// type to respresent responses from /userprincipals/ endpoint
 pub mod userprincipals;
-/// type to respresent responses from /instruments
-pub mod instrument;
-
 
 fn ok_or_default<'a, T, D>(deserializer: D) -> Result<T, D::Error>
 where

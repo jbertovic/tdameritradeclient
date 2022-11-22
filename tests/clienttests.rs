@@ -11,6 +11,7 @@ mod client_tests {
     use std::collections::HashMap;
     use std::env;
     use tdameritradeclient::model::account::AccountRoot;
+    use tdameritradeclient::model::instrument::{InstrumentSearch, FundamentalDetails};
     use tdameritradeclient::model::pricehistory::History;
     use tdameritradeclient::model::quote::Quote;
     use tdameritradeclient::model::userprincipals::UserPrincipals;
@@ -218,6 +219,27 @@ mod client_tests {
         assert_eq!(resptxt.contains("\"cusip\""), true);
     }
     
+    #[test]
+    fn able_to_retrieve_instrument_fundamentals_into_model() {
+        let c = initialize_client();
+        let fundamentals = serde_json::from_value::<HashMap<String, InstrumentSearch>>(
+            c
+            .get(
+                &Endpoint::Instruments,
+                &[
+                    param::Instruments::Symbol("INTC,TRP"),
+                    param::Instruments::SearchType("fundamental"),
+                ],
+            )
+            .unwrap()
+        ).unwrap();
+        println!("{:?}", fundamentals);
+        assert_eq!(fundamentals.len(), 2);
+        let intc_fundamental = fundamentals.get("INTC".into()).unwrap();
+        assert!(matches!(intc_fundamental, InstrumentSearch::Fundamental(_)));
+    }
+
+
 
 
 
