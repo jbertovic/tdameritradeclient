@@ -2,8 +2,7 @@
 
 ## Note Version 0.4.6 Changes
 - Added features to help use tests when Env Variables are set; TDAUTHTOKEN, TDREFRESHTOKEN, TDCLIENTKEY
-- Added model::instrument::fundamental model for instrument endpoint
-- 
+- Added model::instrument::InstrumentSearch model for instrument endpoint that contains fundamental data
 
 ## Note Version 0.4.5 Changes
 - (BREAKING CHANGE) all reqests (get, post, put, patch and delete) will now return `Result<T, TDAClientError>` instead of just `T`
