@@ -64,7 +64,7 @@ pub struct QEquity {
     pub net_percent_change_in_double: f64,
     pub mark_change_in_double: f64,
     #[serde(flatten)]
-    extra: HashMap<String, Value>,
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -91,7 +91,7 @@ pub struct QIndex {
     pub security_status: String,
     pub net_percent_change_in_double: f64,
     #[serde(flatten)]
-    extra: HashMap<String, Value>,
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -146,7 +146,7 @@ pub struct QOption {
     pub days_to_expiration: i64,
     pub implied_yield: f64,
     #[serde(flatten)]
-    extra: HashMap<String, Value>,
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -176,7 +176,7 @@ pub struct QFund {
     pub security_status: String,
     pub net_percent_change_in_double: f64,
     #[serde(flatten)]
-    extra: HashMap<String, Value>,
+    pub extra: HashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -185,7 +185,7 @@ pub struct QGeneral {
     pub asset_type: String,
     pub symbol: String,
     #[serde(flatten)]
-    extra: HashMap<String, Value>,
+    pub extra: HashMap<String, Value>,
 }
 
 impl Quote {

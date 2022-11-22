@@ -5,6 +5,8 @@ use serde::Deserialize;
 /// Deserialized through a HashMap<String, Instrument>
 /// String is Symbol
 ///
+///
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum InstrumentSearch {
